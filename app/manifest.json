@@ -14,8 +14,14 @@
   },
 
   "app":{
-      "background":{
-        "scripts": [ "background.js" ]
+      "background": {
+        "scripts": [ "namespace.js",
+                     "utils/StringUtils.js",
+                     "utils/LogUtil.js",
+                     "utils/ConsoleLogger.js", 
+                     "utils/Options.js",
+                     "coap/ChromeUdpClient.js",
+                     "background.js" ]
       }
   },
     
