@@ -1,6 +1,9 @@
 Copper.StringUtils = function(){
 };
 
+/**
+* @return current datetime formatted as 23.03.2016 15:29:33.214
+*/
 Copper.StringUtils.getDateTime = function() {
 	let currentdate = new Date(); 
 	let dd = currentdate.getDate().toString();
@@ -14,17 +17,22 @@ Copper.StringUtils.getDateTime = function() {
         " " + this.lpad(hh, 2) + ":" + this.lpad(mi, 2) + ":" + this.lpad(ss, 2) + "." + this.lpad(ms, 3);
 };
 
+/**
+* @return String of length len using the first len characters of str optionally left padding it with pad (default 0)
+*/
 Copper.StringUtils.lpad = function(str, len, pad){
-	if (typeof(pad) === "undefined") pad = "0";
-	if (str.length === len) {
+	if (!pad) pad = "0";
+	if (pad.length > 1) throw new Error("Length of padding <> 1");
+	if (typeof(len) !== "number") throw new Error("Illegal Arguments");
+	if (str && str.length === len) {
 		return str;
 	}
 	else {
 		res = [];
-		for (var i = 0; i < len - str.length; i++){
+		for (let i = 0; i < len - (str ? str.length : 0); i++){
 			res.push(pad);
 		}
-		res.push(str);
+		res.push(str ? (str.len < len ? str : str.substring(0, len)) : "");
 		return res.join("");
 	}
 };
