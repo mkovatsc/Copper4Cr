@@ -23,6 +23,7 @@
                      "utils/Options.js",
                      "coap/ChromeUdpClient.js",
                      "coap/CoapMessage.js",
+                     "coap/CoapMessageType.js", 
                      "coap/CoapMessageOptionHeader.js",
                      "coap/CoapMessageOption.js",
                      "background.js" ]
