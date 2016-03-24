@@ -1,5 +1,4 @@
 Copper.Options = function() {
-
 };
 
 Copper.Options.prototype.loggers = [];
