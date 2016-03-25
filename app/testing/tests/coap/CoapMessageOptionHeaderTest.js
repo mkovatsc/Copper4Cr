@@ -1,4 +1,4 @@
-QUnit.test("OptionHeader", function(assert) {
+QUnit.test("CoapMessageOptionHeader: Object", function(assert) {
 	let uriHost = new Copper.CoapMessage.OptionHeader(3, "Uri-Host", Copper.CoapMessage.OptionHeader.TYPE_STRING, 1, 255, false);
 	let etag = new Copper.CoapMessage.OptionHeader(4, "Etag", Copper.CoapMessage.OptionHeader.TYPE_OPAQUE, 1, 8, true);
 	let size1 = new Copper.CoapMessage.OptionHeader(60, "Size1", Copper.CoapMessage.OptionHeader.TYPE_UINT, 0, 4, false);
@@ -15,7 +15,7 @@ QUnit.test("OptionHeader", function(assert) {
 	assert.deepEqual(uriHost.clone(), uriHost);
 });
 
-QUnit.test("getOptionHeader", function(assert) {
+QUnit.test("CoapMessageOptionHeader: getOptionHeader", function(assert) {
 	assert.deepEqual(Copper.CoapMessage.OptionHeader.IF_MATCH, Copper.CoapMessage.OptionHeader.getOptionHeader(1));
 	assert.deepEqual(Copper.CoapMessage.OptionHeader.SIZE1, Copper.CoapMessage.OptionHeader.getOptionHeader(60));
 	assert.deepEqual("Unknown", Copper.CoapMessage.OptionHeader.getOptionHeader(10).name);
@@ -34,7 +34,7 @@ QUnit.test("getOptionHeader", function(assert) {
 	});
 });
 
-QUnit.test("getOptionHeaderForName", function(assert) {
+QUnit.test("CoapMessageOptionHeader: getOptionHeaderForName", function(assert) {
 	assert.deepEqual(Copper.CoapMessage.OptionHeader.IF_MATCH, Copper.CoapMessage.OptionHeader.getOptionHeaderForName("If-Match"));
 	assert.deepEqual("Unknown", Copper.CoapMessage.OptionHeader.getOptionHeaderForName("Something").name);
 	assert.deepEqual(Copper.CoapMessage.OptionHeader.SIZE1, Copper.CoapMessage.OptionHeader.getOptionHeaderForName("Size1"));

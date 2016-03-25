@@ -23,12 +23,12 @@ Copper.StringUtils.getDateTime = function() {
 Copper.StringUtils.lpad = function(str, len, pad){
 	if (!pad) pad = "0";
 	if (pad.length > 1) throw new Error("Length of padding <> 1");
-	if (typeof(len) !== "number") throw new Error("Illegal Arguments");
+	if (typeof(len) !== "number" || (str !== null && typeof(str) !== "string")) throw new Error("Illegal Arguments");
 	if (str && str.length === len) {
 		return str;
 	}
 	else {
-		res = [];
+		let res = [];
 		for (let i = 0; i < len - (str ? str.length : 0); i++){
 			res.push(pad);
 		}

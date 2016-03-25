@@ -1,4 +1,4 @@
-QUnit.test("getMessageType", function(assert) {
+QUnit.test("CoapMessageType: getMessageType", function(assert) {
 	assert.deepEqual(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Type.getType(0));
 	assert.deepEqual(Copper.CoapMessage.Type.ACK, Copper.CoapMessage.Type.getTypeForName("ACK"));
 

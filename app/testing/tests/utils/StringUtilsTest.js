@@ -1,4 +1,4 @@
-QUnit.test("lpadTest", function(assert) {
+QUnit.test("StringUtils: lpadTest", function(assert) {
 	assert.deepEqual(Copper.StringUtils.lpad("teststring", 3), "tes");
 	assert.deepEqual(Copper.StringUtils.lpad("Teststring", 3), "Tes");
 	assert.deepEqual(Copper.StringUtils.lpad("", 3), "000");
@@ -17,8 +17,11 @@ QUnit.test("lpadTest", function(assert) {
 	assert.throws(function(){
 		Copper.StringUtils.lpad("12", 4, "ab")
 	});
+	assert.throws(function(){
+		Copper.StringUtils.lpad(2, 4, "ab")
+	});
 });
 
-QUnit.test("GetDateTimeTest", function(assert) {
+QUnit.test("StringUtils: getDateTimeTest", function(assert) {
 	assert.ok(Copper.StringUtils.getDateTime().match("^\\d\\d\\.\\d\\d\\.20\\d\\d [0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d\\d\\d$"), "getDateTime format");
 });

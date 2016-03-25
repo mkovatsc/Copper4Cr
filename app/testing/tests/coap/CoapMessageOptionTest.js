@@ -1,4 +1,4 @@
-QUnit.test("Option", function(assert) {
+QUnit.test("CoapMessageOption: Object", function(assert) {
 	let optionHeader = new Copper.CoapMessage.OptionHeader(3, "Uri-Host", Copper.CoapMessage.OptionHeader.TYPE_STRING, 2, 255, false);
 
 	assert.deepEqual(new Copper.CoapMessage.Option(optionHeader), new Copper.CoapMessage.Option(optionHeader));
