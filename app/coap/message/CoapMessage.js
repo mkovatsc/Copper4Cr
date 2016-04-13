@@ -8,9 +8,9 @@ Copper.CoapMessage = function(type, code){
 	this.type = type;
 	this.code = code;
 	this.mid = undefined;
-	this.token = undefined;
+	this.token = new ArrayBuffer(0);
 	this.options = new Object();
-	this.payload = null;
+	this.payload = new ArrayBuffer(0);
 };
 
 Copper.CoapMessage.prototype.version = Copper.CoapConstants.VERSION;
@@ -32,7 +32,7 @@ Copper.CoapMessage.prototype.setMid = function(mid){
 * @return: this for method chaining
 */
 Copper.CoapMessage.prototype.setToken = function(token){
-	if (token !== undefined && (!(token instanceof ArrayBuffer) || token.byteLength > 8)){
+	if (token === undefined || !(token instanceof ArrayBuffer) || token.byteLength > 8){
 		throw new Error("Illegal argument");	
 	}
 	this.token = token;
@@ -53,11 +53,21 @@ Copper.CoapMessage.prototype.addOption = function(optionHeader, val, replace){
 	if (!this.options[optionHeader.number]){
 		this.options[optionHeader.number] = new Copper.CoapMessage.Option(optionHeader);
 	}
-	if (replace){
-		this.options[optionHeader.number].setValue(val);	
+	if (val instanceof ArrayBuffer){
+		if (replace){
+			this.options[optionHeader.number].setByteValue(val);	
+		}
+		else {
+			this.options[optionHeader.number].addByteValue(val);		
+		}
 	}
 	else {
-		this.options[optionHeader.number].addValue(val);		
+		if (replace){
+			this.options[optionHeader.number].setValue(val);	
+		}
+		else {
+			this.options[optionHeader.number].addValue(val);		
+		}
 	}
 	return this;
 };
@@ -80,13 +90,26 @@ Copper.CoapMessage.prototype.getOption = function(optionHeader){
 	}
 };
 
+/**
+* @return: an array containing all options set (options are sorted asc according to their number)
+*/
+Copper.CoapMessage.prototype.getOptions = function(){
+	let optionNos = Object.keys(this.options);
+	optionNos.sort(function(a, b){return Number.parseInt(a) - Number.parseInt(b)});
+	let res = [];
+	for (let i=0; i<optionNos.length; i++){
+		res.push(this.options[optionNos[i]]);
+	}
+	return res;
+};
+
 /*
 * Sets the payload of the message
 * @arg payload: payload in form of an array buffer
 * @return: this for method chaining
 */
 Copper.CoapMessage.prototype.setPayload = function(payload){
-	if (payload !== undefined && (!(payload instanceof ArrayBuffer))){
+	if (payload === undefined || !(payload instanceof ArrayBuffer)){
 		throw new Error("Illegal argument");	
 	}
 	this.payload = payload;

@@ -30,12 +30,14 @@ QUnit.test("CoapMessage: Object", function(assert) {
 	assert.deepEqual(msg.getOption(etagHeader), undefined);
 	assert.deepEqual(msg.getOption(maxAgeHeader), 60); // default value
 
-	msg.addOption(uriOptionHeader, "vs0.inf.ethz.ch").addOption(uriOptionHeader, "vs1.inf.ethz.ch", true);
-	assert.deepEqual(msg.getOption(uriOptionHeader), "vs1.inf.ethz.ch");
-
 	msg.addOption(etagHeader, "0x4444");
 	assert.deepEqual(msg.getOption(etagHeader), ["0x4444"]);
 
 	msg.addOption(etagHeader, "0xF3F2F1F0");
 	assert.deepEqual(msg.getOption(etagHeader), ["0x4444", "0xF3F2F1F0"]);
+
+	msg.addOption(uriOptionHeader, "vs0.inf.ethz.ch").addOption(uriOptionHeader, "vs1.inf.ethz.ch", true);
+	assert.deepEqual(msg.getOption(uriOptionHeader), "vs1.inf.ethz.ch");
+
+	assert.deepEqual(msg.getOptions(), [msg.options[uriOptionHeader.number], msg.options[etagHeader.number]]);
 });

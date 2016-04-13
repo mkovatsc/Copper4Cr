@@ -44,6 +44,19 @@ Copper.CoapMessage.Option.prototype.addByteValue = function(byteVal) {
 	return this;
 };
 
+/*
+* Sets or overwrites the option value
+* @val: ArrayBuffer containing the data
+* @return: option (for method chaining)
+*/
+Copper.CoapMessage.Option.prototype.setByteValue = function(val) {
+	if (this.val.length > 0){
+		this.resetValue();
+	}
+	return this.addByteValue(val);
+};
+
+
 /**
 * Sets the option value or adds a value in case of options that support multiple values. 
 * @val: Data in the right format
