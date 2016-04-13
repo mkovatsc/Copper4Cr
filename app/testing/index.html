@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Copper Tests</title>
+  <link rel="stylesheet" href="qunit-1.22.0.css">
+</head>
+<body>
+  <!-- QUnit -->
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src="qunit-1.22.0.js"></script>
+
+  <!-- Scripts under Test -->
+  <script src="../namespace.js"></script>
+  <script src="../utils/Utils.js"></script>
+  <script src="../utils/StringUtils.js"></script>
+  <script src="../utils/ByteUtils.js"></script>
+  <script src="../utils/LogUtil.js"></script>
+  <script src="../utils/ConsoleLogger.js"></script>
+  <script src="../utils/Options.js"></script>
+  <script src="../coap/ChromeUdpClient.js"></script>
+  <script src="../coap/CoapConstants.js"></script>
+  <script src="../coap/message/CoapMessage.js"></script>
+  <script src="../coap/message/CoapMessageType.js"></script>
+  <script src="../coap/message/CoapMessageCode.js"></script>
+  <script src="../coap/message/CoapMessageOptionHeader.js"></script>
+  <script src="../coap/message/CoapMessageBlockOption.js"></script>
+  <script src="../coap/message/CoapMessageOption.js"></script>
+  <script src="../coap/message/CoapMessageSerializer.js"></script>
+  
+  <!--<script src="../background.js"></script>-->
+  
+  <!-- Tests -->
+  <script src="tests/utils/StringUtilsTest.js"></script>
+  <script src="tests/utils/ByteUtilsTest.js"></script>
+  <script src="tests/coap/message/CoapMessageTypeTest.js"></script>
+  <script src="tests/coap/message/CoapMessageCodeTest.js"></script>
+  <script src="tests/coap/message/CoapMessageOptionHeaderTest.js"></script>
+  <script src="tests/coap/message/CoapMessageBlockOptionTest.js"></script>
+  <script src="tests/coap/message/CoapMessageOptionTest.js"></script>
+  <script src="tests/coap/message/CoapMessageTest.js"></script>
+  <script src="tests/coap/message/CoapMessageSerializerTest.js"></script>
+</body>
+</html>

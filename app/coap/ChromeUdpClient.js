@@ -59,13 +59,13 @@ Copper.ChromeUdpClient.prototype.bind = function(onReady){
 			}
 		});
 	});
-}
+};
 
 /* Adds a callback which is called if data is received. Callback should take a datagram as an argument 
 *  @param function callback*/
 Copper.ChromeUdpClient.prototype.addCallback = function(callback){
 	this.callbacks.push(callback);
-}
+};
 
 /* Sends a datagram */
 Copper.ChromeUdpClient.prototype.send = function(datagram){
@@ -88,7 +88,7 @@ Copper.ChromeUdpClient.prototype.send = function(datagram){
 		});
 		return true;
 	}
-}
+};
 
 /* Closes the socket, releases resources */
 Copper.ChromeUdpClient.prototype.shutdown = function() {
@@ -96,7 +96,7 @@ Copper.ChromeUdpClient.prototype.shutdown = function() {
 	chrome.sockets.udp.close(this.socketId, function(){
 		this.socketId = undefined;
 	});
-}
+};
 
 
 /* ------ Implementation -------- */
@@ -107,10 +107,10 @@ Copper.ChromeUdpClient.prototype.onReceive = function(info){
 		Copper.LogUtil.logInfo("Received: " + dataView.getInt32(0).toString(16), this.options);
 		// TODO: callbacks
 	}
-}
+};
 
 Copper.ChromeUdpClient.prototype.onReceiveError = function(info){
 	if (info.socketId == this.socketId){
 		Copper.LogUtil.logError("Error " + info.resultCode + " while receiving data on udp socket.", this.options)
 	}
-}
+};

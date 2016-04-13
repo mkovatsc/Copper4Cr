@@ -16,11 +16,20 @@
   "app":{
       "background": {
         "scripts": [ "namespace.js",
+                     "utils/Utils.js",
                      "utils/StringUtils.js",
+                     "utils/ByteUtils.js",
                      "utils/LogUtil.js",
                      "utils/ConsoleLogger.js", 
                      "utils/Options.js",
                      "coap/ChromeUdpClient.js",
+                     "coap/CoapConstants.js",
+                     "coap/message/CoapMessage.js",
+                     "coap/message/CoapMessageType.js", 
+                     "coap/message/CoapMessageCode.js", 
+                     "coap/message/CoapMessageOptionHeader.js",
+                     "coap/message/CoapMessageBlockOption.js",
+                     "coap/message/CoapMessageOption.js",
                      "background.js" ]
       }
   },
