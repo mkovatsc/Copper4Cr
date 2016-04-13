@@ -1,4 +1,4 @@
-Copper.CoapMessage.OptionHeader = function(number, name, type, minLen, maxLen, multipleValues, defaultVal){
+Copper.CoapMessage.OptionHeader = function(number, name, type, minLen, maxLen, multipleValues, defaultValue){
 	if ((minLen && !Number.isInteger(minLen)) || (maxLen && !Number.isInteger(maxLen))){
 		throw new Error("Invalid Arguments");
 	}
@@ -12,7 +12,7 @@ Copper.CoapMessage.OptionHeader = function(number, name, type, minLen, maxLen, m
 	this.minLen = minLen ? minLen : 0;
 	this.maxLen = maxLen ? maxLen : 0;
 	this.multipleValues = multipleValues ? true : false;
-	this.defaultVal = defaultVal ? defaultVal : undefined;
+	this.defaultValue = defaultValue !== undefined ? defaultValue : undefined;
 };
 
 /* Constants */

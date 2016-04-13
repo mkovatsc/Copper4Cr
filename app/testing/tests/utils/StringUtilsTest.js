@@ -5,6 +5,7 @@ QUnit.test("StringUtils: lpadTest", function(assert) {
 	assert.deepEqual(Copper.StringUtils.lpad(null, 3), "000");
 	assert.deepEqual(Copper.StringUtils.lpad(null, 3, "a"), "aaa");
 	assert.deepEqual(Copper.StringUtils.lpad("test", 0), "");
+	assert.deepEqual(Copper.StringUtils.lpad("112", 3), "112");
 	assert.deepEqual(Copper.StringUtils.lpad("12", 3), "012");
 	assert.deepEqual(Copper.StringUtils.lpad("12", 4), "0012");
 	assert.deepEqual(Copper.StringUtils.lpad("12", 4, "a"), "aa12");
