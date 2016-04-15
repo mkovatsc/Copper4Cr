@@ -2,12 +2,110 @@
 <html>
 <head>
 	<meta charset="utf-8"/>
+	<meta name="viewport" content="width = device-width, initial-scale = 1">
+
 	<title>Copper</title>
+	
 	<link rel="stylesheet" type="text/css" href="css/reset.css"/>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
-    <script type="text/javascript" src="index.js"></script>
+
 </head>
 <body>
-    <h1>Copper</h1>
+
+<div id="menu-bar">
+	<div id= "menu-group" class="btn-group btn-group-lg" role="group" aria-label="...">
+		<button onclick="onClickDiscover()" type="button" class="btn btn-default">
+				<span class="glyphicon glyphicon-search" aria-hidden="true"></span> Discover
+		</button>
+		<button onclick="onClickPing()" type="button" class="btn btn-default border-right">
+				<span class="glyphicon glyphicon-record" aria-hidden="true"></span> Ping
+		</button>
+	</div>
+	
+	<div id= "menu-group" class="btn-group btn-group-lg" role="group" aria-label="...">
+		<button onclick="onClickGet()" type="button" class="btn btn-default">
+				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> GET
+		</button>
+		<button onclick="onClickPost()" type="button" class="btn btn-default">
+				<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> POST
+		</button>
+		<button onclick="onClickPut()" type="button" class="btn btn-default">
+				<span class="glyphicon glyphicon-save" aria-hidden="true"></span> PUT
+		</button>
+		<button onclick="onClickDelete()" type="button" class="btn btn-default">
+				<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> DELETE
+		</button>
+		<button onclick="onClickObserve()" type="button" class="btn btn-default">
+				<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Observe
+		</button>
+	</div>
+	
+	<p> Payload:</p>
+	
+	<div id="payload-dropdown">
+		<div class="btn-group">
+		<button type="button" class="form-control btn btn-default dropdown-toggle" data-toggle="dropdown">
+				Text
+			<!-- Display icon in button -->
+			<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+
+				<li><a href="#">Text</a></li>
+				<li><a href="#">File</a></li>
+			</ul>
+		</div>
+	</div>
+	
+	<div id="behaviour-dropdown">
+		<div class="btn-group">
+		<button type="button" class="form-control btn btn-default dropdown-toggle" data-toggle="dropdown">
+				Behaviour
+			<!-- Display icon in button -->
+			<span class="caret"></span>
+			</button>
+			<ul class="dropdown-menu" role="menu">
+
+				<li><a href="#">Text</a></li>
+				<li><a href="#">File</a></li>
+			</ul>
+		</div>
+	</div>
+	
+	<div id="coap-button">
+		<button onclick="onClickCoap()" type="button" class="btn btn-default">
+			 Coap
+		</button>
+	</div>
+</div>
+
+<!-- MENU BAR DONE -->
+
+
+<div id="sidebar-right">
+</div>
+
+<div id="request">
+</div>
+	
+<div id="container-down">
+	<div id="sidebar-left">
+	
+	</div>
+	<div id="upper">
+		<div id="left-column">
+		</div>
+		<div id="right-column">
+		</div>
+	</div>
+	<div id="info">
+	
+	</div>
+</div>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+	<script src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="index.js"></script>
 </body>
 </html>
