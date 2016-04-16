@@ -40,4 +40,5 @@ QUnit.test("CoapMessage: Object", function(assert) {
 	assert.deepEqual(msg.getOption(uriOptionHeader), "vs1.inf.ethz.ch");
 
 	assert.deepEqual(msg.getOptions(), [msg.options[uriOptionHeader.number], msg.options[etagHeader.number]]);
+	assert.ok(msg.toString());
 });

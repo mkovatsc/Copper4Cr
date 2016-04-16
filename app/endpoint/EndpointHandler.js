@@ -1,0 +1,3 @@
+Copper.EndpointHandler = function(){
+
+};
