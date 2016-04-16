@@ -9,6 +9,7 @@ Copper.CoapMessageSerializer.serialize = function(msg){
 	if (!(msg instanceof Copper.CoapMessage)){
 		throw new Error("Invalid Arguments");
 	}
+
 	// determine size of the resulting message
 	// header & token
 	let sz = 4 + msg.token.byteLength;
@@ -51,61 +52,80 @@ Copper.CoapMessageSerializer.serialize = function(msg){
 	}
 
 	// payload
-	serMsg[idx++] = 0xFF;
-	serMsg.set(new Uint8Array(msg.payload), idx);
+	if (msg.payload.byteLength > 0){
+		serMsg[idx++] = 0xFF;
+		serMsg.set(new Uint8Array(msg.payload), idx);
+	}
 	return buffer;
 };
 
 /**
 * @arg buffer: ArrayBuffer representing a CoapMessage
-* @return: deserialized Copper.CoapMessage object (RFC7252)
+* @return: object containing message (deserialized Copper.CoapMessage object (RFC7252))
+*                            error (string describing error if message was not deserialized)
+*                            warnings (array of strings if problems occured during deserialization)
 */
 Copper.CoapMessageSerializer.deserialize = function(buffer){
 	if (!(buffer instanceof ArrayBuffer)){
 		throw new Error("Invalid Arguments");
 	}
+	let result = {
+		message: undefined, 
+		error: undefined, 
+		warnings: []
+	};
+
 	let serMsg = new Uint8Array(buffer);
 
 	// header & token
 	if (Copper.CoapConstants.VERSION !== ((serMsg[0] >>> 6) & 0x03)) {
-		throw new Error("Cannot handle coap version different from 1");
+		result.error = "Cannot handle coap version different from 1";
+		return result;
 	}
 
-	let resMsg = new Copper.CoapMessage(
-		Copper.CoapMessage.Type.getType((serMsg[0] >>> 4) & 0x03),
-		Copper.CoapMessage.Code.getCode(serMsg[1]));
+	try {
+		let resMsg = new Copper.CoapMessage(
+			Copper.CoapMessage.Type.getType((serMsg[0] >>> 4) & 0x03),
+			Copper.CoapMessage.Code.getCode(serMsg[1]));
+		result.message = resMsg;
 
-	resMsg.setMid(Copper.ByteUtils.convertBytesToUint(buffer, 2, 2));
-	
-	let tokenLen = serMsg[0] & 0x0F;
-	if (tokenLen > 8){
-		throw new Error("Token length is greater than 8");
-	}
-	resMsg.setToken(buffer.slice(4, 4 + tokenLen));
-
-	// options
-	let idx = 4 + tokenLen;
-	let lastOptNumber = 0;
-	while (idx < buffer.byteLength && serMsg[idx] !== 0xFF){
-		let optionDeltaNibble = (serMsg[idx] >>> 4);
-		let addOptionDelta = optionDeltaNibble - Math.min(12, optionDeltaNibble); 
-		let optionSizeNibble = (serMsg[idx] & 0x0F) >>> 0;
-		let addOptionSize = optionSizeNibble - Math.min(12, optionSizeNibble); 
+		resMsg.setMid(Copper.ByteUtils.convertBytesToUint(buffer, 2, 2));
 		
-		idx++;
-		lastOptNumber += optionDeltaNibble + Copper.ByteUtils.convertBytesToUint(buffer, idx, addOptionDelta);
-		idx += addOptionDelta;
+		let tokenLen = serMsg[0] & 0x0F;
+		if (tokenLen > 8){
+			result.warnings.push("Token length is greater than 8");
+		}
+		resMsg.setToken(buffer.slice(4, 4 + Math.min(tokenLen, 8)));
 
-		let optionSize = optionSizeNibble + Copper.ByteUtils.convertBytesToUint(buffer, idx, addOptionSize);
-		idx += addOptionSize;
-		resMsg.addOption(Copper.CoapMessage.OptionHeader.getOptionHeader(lastOptNumber), buffer.slice(idx, idx + optionSize));
+		// options
+		let idx = 4 + tokenLen;
+		let lastOptNumber = 0;
+		while (idx < buffer.byteLength && serMsg[idx] !== 0xFF){
+			let optionDeltaNibble = (serMsg[idx] >>> 4);
+			let addOptionDelta = optionDeltaNibble - Math.min(12, optionDeltaNibble); 
+			let optionSizeNibble = (serMsg[idx] & 0x0F) >>> 0;
+			let addOptionSize = optionSizeNibble - Math.min(12, optionSizeNibble); 
+			
+			idx++;
+			lastOptNumber += optionDeltaNibble + Copper.ByteUtils.convertBytesToUint(buffer, idx, addOptionDelta);
+			idx += addOptionDelta;
 
-		idx += optionSize;
+			let optionSize = optionSizeNibble + Copper.ByteUtils.convertBytesToUint(buffer, idx, addOptionSize);
+			idx += addOptionSize;
+			try {
+				resMsg.addOption(Copper.CoapMessage.OptionHeader.getOptionHeader(lastOptNumber), buffer.slice(idx, idx + optionSize));
+			} catch (exception) {
+				result.warnings.push("Error adding option " + lastOptNumber + ": " + exception.message);
+			}
+			idx += optionSize;
+		}
+		if (idx < buffer.byteLength){
+			resMsg.setPayload(buffer.slice(idx+1));
+		}
+	} catch(exception) {
+		result.error = exception.message;	
 	}
-	if (idx < buffer.byteLength){
-		resMsg.setPayload(buffer.slice(idx+1));
-	}
-	return resMsg;
+	return result;
 };
 
 //----------- Helpers --------------

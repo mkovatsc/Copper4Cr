@@ -72,6 +72,17 @@ Copper.CoapMessage.prototype.addOption = function(optionHeader, val, replace){
 	return this;
 };
 
+/**
+* Removes all option values for the given header
+* @arg optionHeader: header of the option to be removed
+*/
+Copper.CoapMessage.prototype.removeOption = function(optionHeader){
+	if (!(optionHeader instanceof Copper.CoapMessage.OptionHeader)){
+		throw new Error("Illegal argument");
+	}
+	delete this.options[optionHeader.number];
+};
+
 /*
 * @arg optionHeader: header of the option of which the values should be retrieved
 * @return if option is not set: default value (which may be undefined)

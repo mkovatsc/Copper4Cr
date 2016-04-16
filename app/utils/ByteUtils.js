@@ -66,6 +66,7 @@ Copper.ByteUtils.convertStringToBytes = function(str, ascii, strict){
 		throw new Error("Illegal Arguments");
 	}
 	let useUtf8 = ascii ? false : true;
+	strict = strict ? true : false;
 	let resSize = 0;
 	for (let i=0; i<str.length; i++){
 		let c = str.charCodeAt(i);
@@ -119,6 +120,7 @@ Copper.ByteUtils.convertBytesToString = function(buf, offset, length, ascii, str
 	}
 	let bufView = new Uint8Array(buf, (offset ? offset : 0), (length ? length : undefined));
 	let useUtf8 = ascii ? false : true;
+	strict = strict ? true : false;
 
 	let str = [];
 	for (let idx=0; idx<bufView.byteLength; ){
