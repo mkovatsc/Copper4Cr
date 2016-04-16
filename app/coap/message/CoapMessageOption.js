@@ -60,13 +60,18 @@ Copper.CoapMessage.Option.prototype.setByteValue = function(val) {
 /**
 * Sets the option value or adds a value in case of options that support multiple values. 
 * @val: Data in the right format
+* @arg opts: object with optional options. The following can be set:
+*             useUtf8 --> set to false if ascii encoding should be used
+*             strict --> set to true in order to throw errors instead of skipping error parts
 * @return: option (for method chaining)
 */
-Copper.CoapMessage.Option.prototype.addValue = function(val) {
+Copper.CoapMessage.Option.prototype.addValue = function(val, opts) {
+	let ascii = opts !== undefined && opts.useUtf8 === false;
+	let strict = opts !== undefined && opts.strict === true;
 	let Types = Copper.CoapMessage.OptionHeader;
 	switch(this.header.type) {
 		case Types.TYPE_EMPTY:
-			if (val === null || val === 0){
+			if (val === undefined || val === null || val === 0){
 				this.addByteValue(new ArrayBuffer(0));
 				break;
 			}
@@ -82,7 +87,7 @@ Copper.CoapMessage.Option.prototype.addValue = function(val) {
 			throw new Error("Illegal Argument");
 		case Types.TYPE_STRING:
 			if (typeof(val) === "string"){
-				this.addByteValue(Copper.ByteUtils.convertStringToBytes(val));
+				this.addByteValue(Copper.ByteUtils.convertStringToBytes(val, ascii, strict));
 				break;
 			}
 			throw new Error("Illegal Argument");
@@ -101,21 +106,29 @@ Copper.CoapMessage.Option.prototype.addValue = function(val) {
 /*
 * Sets or overwrites the option value
 * @val: Data in the right format (depending on the option header)
+* @arg opts: object with optional options. The following can be set:
+*             useUtf8 --> set to false if ascii encoding should be used
+*             strict --> set to true in order to throw errors instead of skipping error parts
 * @return: option (for method chaining)
 */
-Copper.CoapMessage.Option.prototype.setValue = function(val) {
+Copper.CoapMessage.Option.prototype.setValue = function(val, opts) {
 	if (this.val.length > 0){
 		this.resetValue();
 	}
-	return this.addValue(val);
+	return this.addValue(val, opts);
 };
 
 
 /*
+* @arg opts: object with optional options. The following can be set:
+*             useUtf8 --> set to false if ascii encoding should be used
+*             strict --> set to true in order to throw errors instead of skipping error parts
 * @return: for multi-valued options: array containing all converted values, empty if no value set,
 *          for single-valued: converted value, undefined if not set
 */
-Copper.CoapMessage.Option.prototype.getValue = function() {
+Copper.CoapMessage.Option.prototype.getValue = function(opts) {
+	let ascii = opts !== undefined && opts.useUtf8 === false;
+	let strict = opts !== undefined && opts.strict === true;
 	let val = this.val;
 	if (val.length === 0){
 		return this.header.multipleValues ? [] : undefined;
@@ -132,7 +145,7 @@ Copper.CoapMessage.Option.prototype.getValue = function() {
 					res.push(Copper.ByteUtils.convertBytesToHexString(val[i]));
 					break;
 				case Types.TYPE_STRING:
-					res.push(Copper.ByteUtils.convertBytesToString(val[i]));
+					res.push(Copper.ByteUtils.convertBytesToString(val[i], ascii, strict));
 					break;
 				case Types.TYPE_UINT:
 					res.push(Copper.ByteUtils.convertBytesToUint(val[i]));

@@ -30,6 +30,7 @@
                      "coap/message/CoapMessageOptionHeader.js",
                      "coap/message/CoapMessageBlockOption.js",
                      "coap/message/CoapMessageOption.js",
+                     "coap/message/CoapMessageSerializer.js",
                      "background.js" ]
       }
   },
