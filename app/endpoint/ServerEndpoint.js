@@ -23,12 +23,12 @@ Copper.ServerEndpoint = function(port, id){
 	let thisRef = this;
 
 	this.eventCallback = function(event){
-		thisRef.dispatchEvent(event);
+		return thisRef.dispatchEvent(event);
 	};
 	Copper.Event.registerCallback(this.eventCallback);
 
-	this.state = Copper.Endpoint.STATE_CONNECTED;
-	Copper.Log.logFine("Server Endpoint " + id + " created");
+	this.state = Copper.ServerEndpoint.STATE_CONNECTED;
+	Copper.Log.logFine("Server Endpoint " + this.id + " created");
 };
 
 /* State constants */
@@ -52,20 +52,20 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 			switch(event.type){
 				case Copper.Event.TYPE_ERROR:
 					Copper.Log.logError("Error on endpoint " + this.id + ": " + event.data.errorMessage);
-					break;
+					return true;
 				case Copper.Event.TYPE_CLIENT_DISCONNECTED:
-					this.onDisconnect();
-					break;
+					return this.onDisconnect();
 				case Copper.Event.TYPE_REGISTER_CLIENT:
-					this.onRegisterClient(event.data.remoteAddress, event.data.remotePort);
-					break;
+					return this.onRegisterClient(event.data.remoteAddress, event.data.remotePort, event.sender);
+					
 
 				default:
 					Copper.Log.logWarning("Unknown event type " + event.type);
-					break;
+					return false;
 			}
 		} catch (exception) {
 			this.onServerEndpointException(exception, event.sender);
+			return true;
 		}
 		return true;
 	}
@@ -86,10 +86,11 @@ Copper.ServerEndpoint.prototype.onDisconnect = function(){
 		}
 		Copper.Event.removeEventsForReceiver(this.id);
 		Copper.Event.unregisterCallback(this.eventCallback);
-		Copper.Log.logFine("Server Endpoint " + id + " closed");
+		Copper.Log.logFine("Server Endpoint " + this.id + " closed");
 		this.port.disconnect();
 		this.port = undefined;
 	}
+	return true;
 };
 
 Copper.ServerEndpoint.prototype.onRegisterClient = function(remoteAddress, remotePort, receiver){
@@ -105,11 +106,11 @@ Copper.ServerEndpoint.prototype.onRegisterClient = function(remoteAddress, remot
 		let thisRef = this;
 		this.udpClient.bind(function(bindSuccessful){
 								if (bindSuccessful){
-									this.state = Copper.ServerEndpoint.STATE_UDP_SOCKET_READY;
-									this.port.sendClientMessage(Copper.Event.createClientRegisteredEvent(receiver, this.id));
+									thisRef.state = Copper.ServerEndpoint.STATE_UDP_SOCKET_READY;
+									thisRef.port.sendClientMessage(Copper.Event.createClientRegisteredEvent(receiver, thisRef.id));
 								}
 								else {
-									this.port.sendClientMessage(Copper.Event.createErrorEvent("Error creating the socket", false, receiver, this.id))
+									thisRef.port.sendClientMessage(Copper.Event.createErrorEvent("Error creating the socket", false, receiver, thisRef.id))
 								}
 							},
 							function(datagram, remoteAddress, remotePort){
@@ -120,6 +121,7 @@ Copper.ServerEndpoint.prototype.onRegisterClient = function(remoteAddress, remot
 							}
 		);
 	}
+	return true;
 };
 
 Copper.ServerEndpoint.prototype.onReceiveDatagram = function(datagram, remoteAddress, remotePort){

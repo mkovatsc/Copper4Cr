@@ -30,7 +30,7 @@ Copper.ChromeServerPort.prototype.id = undefined;
 * Creation is on the prototype in order to use different UDP-Implemntations (testing, different browsers)
 */
 Copper.ChromeServerPort.prototype.createUdpClient = function(remoteAddress, remotePort){
-	return new ChromeUdpClient(remoteAddress, remotePort);
+	return new Copper.ChromeUdpClient(remoteAddress, remotePort);
 };
 
 /*
@@ -53,7 +53,10 @@ Copper.ChromeServerPort.prototype.onClientMessage = function(msg){
 };
 
 Copper.ChromeServerPort.prototype.onClientDisconnect = function(){
-	Copper.Event.sendEvent(Copper.Event.createClientDisconnectedEvent(this.id));
+	if (this.port !== undefined){
+		this.disconnect();
+		Copper.Event.sendEvent(Copper.Event.createClientDisconnectedEvent(this.id, 0));
+	}
 };
 
 Copper.ChromeServerPort.prototype.sendClientMessage = function(msg){

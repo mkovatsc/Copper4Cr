@@ -15,25 +15,28 @@
 
   "app":{
       "background": {
-        "scripts": [ "namespace.js",
+        "scripts": [ // shared part
+                     "shared/namespace.js",
 
-                     "utils/StringUtils.js",
-                     "utils/ByteUtils.js",
+                     "shared/utils/StringUtils.js",
+                     "shared/utils/ByteUtils.js",
 
-                     "logging/Log.js",
-                     "logging/ConsoleLogger.js",
+                     "shared/logging/Log.js",
+                     "shared/logging/ConsoleLogger.js",
 
-                     "events/Event.js",
+                     "shared/events/Event.js",
 
-                     "coap/Constants.js",
-                     "coap/CoapMessage.js",
-                     "coap/CoapMessageType.js", 
-                     "coap/CoapMessageCode.js", 
-                     "coap/CoapMessageOptionHeader.js",
-                     "coap/CoapMessageBlockOption.js",
-                     "coap/CoapMessageOption.js",
-                     "coap/CoapMessageSerializer.js",
+                     "shared/coap/Constants.js",
+                     "shared/coap/CoapMessage.js",
+                     "shared/coap/CoapMessageType.js", 
+                     "shared/coap/CoapMessageCode.js", 
+                     "shared/coap/CoapMessageOptionHeader.js",
+                     "shared/coap/CoapMessageBlockOption.js",
+                     "shared/coap/CoapMessageOption.js",
+                     "shared/coap/CoapMessageSerializer.js",
 
+                     
+                     //server part
                      "endpoint/ChromeUdpClient.js",
                      "endpoint/ChromeServerPort.js",
                      "endpoint/ServerEndpoint.js",

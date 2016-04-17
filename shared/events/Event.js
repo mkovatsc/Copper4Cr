@@ -28,9 +28,11 @@ Copper.Event.removeEventsForReceiver = function(receiver){
 	if (receiver === undefined || !Number.isInteger(receiver)){
 		throw new Error("Illegal Argument");
 	}
-	for (let i=0; i<this.queue.length; i++){
-		if (this.queue[i].receiver === receiver){
-			this.queue.splice(i, 1);
+	let oldQueue = this.queue;
+	Copper.Event.queue = [];
+	for (let i=0; i<oldQueue.length; i++){
+		if (oldQueue[i].receiver !== receiver){
+			Copper.Event.queue.push(oldQueue[i]);
 		}
 	}
 };
@@ -39,20 +41,20 @@ Copper.Event.sendEvent = function(event) {
 	if (!Number.isInteger(event.type)){
 		throw new Error("Illegal Arguments");
 	}
-	this.queue.push(event);
-	this.dispatchEvents();
+	Copper.Event.queue.push(event);
+	Copper.Event.dispatchEvents();
 };
 
 Copper.Event.dispatchEvents = function(){
-	let eventQueue = Copper.Event.queue;
+	let oldQueue = Copper.Event.queue;
 	Copper.Event.queue = [];
-	for (let i = 0; i < eventQueue.length; i++){
+	for (let i = 0; i < oldQueue.length; i++){
 		let processed = false;
 		for (let j = 0; j < this.callbacks.length; j++){
-			processed = this.callbacks[j](eventQueue[i]) || processed;
+			processed = this.callbacks[j](oldQueue[i]) || processed;
 		}
 		if (!processed){
-			this.queue.push(eventQueue[i]);
+			Copper.Event.queue.push(oldQueue[i]);
 		}
 	}
 };
