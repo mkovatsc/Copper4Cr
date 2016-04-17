@@ -1,6 +1,8 @@
+// Sends a coap ping to the vs0.inf.ethz.ch server
+// using the CoapMessages, Serialization and the ChromeUdpHandler
 chrome.app.runtime.onLaunched.addListener(function() {
 	
-	Copper.Log.registerLogger(Copper.ConsoleLogger);
+	Copper.Log.registerLogger(Copper.ConsoleLogger.log);
 
 	let udpClient = new Copper.ChromeUdpClient("vs0.inf.ethz.ch", 5683);
 
@@ -16,9 +18,9 @@ chrome.app.runtime.onLaunched.addListener(function() {
 			Copper.Log.logError("Could not bind socket");
 		}
 	};
-	let onReceive = function(datagram, remoteHost, remotePort){
+	let onReceive = function(datagram, remoteAddress, remotePort){
 		/* onReceive */
-		Copper.Log.logInfo("Received " + datagram.byteLength + " from " + remoteHost + ":" + remotePort);
+		Copper.Log.logInfo("Received " + datagram.byteLength + " from " + remoteAddress + ":" + remotePort);
 		let result = Copper.CoapMessageSerializer.deserialize(datagram);
 		if (result.message !== undefined){
 			Copper.Log.logInfo("CoapMessage\n" + result.message);	
@@ -28,12 +30,12 @@ chrome.app.runtime.onLaunched.addListener(function() {
 		}
 		Copper.Log.logInfo("Deserialization Warnings: " + result.warnings);
 		
-		udpClient.shutdown();
+		udpClient.close();
 	};
 	let onReceiveError = function(socketOpen){
 		/* onReceiveError */
 		Copper.Log.logError("Error");
-		udpClient.shutdown();
+		udpClient.close();
 	};
 	
 	udpClient.bind(onBind, onReceive, onReceiveError);

@@ -38,6 +38,6 @@
 /**
  * Copper namespace.
  */
-if ("undefined" == typeof(Copper)) {
+if (typeof(Copper) === "undefined") {
   var Copper = {};
 };

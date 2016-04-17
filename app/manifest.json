@@ -16,6 +16,7 @@
   "app":{
       "background": {
         "scripts": [ "namespace.js",
+
                      "utils/StringUtils.js",
                      "utils/ByteUtils.js",
 
@@ -34,12 +35,14 @@
                      "coap/CoapMessageSerializer.js",
 
                      "endpoint/ChromeUdpClient.js",
-                     "endpoint/Endpoint.js",
-                     "endpoint/EndpointHandler.js",
+                     "endpoint/ChromeServerPort.js",
+                     "endpoint/ServerEndpoint.js",
 
-                     // Perform a coap ping when starting the app
+                     "background.js"
+                     
+                     // Run test on the application by commenting background.js and uncommenting
+                     // one of the following lines
                      //"testing/integration/CoapPing.js"
-                     "background.js" 
                     ]
       }
   },

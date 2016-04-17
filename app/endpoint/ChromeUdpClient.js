@@ -1,29 +1,33 @@
 /* Implementation of the UDP Client interface for the Copper Chrome Application. 
 *
-*  Should be used in the following cycle:
-*  1. let udp = new Copper.ChromeUdpClient(string remotehost, number remoteport, Copper.Options options)
-*  2. udp.bind(function onReady, function onReceive, function onError)
-*  3. udp.send(ArrayBuffer datagram, function callback)
-*  4. udp.shutdown()
+*  STATE_CREATED            (Bind)
+*        |
+* bind   |  
+*        V  
+*   STATE_READY   (Send, Receive, Close)
+*        |
+* close  |
+*        V
+*   STATE_CLOSED
 */
 
-Copper.ChromeUdpClient = function(remotehost, remoteport){
-	if (typeof(remotehost) !== "string" || !Number.isInteger(remoteport) || remoteport <= 0x0 || remoteport > 0xFFFF) {
+Copper.ChromeUdpClient = function(remoteAddress, remotePort){
+	if (typeof(remoteAddress) !== "string" || !Number.isInteger(remotePort) || remotePort <= 0x0 || remotePort > 0xFFFF) {
 		throw new Error("Illegal Arguments");
 	}
-	this.remotehost = remotehost;
-	this.remoteport = remoteport;
+	this.remoteAddress = remoteAddress;
+	this.remotePort = remotePort;
 	this.state = Copper.ChromeUdpClient.STATE_CREATED;
 }
 
 /* State Constants */
 Copper.ChromeUdpClient.STATE_CREATED = 0;
 Copper.ChromeUdpClient.STATE_READY = 1;
-Copper.ChromeUdpClient.STATE_STOPPED = 2;
+Copper.ChromeUdpClient.STATE_CLOSED = 2;
 
 /* Properties */
-Copper.ChromeUdpClient.prototype.remotehost = undefined;
-Copper.ChromeUdpClient.prototype.remoteport = undefined;
+Copper.ChromeUdpClient.prototype.remoteAddress = undefined;
+Copper.ChromeUdpClient.prototype.remotePort = undefined;
 Copper.ChromeUdpClient.prototype.state = undefined;
 
 /* Callbacks */
@@ -65,9 +69,7 @@ Copper.ChromeUdpClient.prototype.bind = function(onBind, onReceive, onReceiveErr
 			else {
 				Copper.Log.logError("Error " + resultCode + " while binding udp socket.");
 			}
-			if (onBind !== undefined){
-				onBind(resultCode >= 0);
-			}
+			if (onBind !== undefined) onBind(resultCode >= 0);
 		});
 	});
 };
@@ -75,7 +77,7 @@ Copper.ChromeUdpClient.prototype.bind = function(onBind, onReceive, onReceiveErr
 /**
 * Sends a datagram 
 * @arg datagram: array buffer to send
-* @arg onSent(boolean successful, int bytesSent)
+* @arg onSent(boolean successful, int bytesSent, boolean socketOpen)
 */
 Copper.ChromeUdpClient.prototype.send = function(datagram, onSent){
 	if (!(datagram instanceof ArrayBuffer)){
@@ -85,22 +87,27 @@ Copper.ChromeUdpClient.prototype.send = function(datagram, onSent){
 		throw new Error("Socket not ready");
 	}
 	let thisRef = this;
-	chrome.sockets.udp.send(this.socketId, datagram, this.remotehost, this.remoteport, function(sendInfo) {
+	chrome.sockets.udp.send(this.socketId, datagram, this.remoteAddress, this.remotePort, function(sendInfo) {
 		if (sendInfo.resultCode < 0){
 			Copper.Log.logError("Error " + sendInfo.resultCode + " while sending data on udp socket.");
+			let thisRef = this;
+			chrome.sockets.udp.getInfo(this.socketId, function(socketInfo){
+				if (!(socketInfo.localPort > 0)) {
+					thisRef.close();
+				}
+				if (onSent !== undefined) onSent(false, 0, thisRef.state === Copper.ChromeUdpClient.STATE_READY);
+			});
 		}
 		else {
-			Copper.Log.logInfo("Sent " + sendInfo.bytesSent + " bytes to " + thisRef.remotehost + ":" + thisRef.remoteport);	
-		}
-		if (typeof(onSent) === "function"){
-			onSent(sendInfo.resultCode >= 0, sendInfo.bytesSent);
+			Copper.Log.logInfo("Sent " + sendInfo.bytesSent + " bytes to " + thisRef.remoteAddress + ":" + thisRef.remotePort);	
+			if (onSent !== undefined) onSent(sendInfo.resultCode >= 0, sendInfo.bytesSent);
 		}
 	});
 };
 
 /* Closes the socket, releases resources */
-Copper.ChromeUdpClient.prototype.shutdown = function() {
-	this.state = Copper.ChromeUdpClient.STATE_STOPPED;
+Copper.ChromeUdpClient.prototype.close = function() {
+	this.state = Copper.ChromeUdpClient.STATE_CLOSED;
 	if (this.socketId !== undefined){
 		chrome.sockets.udp.close(this.socketId, function(){
 			this.socketId = undefined;
@@ -113,9 +120,7 @@ Copper.ChromeUdpClient.prototype.shutdown = function() {
 Copper.ChromeUdpClient.prototype.onReceive = function(info){
 	if (info.socketId === this.socketId){
 		Copper.Log.logInfo("Received " + info.data.byteLength + " bytes from " + info.remoteAddress + ":" + info.remotePort);
-		if (this.onReceiveCallback !== undefined){
-			this.onReceiveCallback(info.data, info.remoteAddress, info.remotePort);
-		}
+		if (this.onReceiveCallback !== undefined) this.onReceiveCallback(info.data, info.remoteAddress, info.remotePort);
 	}
 };
 
@@ -123,13 +128,11 @@ Copper.ChromeUdpClient.prototype.onReceiveError = function(info){
 	if (info.socketId === this.socketId){
 		Copper.Log.logError("Error " + info.resultCode + " while receiving data on udp socket.");
 		let thisRef = this;
-		chrome.sockets.udp.getInfo(info.socketId, function(socketInfo){
+		chrome.sockets.udp.getInfo(this.socketId, function(socketInfo){
 			if (!(socketInfo.localPort > 0)) {
-				thisRef.shutdown();
+				thisRef.close();
 			}
-			if (thisRef.onReceiveErrorCallback !== undefined){
-				thisRef.onReceiveErrorCallback(thisRef.state === Copper.ChromeUdpClient.STATE_READY);
-			}
+			if (thisRef.onReceiveErrorCallback !== undefined) thisRef.onReceiveErrorCallback(thisRef.state === Copper.ChromeUdpClient.STATE_READY);
 		});
 	}
 };

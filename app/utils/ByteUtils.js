@@ -118,7 +118,9 @@ Copper.ByteUtils.convertBytesToString = function(buf, offset, length, ascii, str
 	if (!(buf instanceof ArrayBuffer) || (offset && (!Number.isInteger(offset) || offset < 0)) || (length && (!Number.isInteger(length) || length < 0))){
 		throw new Error("Illegal Arguments");
 	}
-	let bufView = new Uint8Array(buf, (offset ? offset : 0), (length ? length : undefined));
+	offset = offset ? offset : 0;
+	length = length ? length : (buf.byteLength - offset);
+	let bufView = new Uint8Array(buf, offset, length);
 	let useUtf8 = ascii ? false : true;
 	strict = strict ? true : false;
 
@@ -200,7 +202,9 @@ Copper.ByteUtils.convertBytesToUint = function(buf, offset, length){
 	if (buf.byteLength === 0 || length === 0){
 		return 0;
 	}
-	let bufView = new Uint8Array(buf, (offset ? offset : 0), (length ? length : undefined));
+	offset = offset ? offset : 0;
+	length = length ? length : (buf.byteLength - offset);
+	let bufView = new Uint8Array(buf, offset, length);
 	let res = 0;
 	for (let i=0; i<bufView.byteLength; i++){
 		res = (res << 8) | bufView[i];
@@ -222,7 +226,9 @@ Copper.ByteUtils.convertBytesToHexString = function(buf, offset, length){
 	if (buf.byteLength === 0 || length === 0){
 		return "0x0";
 	}
-	let bufView = new Uint8Array(buf, (offset ? offset : 0), (length ? length : undefined));
+	offset = offset ? offset : 0;
+	length = length ? length : (buf.byteLength - offset);
+	let bufView = new Uint8Array(buf, offset, length);
 	let res = ["0x"];
 	for (let i=0; i<bufView.byteLength; i++){
 		res.push(bufView[i].toString(16).toUpperCase());

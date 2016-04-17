@@ -16,11 +16,11 @@ Copper.Log.getLogLevelText = function(level){
 };
 
 // ------- Setup -----------
-Copper.Log.logLevel = Copper.Log.LEVEL_INFO;
+Copper.Log.logLevel = Copper.Log.LEVEL_ALL;
 Copper.Log.loggers = [];
 
 Copper.Log.registerLogger = function(logger){
-	if (!(typeof(logger.log) === "function")){
+	if (!(typeof(logger) === "function")){
 		throw new Error("Illegal Arguments");
 	}
 	this.loggers.push(logger);
@@ -47,7 +47,7 @@ Copper.Log.logError = function(error){
 Copper.Log.log = function(logLevel, text) {
 	if (this.logLevel <= logLevel){
 		for (let i = 0; i < this.loggers.length; i++){
-			this.loggers[i].log(logLevel, text);
+			this.loggers[i](logLevel, text);
 		}
 	}
 };
