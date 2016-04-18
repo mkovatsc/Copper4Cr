@@ -1,0 +1,2 @@
+Copper.Options = function() {
+};

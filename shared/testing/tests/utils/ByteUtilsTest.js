@@ -106,9 +106,16 @@ QUnit.test("ByteUtils: convertStringToBytes", function(assert) {
 	});
 });
 
-QUnit.test("ByteUtils: convertStringToBytes", function(assert) {
+QUnit.test("ByteUtils: convertBytesToHexString", function(assert) {
 	let str = String.fromCharCode(127) + String.fromCharCode(128) + String.fromCharCode(2047);
 	assert.deepEqual(Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertStringToBytes(str)), "0x7FC280DFBF");
 	let num = 232414325;
 	assert.deepEqual(Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertUintToBytes(num)), "0x" + num.toString(16).toUpperCase());
+});
+
+QUnit.test("ByteUtils: convertBytesToJson", function(assert) {
+	let data = 0x43241349;
+	let json = Copper.ByteUtils.convertBytesToJson(Copper.ByteUtils.convertUintToBytes(data));
+	console.log(json);
+	assert.deepEqual(Copper.ByteUtils.convertBytesToUint(Copper.ByteUtils.convertJsonToBytes(json)), data);
 });

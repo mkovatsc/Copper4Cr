@@ -118,7 +118,9 @@ Copper.ByteUtils.convertBytesToString = function(buf, offset, length, ascii, str
 	if (!(buf instanceof ArrayBuffer) || (offset && (!Number.isInteger(offset) || offset < 0)) || (length && (!Number.isInteger(length) || length < 0))){
 		throw new Error("Illegal Arguments");
 	}
-	let bufView = new Uint8Array(buf, (offset ? offset : 0), (length ? length : undefined));
+	offset = offset ? offset : 0;
+	length = length ? length : (buf.byteLength - offset);
+	let bufView = new Uint8Array(buf, offset, length);
 	let useUtf8 = ascii ? false : true;
 	strict = strict ? true : false;
 
@@ -200,10 +202,12 @@ Copper.ByteUtils.convertBytesToUint = function(buf, offset, length){
 	if (buf.byteLength === 0 || length === 0){
 		return 0;
 	}
-	let bufView = new Uint8Array(buf, (offset ? offset : 0), (length ? length : undefined));
+	offset = offset ? offset : 0;
+	length = length ? length : (buf.byteLength - offset);
+	let bufView = new Uint8Array(buf, offset, length);
 	let res = 0;
 	for (let i=0; i<bufView.byteLength; i++){
-		res = (res << 8) | bufView[i];
+		res = ((res << 8) >>> 0 ) | bufView[i];
 	}
 	// convert to unsigned integer
 	return res >>> 0;
@@ -222,10 +226,38 @@ Copper.ByteUtils.convertBytesToHexString = function(buf, offset, length){
 	if (buf.byteLength === 0 || length === 0){
 		return "0x0";
 	}
-	let bufView = new Uint8Array(buf, (offset ? offset : 0), (length ? length : undefined));
+	offset = offset ? offset : 0;
+	length = length ? length : (buf.byteLength - offset);
+	let bufView = new Uint8Array(buf, offset, length);
 	let res = ["0x"];
 	for (let i=0; i<bufView.byteLength; i++){
 		res.push(bufView[i].toString(16).toUpperCase());
 	}
 	return res.join("");
+};
+
+/**
+* @arg buf: array buffer to convert
+* @return: json representation (can be converted using convertJsonToBytes)
+*/
+Copper.ByteUtils.convertBytesToJson = function(buf){
+	if (!(buf instanceof ArrayBuffer)){
+		throw new Error("Illegal Arguments");
+	}
+	let data = {
+	    data: Array.apply(null, new Uint8Array(buf)),
+	};
+	return JSON.stringify(data);
+};
+
+/**
+* @arg json: json representation of an array buffer
+* @return: array buffer of json
+*/
+Copper.ByteUtils.convertJsonToBytes = function(json){
+	if (!(typeof(json) === "string")){
+		throw new Error("Illegal Arguments");
+	}
+	let data = JSON.parse(json);
+	return new Uint8Array(data.data).buffer;
 };

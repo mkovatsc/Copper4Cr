@@ -1,11 +1,17 @@
-﻿options = new Copper.Options();
-options.loggers = [new Copper.ConsoleLogger()];
-Copper.LogUtil.logInfo("test Logging", options);
+﻿chrome.app.runtime.onLaunched.addListener(function() {
+	
+	Copper.Log.registerLogger(Copper.ConsoleLogger.log);
 
-udpClient = new Copper.ChromeUdpClient("127.0.0.1", 5683, options);
-udpClient.bind(function(){
-	udpClient.send(null);
-	window.setTimeout(function(){
-		udpClient.shutdown();
-	},1000);
+	let endpointId = 1;
+	chrome.runtime.onConnectExternal.addListener(function(port) {
+		let externalid = undefined;
+		if (port.sender){
+			externalid = port.sender.id ? port.sender.id : port.sender.url;
+		}
+		Copper.Log.logFine("new connection from extension, app or website" + (externalid !== undefined ? (" (" + externalid + ")") : ""));
+		let newEndpointId = endpointId++;
+		new Copper.ServerEndpoint(new Copper.ChromeServerPort(port, newEndpointId), newEndpointId);
+	});
+
+	Copper.Log.logFine("Listening for new connection...");
 });

@@ -126,3 +126,17 @@ Copper.CoapMessage.prototype.setPayload = function(payload){
 	this.payload = payload;
 	return this;
 };
+
+/*
+* @return: String describing the message
+*/
+Copper.CoapMessage.prototype.toString = function(){
+	let ret = [];
+	ret.push("Type: " + this.type.name);
+	ret.push("Code: " + this.code.name);
+	ret.push("MID: " + this.mid);
+	ret.push("Token: " + Copper.ByteUtils.convertBytesToHexString(this.token));
+	ret.push("Options: " + this.getOptions().length);
+	ret.push("Payload: " + this.payload.byteLength);
+	return ret.join("\n");
+};

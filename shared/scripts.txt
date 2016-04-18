@@ -1,0 +1,18 @@
+                     "shared/namespace.js",
+
+                     "shared/utils/StringUtils.js",
+                     "shared/utils/ByteUtils.js",
+
+                     "shared/logging/Log.js",
+                     "shared/logging/ConsoleLogger.js",
+
+                     "shared/events/Event.js",
+
+                     "shared/coap/Constants.js",
+                     "shared/coap/CoapMessage.js",
+                     "shared/coap/CoapMessageType.js", 
+                     "shared/coap/CoapMessageCode.js", 
+                     "shared/coap/CoapMessageOptionHeader.js",
+                     "shared/coap/CoapMessageBlockOption.js",
+                     "shared/coap/CoapMessageOption.js",
+                     "shared/coap/CoapMessageSerializer.js",

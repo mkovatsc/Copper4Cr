@@ -15,23 +15,38 @@
 
   "app":{
       "background": {
-        "scripts": [ "namespace.js",
-                     "utils/Utils.js",
-                     "utils/StringUtils.js",
-                     "utils/ByteUtils.js",
-                     "utils/LogUtil.js",
-                     "utils/ConsoleLogger.js", 
-                     "utils/Options.js",
-                     "coap/ChromeUdpClient.js",
-                     "coap/CoapConstants.js",
-                     "coap/message/CoapMessage.js",
-                     "coap/message/CoapMessageType.js", 
-                     "coap/message/CoapMessageCode.js", 
-                     "coap/message/CoapMessageOptionHeader.js",
-                     "coap/message/CoapMessageBlockOption.js",
-                     "coap/message/CoapMessageOption.js",
-                     "coap/message/CoapMessageSerializer.js",
-                     "background.js" ]
+        "scripts": [ // shared part
+                     "shared/namespace.js",
+
+                     "shared/utils/StringUtils.js",
+                     "shared/utils/ByteUtils.js",
+
+                     "shared/logging/Log.js",
+                     "shared/logging/ConsoleLogger.js",
+
+                     "shared/events/Event.js",
+
+                     "shared/coap/Constants.js",
+                     "shared/coap/CoapMessage.js",
+                     "shared/coap/CoapMessageType.js", 
+                     "shared/coap/CoapMessageCode.js", 
+                     "shared/coap/CoapMessageOptionHeader.js",
+                     "shared/coap/CoapMessageBlockOption.js",
+                     "shared/coap/CoapMessageOption.js",
+                     "shared/coap/CoapMessageSerializer.js",
+
+                     
+                     //server part
+                     "endpoint/ChromeUdpClient.js",
+                     "endpoint/ChromeServerPort.js",
+                     "endpoint/ServerEndpoint.js",
+
+                     "background.js"
+                     
+                     // Run test on the application by commenting background.js and uncommenting
+                     // one of the following lines
+                     //"testing/integration/CoapPing.js"
+                    ]
       }
   },
     
