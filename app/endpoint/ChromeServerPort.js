@@ -47,6 +47,7 @@ Copper.ChromeServerPort.prototype.disconnect = function(){
 /* Implementation */
 Copper.ChromeServerPort.prototype.onClientMessage = function(msg){
 	// Route message through event queue. Id is set as the endpoint id.
+	msg = Copper.Event.createFromJson(msg);
 	msg.receiver = this.id;
 	msg.sender = msg.sender ? msg.sender : 0;
 	Copper.Event.sendEvent(msg);
@@ -66,7 +67,7 @@ Copper.ChromeServerPort.prototype.sendClientMessage = function(msg){
 	if (this.port !== undefined){
 		delete msg.receiver;
 		try {
-			this.port.postMessage(msg);
+			this.port.postMessage(Copper.Event.convertToJson(msg));
 		} catch (exception){
 			this.onClientDisconnect();
 		}

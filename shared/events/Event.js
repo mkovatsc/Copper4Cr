@@ -108,3 +108,42 @@ Copper.Event.createClientRegisteredEvent = function(receiver, sender){
 	let data = {};
 	return Copper.Event.createEvent(Copper.Event.TYPE_CLIENT_REGISTERED, data, receiver, sender);
 };
+
+Copper.Event.createClientUnregisterEvent = function(receiver, sender){
+	let data = {};
+	return Copper.Event.createEvent(Copper.Event.TYPE_UNREGISTER_CLIENT, data, receiver, sender);
+};
+
+Copper.Event.createClientSendCoapMessageEvent = function(coapMessage, receiver, sender){
+	let data = {
+		coapMessage: coapMessage
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_SEND_COAP_MESSAGE, data, receiver, sender);
+};
+
+Copper.Event.createReceivedCoapMessageEvent = function(coapMessage, parserWarnings, parserError, remoteAddress, remotePort, byteLength, receiver, sender){
+	let data = {
+		coapMessage: coapMessage,
+		parserWarnings: parserWarnings,
+		parserError: parserError,
+		remoteAddress: remoteAddress,
+		remotePort: remotePort,
+		byteLength: byteLength
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_COAP_MESSAGE_RECEIVED, data, receiver, sender);
+};
+
+Copper.Event.convertToJson = function(event){
+	if (event.data !== undefined && event.data.coapMessage instanceof Copper.CoapMessage){
+		event.data.coapMessage = Copper.ByteUtils.convertBytesToJson(Copper.CoapMessageSerializer.serialize(event.data.coapMessage));
+	}
+	return JSON.stringify(event);
+};
+
+Copper.Event.createFromJson = function(json){
+	let event = JSON.parse(json);
+	if (event.data !== undefined && typeof(event.data.coapMessage) === "string"){
+		event.data.coapMessage = Copper.CoapMessageSerializer.deserialize(Copper.ByteUtils.convertJsonToBytes(event.data.coapMessage)).message;
+	}
+	return event;
+};
