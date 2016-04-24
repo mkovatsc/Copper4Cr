@@ -10,7 +10,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     	Copper.Log.logInfo(msg);
     	switch(msg.type){
     		case Copper.Event.TYPE_CLIENT_REGISTERED:
-    			let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.PING);
+    			let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.EMPTY);
 				coapMessage.setMid(4);
     			clientPort.postMessage(Copper.Event.convertToJson(Copper.Event.createClientSendCoapMessageEvent(coapMessage, 0, 0)));
     			break;

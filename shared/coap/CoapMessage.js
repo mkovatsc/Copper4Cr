@@ -35,6 +35,9 @@ Copper.CoapMessage.prototype.setToken = function(token){
 	if (token === undefined || !(token instanceof ArrayBuffer) || token.byteLength > 8){
 		throw new Error("Illegal argument");	
 	}
+	if (this.code === Copper.CoapMessage.Code.EMPTY && token.byteLength > 0){
+		throw new Error("Empty message cannot have a token");
+	}
 	this.token = token;
 	return this;
 };
@@ -49,6 +52,9 @@ Copper.CoapMessage.prototype.setToken = function(token){
 Copper.CoapMessage.prototype.addOption = function(optionHeader, val, replace){
 	if (!(optionHeader instanceof Copper.CoapMessage.OptionHeader)){
 		throw new Error("Illegal argument");
+	}
+	if (this.code === Copper.CoapMessage.Code.EMPTY){
+		throw new Error("Empty message cannot have options");
 	}
 	if (!this.options[optionHeader.number]){
 		this.options[optionHeader.number] = new Copper.CoapMessage.Option(optionHeader);
@@ -122,6 +128,9 @@ Copper.CoapMessage.prototype.getOptions = function(){
 Copper.CoapMessage.prototype.setPayload = function(payload){
 	if (payload === undefined || !(payload instanceof ArrayBuffer)){
 		throw new Error("Illegal argument");	
+	}
+	if (this.code === Copper.CoapMessage.Code.EMPTY && payload.byteLength > 0){
+		throw new Error("Empty message cannot have a payload");
 	}
 	this.payload = payload;
 	return this;

@@ -9,7 +9,7 @@ chrome.app.runtime.onLaunched.addListener(function() {
 	let onBind = function(successful){
 		/* onBind */
 		if (successful){
-			let pingMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.PING);
+			let pingMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.EMPTY);
 			pingMsg.setMid(0);
 			udpClient.send(Copper.CoapMessageSerializer.serialize(pingMsg));
 			Copper.Log.logInfo("Sent Ping");

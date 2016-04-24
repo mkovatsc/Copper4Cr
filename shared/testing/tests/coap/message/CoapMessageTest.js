@@ -41,4 +41,15 @@ QUnit.test("CoapMessage: Object", function(assert) {
 
 	assert.deepEqual(msg.getOptions(), [msg.options[uriOptionHeader.number], msg.options[etagHeader.number]]);
 	assert.ok(msg.toString());
+
+	// Empty message must not contain payload
+	assert.throws(function(){
+		new Copper.CoapMessage(conType, Copper.CoapMessage.Code.EMPTY).setToken(token);
+	});
+	assert.throws(function(){
+		new Copper.CoapMessage(conType, Copper.CoapMessage.Code.EMPTY).addOption(etagHeader, "0x33");
+	});
+	assert.throws(function(){
+		new Copper.CoapMessage(conType, Copper.CoapMessage.Code.EMPTY).setPayload(payload);
+	});
 });
