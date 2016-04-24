@@ -3,9 +3,10 @@
 	text-align: center;
 	font-family: Arial;
 	color: #333333;
-	font-size: 13px;
-	background-color: blue;
+	font-size: 12px;
+	background-color: yellow;
 	height: 100%;
+	width: 100%;
 	overflow-x: hidden;
 }
 
@@ -88,6 +89,12 @@
   background-color: green;
 }
 
+.icon-car {
+    background-image: url(http://www.example.com/bck.png);
+    height: 24px;
+    width: 24px;
+	}
+
 #payload-dropdown
 {
 	float: left;
@@ -125,104 +132,124 @@
 	width: 100%;
 }
 
-#top-container
-{
-	position: relative;
-	width: 100%;
-	height: 100%;
-	outline: 10px solid black;
-	background-color: red;
-	padding-right: 200px;
-}
-
-#top-container  > .wrapper
-{
-	top: 200px;
-}
-
-#request
-{
-	height: 200px;
-	width: 100%;
-	background-color: pink;
-	outline: 5px solid cyan;
-}
-
-
-#sidebar-right
+#container
 {
 	position: absolute;
-	right: 0;
-	top: 0;
-	height: 100%;
-	min-width: 200px;
-	background-color: green;
-	outline: 5px solid yellow;
-}
-
-#sub-container
-{
-	position: relative;
 	width: 100%;
-	height: 100%;
-	padding-left: 200px;
-	padding-right: 200px;
-}
-
-#sub-container  > .wrapper
-{
-	top: 200px;
-}
-
-#sidebar-left
-{
-	position: absolute;
-	left: 0;
-	top: 0;
-	height: 100%;
-	min-width: 200px;
-	background-color: orange;
-	outline: 5px solid yellow;
-}
-
-#table-left
-{
-	height: 200px;
-	width: 50%;
-	float: left;
-	background-color: #04f;
-	outline: 5px solid cyan;
-}
-
-#table-right
-{
-	height: 200px;
-	width: 50%;
-	float: right;
-	background-color: #e28;
-	outline: 5px solid cyan;
-}
-
-#table-right
-{
-	height: 200px;
-	width: 50%;
-	float: right;
-	background-color: #e28;
-	outline: 5px solid cyan;
-}
-
-
-#info
-{
-	position: absolute;
-	top: 200px;
-	left: 200px;
-	right: 200px;
+	top: 40px;
 	bottom: 0;
-	background-color: #6a5;
-	outline: 5px solid cyan;
+	background-color: white;
+	text-align: left;
 }
 
 
+#top-wrapper{
+	display: flex;
+	position: relative;
+	background-color: green;
+	height: 100%;
+	flex-direction: column;
+}
+
+#top-container{
+	background-color: yellow;
+}
+
+
+
+.flex {
+	flex: 1;	
+}
+
+.vbox {
+	display: flex;
+	flex-direction: column;
+}
+
+.hbox {
+	display: flex;
+	flex-direction: row;
+}
+
+
+#resource_tree_container
+{
+	width: 16em;
+}
+
+#resource_tree
+{
+}
+
+#info_code
+{
+	font-size: 18pt; 
+	font-weight: bold;
+	outline: 5px solid yellow;
+	overflow: hidden;
+
+}
+
+#packet_header
+{
+	outline: 5px solid orange;
+	width: 200px;
+	margin: 0 5px;
+}
+
+
+#packet_options
+{
+	outline: 5px solid red;
+	margin: 0 5px;
+}
+
+#packet_options table
+{
+	height: 100%;
+	width: 100%;
+}
+
+
+#message_pane th, td
+{
+	padding:0 5px;
+}
+
+#log_messages {
+	background-color: black;
+	height: 216px;
+}
+
+
+#sidebar {
+	width: 18.5em;
+}
+
+#sidebar input {
+	align-items: center;
+}
+
+#sidebar label {
+	align-items: center;
+}
+
+#sidebar p {
+	margin: 0;
+	padding-top: 2px;
+}
+
+#sidebar .btn
+{
+	border-radius: 0px;
+	border-width: 0px;
+	border-color: black;
+	background-color: white;
+	color: black;
+	margin-left: 10px;
+	margin-top: 7px;
+	height: 26px;
+	padding: 0 7px;
+	align-items: center;
+}
 
