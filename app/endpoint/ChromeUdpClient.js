@@ -77,7 +77,7 @@ Copper.ChromeUdpClient.prototype.bind = function(onBind, onReceive, onReceiveErr
 /**
 * Sends a datagram 
 * @arg datagram: array buffer to send
-* @arg onSent(boolean successful, int bytesSent, boolean socketOpen)
+* @arg onSent(boolean successful, int bytesSent, boolean socketOpen, string errorMsg)
 */
 Copper.ChromeUdpClient.prototype.send = function(datagram, onSent){
 	if (!(datagram instanceof ArrayBuffer)){
@@ -89,18 +89,18 @@ Copper.ChromeUdpClient.prototype.send = function(datagram, onSent){
 	let thisRef = this;
 	chrome.sockets.udp.send(this.socketId, datagram, this.remoteAddress, this.remotePort, function(sendInfo) {
 		if (sendInfo.resultCode < 0){
-			Copper.Log.logError("Error " + sendInfo.resultCode + " while sending data on udp socket.");
-			let thisRef = this;
-			chrome.sockets.udp.getInfo(this.socketId, function(socketInfo){
+			let errorMsg = (chrome.runtime.lastError ? chrome.runtime.lastError.message + " (" + sendInfo.resultCode + ")"  : "Send Error " + sendInfo.resultCode);
+			Copper.Log.logError(errorMsg + " while sending data on udp socket.");
+			chrome.sockets.udp.getInfo(thisRef.socketId, function(socketInfo){
 				if (!(socketInfo.localPort > 0)) {
 					thisRef.close();
 				}
-				if (onSent !== undefined) onSent(false, 0, thisRef.state === Copper.ChromeUdpClient.STATE_READY);
+				if (onSent !== undefined) onSent(false, 0, thisRef.state === Copper.ChromeUdpClient.STATE_READY, errorMsg);
 			});
 		}
 		else {
 			Copper.Log.logInfo("Sent " + sendInfo.bytesSent + " bytes to " + thisRef.remoteAddress + ":" + thisRef.remotePort);	
-			if (onSent !== undefined) onSent(sendInfo.resultCode >= 0, sendInfo.bytesSent);
+			if (onSent !== undefined) onSent(sendInfo.resultCode >= 0, sendInfo.bytesSent, undefined);
 		}
 	});
 };

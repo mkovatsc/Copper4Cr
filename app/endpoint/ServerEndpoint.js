@@ -152,8 +152,17 @@ Copper.ServerEndpoint.prototype.onClientSendCoapMessage = function(coapMessage, 
 		this.port.sendClientMessage(Copper.Event.createErrorEvent("Illegal State", false, receiver, this.id));
 	}
 	else {
-		this.udpClient.send(Copper.CoapMessageSerializer.serialize(coapMessage));
+		let thisRef = this;
+		this.udpClient.send(Copper.CoapMessageSerializer.serialize(coapMessage), function(successful, bytesSent, socketOpen, errorMsg){
+			if (!successful){
+				thisRef.port.sendClientMessage(Copper.Event.createErrorEvent("Error while sending: " + errorMsg, socketOpen, receiver, thisRef.id));
+			}
+			if (!socketOpen){
+				thisRef.onDisconnect();
+			}
+		});
 	}
+	return true;
 };
 
 // -------- UDP Socket -----------
