@@ -45,3 +45,9 @@ function onClickObserve()
 function onClickCoap()
 {
 }
+
+function clearInputText(id)
+{
+	var inputText = document.getElementById(id);
+	inputText.value="";
+}

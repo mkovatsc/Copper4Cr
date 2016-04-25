@@ -165,13 +165,57 @@
 				
 				</div>
 				<div id="sidebar" class="vbox" style="background-color: orange;">
-					<div class="hbox"  style="background-color: blue;">
-						<div class="checkbox" style="margin-left: 10px; background-color: lime;" >
+					<div class="hbox" style="background-color: blue;">
+						<div class="checkbox" style="background-color: lime;" >
 							<label>
 								<input type="checkbox"><p>Debug Control</p>
 							</label>
 						</div>
-						<button type="submit" class="btn">Submit</button>
+						<button id="submit-button" type="submit" class="btn">Submit</button>
+					</div>
+					
+					<div class="vbox">
+						<label>Token</label>
+						<div class="flex hbox">
+							<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_token" placeholder="use hex (0x..) or string"><span onclick="clearInputText('debug_option_token')" title="Clear">&times;</span></span>		
+						</div>
+						
+						<label style="padding-top: 2px; margin-bottom: 2px;">Request Options</label>
+						<p>Accept</p>
+						<div class="flex hbox dropdown">
+							<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_token">
+								<div class="dropdown-caret"><a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
+									<span class="caret"></span>
+								</a>
+								<ul class="dropdown-menu">
+									<li><a href="#"><i class="icon-pencil"></i>&nbsp</a></li>
+									<li><a href="#"><i class="icon-trash"></i>Example</a></li>
+									<li><a href="#"><i class="icon-ban-circle"></i>Example</a></li>
+									<li class="divider"></li>
+									<li><a href="#"><i class="i"></i>Example</a></li>
+								</ul>
+							
+								</div>
+							</span>		
+						</div>
+						
+						<p>Content-Format</p>
+						<div class="flex hbox dropdown">
+							<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_token">
+								<div class="dropdown-caret"><a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
+									<span class="caret"></span>
+								</a>
+								<ul class="dropdown-menu">
+									<li><a href="#"><i class="icon-pencil"></i>&nbsp</a></li>
+									<li><a href="#"><i class="icon-trash"></i>Example</a></li>
+									<li><a href="#"><i class="icon-ban-circle"></i>Example</a></li>
+									<li class="divider"></li>
+									<li><a href="#"><i class="i"></i>Example</a></li>
+								</ul>
+							
+								</div>
+							</span>		
+						</div>
 					</div>
 					
 					
