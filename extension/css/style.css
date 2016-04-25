@@ -156,7 +156,7 @@
 }
 
 .flex {
-	flex: 1;	
+	flex: 1;
 }
 
 .vbox {
@@ -222,14 +222,16 @@
 
 #sidebar {
 	width: 18.5em;
-	padding: 0 10px;
 }
 
-
 #sidebar label {
-	text-align: center;
 	margin-top: 10px;
 	margin-bottom: 5px;
+}
+
+#sidebar .checkbox 
+{
+	margin-bottom: 0;
 }
 
 #sidebar .checkbox > label
@@ -238,6 +240,8 @@
 	margin-bottom: 0;
 	text-align: left;
 }
+
+
 
 #sidebar .checkbox p {
 	margin: 0;
@@ -266,8 +270,7 @@
 	border-color: black;
 	background-color: white;
 	color: black;
-	margin-left: 15px;
-	margin-top: 7px;
+	margin-left: 13px;
 	height: 26px;
 	padding: 0 17px;
 	align-items: center;
@@ -288,8 +291,17 @@
   border:none;
   background:white;
   outline:none;
+  width: 0;
 }
 
+.text-input-custom  span {
+  cursor:pointer;
+  width: 5px;
+  padding-right: 5px;
+  padding-top: 2px;
+  margin-left: 1px;
+  font-weight:bold;
+}
 
 .dropdown-caret > a
 {
@@ -304,17 +316,19 @@
 	margin-left: 1px;
 }
 
-.text-input-custom  span {
-  cursor:pointer;
-  width: 5px;
-  padding-right: 5px;
-  margin-left: 1px;
-  font-weight:bold;
-}
 
 .dropdown-menu > li > a:hover {
     background-color: blue;
 	color: white;
 }
 
+#sidebar-block-size > div
+{
+	margin-left: 6px;
+}
+
+#chk_debug_option_block_auto {
+	margin-left: auto;
+	margin-right: auto;
+}
 
