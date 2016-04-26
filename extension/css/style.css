@@ -7,7 +7,7 @@
 	background-color: yellow;
 	height: 100%;
 	width: 100%;
-	overflow-x: hidden;
+	overflow: hidden;
 }
 
 
@@ -17,7 +17,8 @@
 	background-color: white;
 	min-width: 800px;
 	width: 100%;
-	float: left
+	border-top: 1px black solid;
+	border-bottom: 1px black solid;
 }
 
 #menu-bar #last-button
@@ -99,7 +100,7 @@
 {
 	float: left;
 	padding-top: 6px;
-	margin-right: 13px;
+	margin: 0 10px;
 }
 
 #behaviour-dropdown
@@ -169,6 +170,29 @@
 	flex-direction: row;
 }
 
+.box-label{
+	padding: 6px;
+	padding-left: 8px;
+	padding-bottom: 0;
+	margin: 0;
+	font-size: 12px;
+}
+
+
+fieldset {
+	border: 1px solid rgba(0, 0, 0, .2);
+	margin: 4px;
+	background-color: silver;
+}
+
+legend {
+	border: none;
+	font-size: 12px;
+	width: 45px;
+	margin: 0;
+	margin-left: 7px;
+	padding: 0 5px;
+}
 
 #resource_tree_container
 {
@@ -177,48 +201,60 @@
 
 #resource_tree
 {
+	margin: 4px;
 }
 
 #info_code
 {
 	font-size: 18pt; 
 	font-weight: bold;
-	outline: 5px solid yellow;
 	overflow: hidden;
-
+	padding: 0 10px;
+	margin-top: 0px;
 }
 
 #packet_header
 {
-	outline: 5px solid orange;
 	width: 200px;
-	margin: 0 5px;
+	margin: 4px;
+	border: 1px black solid;
+	background-color: white;
 }
 
 
 #packet_options
 {
-	outline: 5px solid red;
-	margin: 0 5px;
+	margin: 4px;
+	border: 1px black solid;
+	background-color: white;
 }
 
 #packet_options table
 {
+	display: block;
 	height: 100%;
 	width: 100%;
 }
-
 
 #message_pane th, td
 {
 	padding:0 5px;
 }
 
-#log_messages {
-	background-color: black;
-	height: 216px;
+#tabbed-pane-payload
+{
+	overflow-y: auto;
+	padding: 4px;
+	width: 100%;
+	height: 100%;
 }
 
+#tabbed-pane-payload p
+{
+
+	margin: 0; 
+	padding: 0;
+}
 
 #sidebar {
 	width: 18.5em;
@@ -263,7 +299,7 @@
 	color: black;
 }
 
-#submit-button
+#reset-button
 {
 	border-radius: 5px;
 	border-width: 0px;
@@ -331,4 +367,69 @@
 	margin-left: auto;
 	margin-right: auto;
 }
+
+#log_messages {
+	background-color: white;
+	margin: 5px;
+	border: 1px solid;
+}
+
+
+#log_messages table {
+	display: flex;
+    flex-direction: column;
+}
+
+#log_messages  tbody , #log_messages  thead{
+    display: block;
+	overflow-y: overlay
+}
+
+#log_messages thead{
+	min-height: 20px;
+}
+
+
+#log_messages  tr {
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+}
+
+#log_messages td, #log_messages  th {
+    display: block;
+    flex-direction: column;
+	text-align: left;
+	padding-left: 5px;
+	
+}
+
+#log_messages theadd::-webkit-scrollbar {
+    width: 17px;
+}
+
+
+
+#log_messages td:nth-child(1), #log_messages  th:nth-child(1) {
+    width: 50px;
+}
+
+#log_messages  td:nth-child(2), #log_messages  th:nth-child(2) {
+    width: 100px;
+}
+
+#log_messages td:nth-child(3), #log_messages  th:nth-child(3) {
+    width: 50px;
+}
+
+#log_messages td:nth-child(4), #log_messages  th:nth-child(4) {
+    width: 65px;
+}
+
+#log_messages td:nth-last-child(-n+2), #log_messages  th:nth-last-child(-n+2) {
+    display: block;
+    flex-direction: column;
+    flex: 1;
+}
+
 
