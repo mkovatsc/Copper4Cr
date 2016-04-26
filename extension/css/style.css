@@ -11,6 +11,11 @@
 }
 
 
+* {
+	min-width: 0;
+	min-height: 0%;
+}
+
 #menu-bar {
 	display: inline-block;
 	height: 40px;
@@ -89,12 +94,6 @@
 #menu-bar .glyphicon-eye-open:before {
   background-color: green;
 }
-
-.icon-car {
-    background-image: url(http://www.example.com/bck.png);
-    height: 24px;
-    width: 24px;
-	}
 
 #payload-dropdown
 {
