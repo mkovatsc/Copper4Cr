@@ -86,12 +86,12 @@
 		<div class="flex vbox" style="background-color: yellow; padding: 4px;">
 			<div class="flex hbox" style="background-color: pink;">
 				<div class="flex vbox" style="background-color: cyan;">
-				
-					<fieldset style="display: inline-block; border: 1px black solid">
-						<legend style="border: none;">Status</legend>
-						<div class="hbox"><label class="flex" id="info_code">some Text<label></div>
-					</fieldset>
-					
+					<div >
+						<fieldset style="border: 1px black solid">
+							<legend style="border: none;">Status</legend>
+							<div class="hbox"><label class="flex" id="info_code">some Text<label></div>
+						</fieldset>
+					</div>
 					<div class="flex hbox" style="background-color: green;">
 					
 						<div id="resource_tree_container" style="background-color: brown;">
@@ -101,7 +101,7 @@
 						</div>
 						
 						<div id="message_pane" class="flex vbox" style="background-color: silver;">
-							<div class="hbox" style="height: 170px; background-color: lime;">
+							<div class="hbox" style="min-height: 100px; background-color: lime;">
 								<div id="packet_header">
 									<table style="background-color: white;">
 										<col width="50px">
