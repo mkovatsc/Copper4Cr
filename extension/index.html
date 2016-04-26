@@ -86,7 +86,7 @@
 		<div class="flex vbox" style="background-color: yellow; padding: 4px;">
 			<div class="flex hbox" style="background-color: pink;">
 				<div class="flex vbox" style="background-color: cyan;">
-					<div >
+					<div style="min-height: 66px;" >
 						<fieldset style="border: 1px black solid">
 							<legend style="border: none;">Status</legend>
 							<div class="hbox"><label class="flex" id="info_code">some Text<label></div>
@@ -148,9 +148,9 @@
 								</div>
 							</div>
 							<div class="flex vbox" style="margin: 4px; background-color: gold;">
-								<div><p class="box-label">Payload</p></div>
+								<div style="min-height: 25px;"><p class="box-label">Payload</p></div>
 								
-								<div>
+								<div style="min-height: 40px;">
 									<ul class="nav nav-tabs">
 										<li class="active"><a href="#tab_incoming" role="tab" data-toggle="tab">Incoming</a></li>
 										<li><a href="#tab_rendered" role="tab" data-toggle="tab">Rendered</a></li>
@@ -158,61 +158,61 @@
 									</ul>
 								</div>
 								<div id="tabbed-pane-payload" class="tab-content" style="background-color: blue;">
-									<div class="tab-pane active" id="tab_incoming" style="background-color: red;">
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p><p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-										<p>Incoming Tab</p>
-									</div>
-									<div class="tab-pane" id="tab_rendered" style="background-color: cyan;">
-										<p>Rendered Tab</p>
-									</div>
-									<div class="tab-pane" id="tab_outgoing" style="background-color: olive;">
-										<p>Outgoing Tab</p>
-									</div>
+										<div class="tab-pane active" id="tab_incoming" style="padding: 4px; background-color: red;">
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p><p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+											<p>Incoming Tab</p>
+										</div>
+										<div class="tab-pane" id="tab_rendered" style="padding: 4px; background-color: cyan;">
+											<p>Rendered Tab</p>
+										</div>
+										<div class="tab-pane" id="tab_outgoing" style="padding: 4px; background-color: olive;">
+											<p>Outgoing Tab</p>
+										</div>
 								</div>
 							</div>
 						</div>
@@ -231,152 +231,153 @@
 						
 					</div>
 					
-					<div style="display: block; padding: 0 5px 10px 9px; overflow-y: auto; background-color: orange;">
-						<div style="text-align: center;"><label>Token</label></div>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_token" placeholder="use hex (0x..) or string"><span onclick="clearInputText('debug_option_token')" title="Clear">&times;</span></span>		
-						</div>
-						
-						<div style="text-align: center;"><label style="padding-top: 2px; margin-bottom: 2px;">Request Options</label></div>
-						<p>Accept</p>
-						<div class="flex hbox dropdown">
-							<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_token">
-								<div class="dropdown-caret"><a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
-									<span class="caret"></span>
-								</a>
-								<ul class="dropdown-menu">
-									<li><a href="#"><i class="icon-pencil"></i>&nbsp</a></li>
-									<li><a href="#"><i class="icon-trash"></i>Example</a></li>
-									<li><a href="#"><i class="icon-ban-circle"></i>Example</a></li>
-									<li class="divider"></li>
-									<li><a href="#"><i class="i"></i>Example</a></li>
-								</ul>
+					<div style="display: block; padding: 0 5px 0 9px; overflow-y: auto; background-color: orange;">
+						<div style="padding: 4px;">
+							<div style="text-align: center;"><label>Token</label></div>
+							<div class="flex hbox">
+								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_token" placeholder="use hex (0x..) or string"><span onclick="clearInputText('debug_option_token')" title="Clear">&times;</span></span>		
+							</div>
 							
+							<div style="text-align: center;"><label style="padding-top: 2px; margin-bottom: 2px;">Request Options</label></div>
+							<p>Accept</p>
+							<div class="flex hbox dropdown">
+								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_token">
+									<div class="dropdown-caret"><a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
+										<span class="caret"></span>
+									</a>
+									<ul class="dropdown-menu">
+										<li><a href="#"><i class="icon-pencil"></i>&nbsp</a></li>
+										<li><a href="#"><i class="icon-trash"></i>Example</a></li>
+										<li><a href="#"><i class="icon-ban-circle"></i>Example</a></li>
+										<li class="divider"></li>
+										<li><a href="#"><i class="i"></i>Example</a></li>
+									</ul>
+								
+									</div>
+								</span>		
+							</div>
+							
+							<p>Content-Format</p>
+							<div class="flex hbox dropdown">
+								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_content_format">
+									<div class="dropdown-caret"><a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
+										<span class="caret"></span>
+									</a>
+									<ul class="dropdown-menu">
+										<li><a href="#"><i class="icon-pencil"></i>&nbsp</a></li>
+										<li><a href="#"><i class="icon-trash"></i>Example</a></li>
+										<li><a href="#"><i class="icon-ban-circle"></i>Example</a></li>
+										<li class="divider"></li>
+										<li><a href="#"><i class="i"></i>Example</a></li>
+									</ul>
+								
+									</div>
+								</span>		
+							</div>
+							
+							<div id="sidebar-block-size" class="hbox">
+								<div class="vbox" style="flex: 3; margin-left: 0;">
+									<p>Block1 (Req.)</p>
+									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_block1" placeholder="block no."><span onclick="clearInputText('debug_option_block1')" title="Clear">&times;</span></span>		
+									<p>Size1</p>
+									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_size1" placeholder="total size"><span onclick="clearInputText('debug_option_size1')" title="Clear">&times;</span></span>		
+
 								</div>
-							</span>		
-						</div>
-						
-						<p>Content-Format</p>
-						<div class="flex hbox dropdown">
-							<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_content_format">
-								<div class="dropdown-caret"><a class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="#">
-									<span class="caret"></span>
-								</a>
-								<ul class="dropdown-menu">
-									<li><a href="#"><i class="icon-pencil"></i>&nbsp</a></li>
-									<li><a href="#"><i class="icon-trash"></i>Example</a></li>
-									<li><a href="#"><i class="icon-ban-circle"></i>Example</a></li>
-									<li class="divider"></li>
-									<li><a href="#"><i class="i"></i>Example</a></li>
-								</ul>
-							
+								
+								<div class="vbox" style="flex: 3;">
+									<p>Block2 (Res.)</p>
+									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_block2" placeholder="block no."><span onclick="clearInputText('debug_option_block2')" title="Clear">&times;</span></span>		
+									<p>Size2</p>
+									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_size2" placeholder="total size"><span onclick="clearInputText('debug_option_size2')" title="Clear">&times;</span></span>		
+
 								</div>
-							</span>		
-						</div>
-						
-						<div id="sidebar-block-size" class="hbox">
-							<div class="vbox" style="flex: 3; margin-left: 0;">
-								<p>Block1 (Req.)</p>
-								<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_block1" placeholder="block no."><span onclick="clearInputText('debug_option_block1')" title="Clear">&times;</span></span>		
-								<p>Size1</p>
-								<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_size1" placeholder="total size"><span onclick="clearInputText('debug_option_size1')" title="Clear">&times;</span></span>		
+								
+								<div class="vbox" style="flex: 1;">
+									<p style="margin-left: auto; margin-right: auto;" >Auto</p>
+									<input id="chk_debug_option_block_auto" type="checkbox">
+								</div>
+							</div>
+							
+							<p>Observe</p>
+							<div class="flex hbox">
+								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_observe" placeholder="use integer"><span onclick="clearInputText('debug_option_observe')" title="Clear">&times;</span></span>		
+							</div>
+							
+							<p>ETag</p>
+							<div class="flex hbox">
+								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_etag" placeholder="use hex (0x..) or string"><span onclick="clearInputText('debug_option_etag')" title="Clear">&times;</span></span>		
+							</div>
+							
+							<p>If-Match</p>
+							<div class="flex hbox">
+								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_if_match" placeholder="use an Etag"><span onclick="clearInputText('debug_option_if_match')" title="Clear">&times;</span></span>		
+							</div>
+							
+							<div class="checkbox">
+								<label>
+									<input id="debug_option_if_none_match" type="checkbox"><p>If-None-Match</p>
+								</label>
+							</div>
+							
+							<div class="hbox">
+								<div class="flex">
+									<p>Uri-Host</p>
+									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_uri_host" placeholder="not set"><span onclick="clearInputText('debug_option_uri_host')" title="Clear">&times;</span></span>		
+								</div>
+								
+								<div style="margin-left: 6px; width: 4em;">
+									<p>Uri-Port</p>
+									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_uri_port" placeholder="n/s"><span onclick="clearInputText('debug_option_uri_port')" title="Clear">&times;</span></span>		
+								</div>
+							</div>
+							
+							<p>Proxy-Uri</p>
+							<div class="flex hbox">
+								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_proxy_uri" placeholder="use an Etag"><span onclick="clearInputText('debug_option_proxy_uri')" title="Clear">&times;</span></span>		
+							</div>
+							
+							<div class="checkbox">
+								<label>
+									<input id="debug_option_proxy_scheme" type="checkbox"><p>Use Proxy-Scheme option</p>
+								</label>
+							</div>
+							
+							<div style="text-align: center;"><label>Response Options</label></div>
+							
+							<p>Max-Age</p>
+							<div class="flex hbox">
+								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_max_age" placeholder="use integer"><span onclick="clearInputText('debug_option_max_age')" title="Clear">&times;</span></span>		
+							</div>
+							
+							<div class="hbox">
+								<div class="flex">
+									<p>Location-Path</p>
+									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_location_path" placeholder="not set"><span onclick="clearInputText('debug_option_location_path')" title="Clear">&times;</span></span>		
+								</div>
+								
+								<div class="flex" style="margin-left: 6px;">
+									<p>Location-Query</p>
+									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_location_query" placeholder="not set"><span onclick="clearInputText('debug_option_location_query')" title="Clear">&times;</span></span>		
+								</div>
+							</div>
+							
+							<div style="text-align: center;"><label>Custom Options</label></div>
 
+							<div class="hbox">
+								<div style="flex: 1;">
+									<p>Number</p>
+									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_custom_number" placeholder="not set"><span onclick="clearInputText('debug_option_custom_number')" title="Clear">&times;</span></span>		
+								</div>
+								
+								<div style="margin-left: 6px; flex: 2;">
+									<p>Value</p>
+									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_custom_value" placeholder="use hex (0x..) or string"><span onclick="clearInputText('debug_option_custom_value')" title="Clear">&times;</span></span>		
+								</div>
 							</div>
 							
-							<div class="vbox" style="flex: 3;">
-								<p>Block2 (Res.)</p>
-								<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_block2" placeholder="block no."><span onclick="clearInputText('debug_option_block2')" title="Clear">&times;</span></span>		
-								<p>Size2</p>
-								<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_size2" placeholder="total size"><span onclick="clearInputText('debug_option_size2')" title="Clear">&times;</span></span>		
-
-							</div>
-							
-							<div class="vbox" style="flex: 1;">
-								<p style="margin-left: auto; margin-right: auto;" >Auto</p>
-								<input id="chk_debug_option_block_auto" type="checkbox">
-							</div>
-						</div>
-						
-						<p>Observe</p>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_observe" placeholder="use integer"><span onclick="clearInputText('debug_option_observe')" title="Clear">&times;</span></span>		
-						</div>
-						
-						<p>ETag</p>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_etag" placeholder="use hex (0x..) or string"><span onclick="clearInputText('debug_option_etag')" title="Clear">&times;</span></span>		
-						</div>
-						
-						<p>If-Match</p>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_if_match" placeholder="use an Etag"><span onclick="clearInputText('debug_option_if_match')" title="Clear">&times;</span></span>		
-						</div>
-						
-						<div class="checkbox">
-							<label>
-								<input id="debug_option_if_none_match" type="checkbox"><p>If-None-Match</p>
-							</label>
-						</div>
-						
-						<div class="hbox">
-							<div class="flex">
-								<p>Uri-Host</p>
-								<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_uri_host" placeholder="not set"><span onclick="clearInputText('debug_option_uri_host')" title="Clear">&times;</span></span>		
-							</div>
-							
-							<div style="margin-left: 6px; width: 4em;">
-								<p>Uri-Port</p>
-								<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_uri_port" placeholder="n/s"><span onclick="clearInputText('debug_option_uri_port')" title="Clear">&times;</span></span>		
-							</div>
-						</div>
-						
-						<p>Proxy-Uri</p>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_proxy_uri" placeholder="use an Etag"><span onclick="clearInputText('debug_option_proxy_uri')" title="Clear">&times;</span></span>		
-						</div>
-						
-						<div class="checkbox">
-							<label>
-								<input id="debug_option_proxy_scheme" type="checkbox"><p>Use Proxy-Scheme option</p>
-							</label>
-						</div>
-						
-						<div style="text-align: center;"><label>Response Options</label></div>
-						
-						<p>Max-Age</p>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_max_age" placeholder="use integer"><span onclick="clearInputText('debug_option_max_age')" title="Clear">&times;</span></span>		
-						</div>
-						
-						<div class="hbox">
-							<div class="flex">
-								<p>Location-Path</p>
-								<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_location_path" placeholder="not set"><span onclick="clearInputText('debug_option_location_path')" title="Clear">&times;</span></span>		
-							</div>
-							
-							<div class="flex" style="margin-left: 6px;">
-								<p>Location-Query</p>
-								<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_location_query" placeholder="not set"><span onclick="clearInputText('debug_option_location_query')" title="Clear">&times;</span></span>		
-							</div>
-						</div>
-						
-						<div style="text-align: center;"><label>Custom Options</label></div>
-
-						<div class="hbox">
-							<div style="flex: 1;">
-								<p>Number</p>
-								<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_custom_number" placeholder="not set"><span onclick="clearInputText('debug_option_custom_number')" title="Clear">&times;</span></span>		
-							</div>
-							
-							<div style="margin-left: 6px; flex: 2;">
-								<p>Value</p>
-								<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_custom_value" placeholder="use hex (0x..) or string"><span onclick="clearInputText('debug_option_custom_value')" title="Clear">&times;</span></span>		
-							</div>
 						</div>
 						
 					</div>
-					
-					
 						
 				</div>
 			</div>
@@ -385,127 +386,107 @@
 		<div class="vbox" style="height: 216px; background-color: pink;">
 			<p class="box-label">CoAP Message Log</p>
 			<div id="log_messages" class="flex vbox">
-				<table style="background-color: white; height: 100%;">
-					<thead>
-					<tr>
-						<th>Time</th>
-						<th>CoAP Message</th>
-						<th>MID</th>
-						<th>Token</th>
-						<th>Options</th>
-						<th>Payload</th>
-					</tr>
-					</thead>
-					<tbody>
+				<div class="hbox table-head">
+					<p>Time</p>
+					<p>CoAP Message</p>
+					<p>MID</p>
+					<p>Token</p>
+					<p>Options</p>
+					<p>Payload</p>
+					<div style="float: right; width: 18px; height: 0;"></div> <!-- fix for firefox -> no "scrollbar: overlay;" support -->
 
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
+				</div>
+				<div style="display: inline-block; overflow-y: scroll; overflow-x: hidden;">
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
 					
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
-					
-					
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
-					
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
-					
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
-					
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
-					
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
-					
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
-					
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
-					
-					<tr>
-						<td>Time</td>
-						<td>CoAP Message</td>
-						<td>MID</td>
-						<td>Token</td>
-						<td>Options</td>
-						<td>Payload</td>
-					</tr>
-					</tbody>
-				</table>
+				</div>
 			</div>
 		</div>
 	</div>
