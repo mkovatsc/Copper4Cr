@@ -21,55 +21,52 @@ Copper.ChromeServerPort = function(port, id){
 /* prototype */
 Copper.ChromeServerPort.prototype.port = undefined;
 Copper.ChromeServerPort.prototype.id = undefined;
+Copper.ChromeServerPort.prototype.disconnectCallback = undefined;
 
 /*
-* @arg remoteAddress
-* @arg remotePort
-* @return: udpclient which will send messages to the given host:port
+* @return: udpclient which can be bound to a local port
 * 
-* Creation is on the prototype in order to use different UDP-Implemntations (testing, different browsers)
+* Creation is on the port prototype in order to use different UDP-Implemntations (testing, different browsers)
 */
-Copper.ChromeServerPort.prototype.createUdpClient = function(remoteAddress, remotePort){
-	return new Copper.ChromeUdpClient(remoteAddress, remotePort);
+Copper.ChromeServerPort.prototype.createUdpClient = function(){
+	return new Copper.ChromeUdpClient();
 };
 
 /*
-* Disconnects the port and clears all resources
-*/
-Copper.ChromeServerPort.prototype.disconnect = function(){
-	if (this.port !== undefined){
-		this.port.disconnect();
-		this.port = undefined;
+* Register a callback of the that is called when the client port disconnects
+* 
+* @arg callback: callback of the form function()
+*/ 
+Copper.ChromeServerPort.prototype.registerDisconnectCallback = function(callback) {
+	if (typeof(callback) !== "function"){
+		throw new Error("Illegal Arguments");
 	}
+	this.disconnectCallback = callback;
 };
 
-
-/* Implementation */
-Copper.ChromeServerPort.prototype.onClientMessage = function(msg){
-	// Route message through event queue. Id is set as the endpoint id.
-	msg = Copper.Event.createFromJson(msg);
-	msg.receiver = this.id;
-	msg.sender = msg.sender ? msg.sender : 0;
-	Copper.Event.sendEvent(msg);
-};
-
-Copper.ChromeServerPort.prototype.onClientDisconnect = function(){
-	if (this.port !== undefined){
-		this.disconnect();
-		Copper.Event.sendEvent(Copper.Event.createClientDisconnectedEvent(this.id, 0));
-	}
-};
-
+/*
+* Send the message to the client
+*
+* @arg: message in form of an event
+*/ 
 Copper.ChromeServerPort.prototype.sendClientMessage = function(msg){
 	if (!Number.isInteger(msg.type)){
 		throw new Error("Illegal Arguments");
 	}
 	if (this.port !== undefined){
-		delete msg.receiver;
-		try {
-			this.port.postMessage(Copper.Event.convertToJson(msg));
-		} catch (exception){
-			this.onClientDisconnect();
-		}
+		this.port.postMessage(Copper.Event.convertToJson(msg));
 	}
+};
+
+/* Implementation */
+Copper.ChromeServerPort.prototype.onClientMessage = function(msg){
+	// Route message through event queue. Id is set as the endpoint id.
+	msg = Copper.Event.createFromJson(msg);
+	msg.endpointId = this.id;
+	Copper.Event.sendEvent(msg);
+};
+
+Copper.ChromeServerPort.prototype.onClientDisconnect = function(){
+	this.port = undefined;
+	if (this.disconnectCallback !== undefined) this.disconnectCallback();
 };

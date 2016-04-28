@@ -39,6 +39,7 @@
                      //server part
                      "endpoint/ChromeUdpClient.js",
                      "endpoint/ChromeServerPort.js",
+                     "endpoint/TransactionHandler.js",
                      "endpoint/ServerEndpoint.js",
 
                      "background.js"

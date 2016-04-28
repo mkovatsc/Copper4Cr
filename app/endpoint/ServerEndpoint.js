@@ -17,10 +17,14 @@ Copper.ServerEndpoint = function(port, id){
 	if (!port || !Number.isInteger(id)){
 		throw new Error("Illegal Arguments");
 	}
-	this.port = port;
 	this.id = id;
+	this.port = port;
 	
 	let thisRef = this;
+
+	this.port.registerDisconnectCallback(function(){
+		thisRef.handleClientDisconnected();
+	});
 
 	this.eventCallback = function(event){
 		return thisRef.dispatchEvent(event);
@@ -40,140 +44,107 @@ Copper.ServerEndpoint.STATE_DISCONNECTED = 2;
 Copper.ServerEndpoint.prototype.port = undefined;
 Copper.ServerEndpoint.prototype.id = undefined;
 Copper.ServerEndpoint.prototype.state = undefined;
-Copper.ServerEndpoint.prototype.udpClient = undefined;
+Copper.ServerEndpoint.prototype.transactionHandler = undefined;
 Copper.ServerEndpoint.prototype.eventCallback = undefined;
 
+
+/* Callbacks */
+/* Callback for the Copper event queue */
 Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 	if (!Number.isInteger(event.type)){
 		throw new Error("Illegal Arguments");
 	}
-	if (event.receiver === this.id){
+	if (event.endpointId === this.id){
 		try {
 			switch(event.type){
 				case Copper.Event.TYPE_ERROR:
-					Copper.Log.logError("Error on endpoint " + this.id + ": " + event.data.errorMessage);
-					return true;
-				case Copper.Event.TYPE_CLIENT_DISCONNECTED:
-					return this.onDisconnect();
+					return this.onError(event.data.errorMessage, event.data.endpointReady);
+
 				case Copper.Event.TYPE_REGISTER_CLIENT:
-					return this.onRegisterClient(event.data.remoteAddress, event.data.remotePort, event.sender);
+					return this.onRegisterClient(event.data.remoteAddress, event.data.remotePort);
+				case Copper.Event.TYPE_CLIENT_REGISTERED:
+					this.state = Copper.ServerEndpoint.STATE_UDP_SOCKET_READY;
+					this.port.sendClientMessage(event);
+					return true;
 				case Copper.Event.TYPE_UNREGISTER_CLIENT:
-					return this.onUnregisterClient(event.sender);
+					return this.onUnregisterClient();
 
 				case Copper.Event.TYPE_SEND_COAP_MESSAGE:
-					return this.onClientSendCoapMessage(event.data.coapMessage, event.sender);
+					return this.onClientSendCoapMessage(event.data.coapMessage);
+				case Copper.Event.TYPE_COAP_MESSAGE_SENT:
+					this.port.sendClientMessage(event);
+					return true;
 
-				case Copper.Event.TYPE_CLIENT_REGISTERED:
 				case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
-					return false;
+					this.port.sendClientMessage(event);
+					return true;
 
 				default:
 					Copper.Log.logWarning("Unknown event type " + event.type);
 					return false;
 			}
 		} catch (exception) {
-			this.onServerEndpointException(exception, event.sender);
-			return true;
+			Copper.Log.logError("Error on endpoint " + this.id + ": " + exception.message);
+			return this.onError("Endpoint Error: " + exception.message, false);
 		}
-		return true;
 	}
 };
 
-Copper.ServerEndpoint.prototype.onServerEndpointException = function(exception, receiver){
-	Copper.Log.logError("Error on endpoint " + this.id + ": " + exception.message);
-	this.port.sendClientMessage(Copper.Event.createErrorEvent(exception.message, false, receiver, this.id));
-	this.onDisconnect();
-};
-
-Copper.ServerEndpoint.prototype.onDisconnect = function(){
+/* Callback for the server port (called when the client disconnects) */
+Copper.ServerEndpoint.prototype.handleClientDisconnected = function(){
+	if (this.state === Copper.ServerEndpoint.STATE_UDP_SOCKET_READY){
+		this.transactionHandler.close();
+		this.transactionHandler = undefined;
+	}
 	if (this.state !== Copper.ServerEndpoint.STATE_DISCONNECTED){
 		this.state = Copper.ServerEndpoint.STATE_DISCONNECTED;
-		if (this.udpClient !== undefined){
-			this.udpClient.close();
-			this.udpClient = undefined;
-		}
-		Copper.Event.removeEventsForReceiver(this.id);
+		Copper.Event.removeEventsForEndpoint(this.id);
 		Copper.Event.unregisterCallback(this.eventCallback);
 		Copper.Log.logFine("Server Endpoint " + this.id + " closed");
-		this.port.disconnect();
-		this.port = undefined;
 	}
+};
+
+/* Implementation of the different events */
+Copper.ServerEndpoint.prototype.onError = function(errorMessage, endpointReady){
+	if (this.state === Copper.ServerEndpoint.STATE_UDP_SOCKET_READY && !endpointReady){
+		this.transactionHandler.close();
+		this.transactionHandler = undefined;
+		this.state = Copper.ServerEndpoint.STATE_CONNECTED;
+	}
+	this.port.sendClientMessage(Copper.Event.createErrorEvent(errorMessage, endpointReady, this.id));
 	return true;
 };
 
-Copper.ServerEndpoint.prototype.onRegisterClient = function(remoteAddress, remotePort, receiver){
+Copper.ServerEndpoint.prototype.onRegisterClient = function(remoteAddress, remotePort){
 	if (this.state !== Copper.ServerEndpoint.STATE_CONNECTED){
-		this.port.sendClientMessage(Copper.Event.createErrorEvent("Illegal State", this.state === Copper.ServerEndpoint.STATE_UDP_SOCKET_READY, receiver, this.id));
-	}
-	else if (this.udpClient !== undefined){
-		// we are already connecting
-		this.port.sendClientMessage(Copper.Event.createErrorEvent("Illegal State", true, receiver, this.id));
+		this.onError("Illegal State", this.state === Copper.ServerEndpoint.STATE_UDP_SOCKET_READY);
 	}
 	else {
-		this.udpClient = this.port.createUdpClient(remoteAddress, remotePort);
-		let thisRef = this;
-		this.udpClient.bind(function(bindSuccessful){
-								if (bindSuccessful){
-									thisRef.state = Copper.ServerEndpoint.STATE_UDP_SOCKET_READY;
-									thisRef.port.sendClientMessage(Copper.Event.createClientRegisteredEvent(receiver, thisRef.id));
-								}
-								else {
-									thisRef.port.sendClientMessage(Copper.Event.createErrorEvent("Error creating the socket", false, receiver, thisRef.id))
-								}
-							},
-							function(datagram, remoteAddress, remotePort){
-								thisRef.onReceiveDatagram(datagram, remoteAddress, remotePort);
-							},
-							function(socketOpen){
-								thisRef.onReceiveDatagramError(socketOpen);
-							}
-		);
+		this.transactionHandler = new Copper.TransactionHandler(this.port.createUdpClient(), remoteAddress, remotePort, this.id);
+		this.transactionHandler.bind();
 	}
 	return true;
 };
 
-Copper.ServerEndpoint.prototype.onUnregisterClient = function(receiver){
+Copper.ServerEndpoint.prototype.onUnregisterClient = function(){
 	if (this.state !== Copper.ServerEndpoint.STATE_UDP_SOCKET_READY){
-		this.port.sendClientMessage(Copper.Event.createErrorEvent("Illegal State", false, receiver, this.id));
+		this.onError("Illegal State", false);
 	}
 	else {
-		if (this.udpClient !== undefined){
-			this.udpClient.close();
-			this.udpClient = undefined;
-		}
-		this.state === Copper.ServerEndpoint.STATE_CONNECTED;
+		this.transactionHandler.close();
+		this.transactionHandler = undefined;
+		this.state = Copper.ServerEndpoint.STATE_CONNECTED;
 		Copper.Log.logFine("Server Endpoint " + this.id + ": Client unregistered");
 	}
 	return true;
 };
 
-Copper.ServerEndpoint.prototype.onClientSendCoapMessage = function(coapMessage, receiver){
+Copper.ServerEndpoint.prototype.onClientSendCoapMessage = function(coapMessage){
 	if (this.state !== Copper.ServerEndpoint.STATE_UDP_SOCKET_READY){
-		this.port.sendClientMessage(Copper.Event.createErrorEvent("Illegal State", false, receiver, this.id));
+		this.onError("Illegal State", false);
 	}
 	else {
-		let thisRef = this;
-		this.udpClient.send(Copper.CoapMessageSerializer.serialize(coapMessage), function(successful, bytesSent, socketOpen, errorMsg){
-			if (!successful){
-				thisRef.port.sendClientMessage(Copper.Event.createErrorEvent("Error while sending: " + errorMsg, socketOpen, receiver, thisRef.id));
-			}
-			if (!socketOpen){
-				thisRef.onDisconnect();
-			}
-		});
+		this.transactionHandler.sendCoapMessage(coapMessage);
 	}
 	return true;
-};
-
-// -------- UDP Socket -----------
-Copper.ServerEndpoint.prototype.onReceiveDatagram = function(datagram, remoteAddress, remotePort){
-	let result = Copper.CoapMessageSerializer.deserialize(datagram);
-	this.port.sendClientMessage(Copper.Event.createReceivedCoapMessageEvent(result.message, result.warnings, result.error, remoteAddress, remotePort, datagram.byteLength, 0, this.id));
-};
-
-Copper.ServerEndpoint.prototype.onReceiveDatagramError = function(socketOpen){
-	this.port.sendClientMessage(Copper.Event.createErrorEvent("Receive Error", socketOpen, 0, this.id));
-	if (!socketOpen){
-		this.onDisconnect();
-	}
 };

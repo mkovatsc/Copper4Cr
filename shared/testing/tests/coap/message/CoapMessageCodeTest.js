@@ -44,6 +44,9 @@ QUnit.test("CoapMessageCode: SuccessCode", function(assert) {
 	assert.throws(function() {
 		Copper.CoapMessage.Code.getCode(97);
 	});
+	assert.throws(function() {
+		Copper.CoapMessage.Code.getCode(225);
+	});
 });
 
 QUnit.test("CoapMessageCode: ClientErrorCode", function(assert) {
