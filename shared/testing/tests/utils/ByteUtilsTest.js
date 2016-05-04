@@ -116,6 +116,5 @@ QUnit.test("ByteUtils: convertBytesToHexString", function(assert) {
 QUnit.test("ByteUtils: convertBytesToJson", function(assert) {
 	let data = 0x43241349;
 	let json = Copper.ByteUtils.convertBytesToJson(Copper.ByteUtils.convertUintToBytes(data));
-	console.log(json);
 	assert.deepEqual(Copper.ByteUtils.convertBytesToUint(Copper.ByteUtils.convertJsonToBytes(json)), data);
 });

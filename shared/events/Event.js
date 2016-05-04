@@ -65,15 +65,20 @@ Copper.Event.dispatchEvents = function(){
 };
 
 Copper.Event.TYPE_ERROR = 1;
+Copper.Event.ERROR_GENERAL = 10;
+Copper.Event.ERROR_ILLEGAL_STATE = 11;
+Copper.Event.ERROR_BIND = 12;
+Copper.Event.ERROR_SEND = 13;
+Copper.Event.ERROR_RECEIVE = 14;
 
-Copper.Event.TYPE_REGISTER_CLIENT = 10;
-Copper.Event.TYPE_CLIENT_REGISTERED = 11;
-Copper.Event.TYPE_UNREGISTER_CLIENT = 12;
+Copper.Event.TYPE_REGISTER_CLIENT = 20;
+Copper.Event.TYPE_CLIENT_REGISTERED = 21;
+Copper.Event.TYPE_UNREGISTER_CLIENT = 22;
 
-Copper.Event.TYPE_SEND_COAP_MESSAGE = 20;
-Copper.Event.TYPE_COAP_MESSAGE_SENT = 21;
+Copper.Event.TYPE_SEND_COAP_MESSAGE = 30;
+Copper.Event.TYPE_COAP_MESSAGE_SENT = 31;
 
-Copper.Event.TYPE_COAP_MESSAGE_RECEIVED = 30;
+Copper.Event.TYPE_COAP_MESSAGE_RECEIVED = 40;
 
 Copper.Event.createEvent = function(type, data, endpointId){
 	if (!Number.isInteger(type) || !Number.isInteger(endpointId)){
@@ -88,8 +93,12 @@ Copper.Event.createEvent = function(type, data, endpointId){
 	return event;
 };
 
-Copper.Event.createErrorEvent = function(errorMessage, endpointReady, endpointId){
+Copper.Event.createErrorEvent = function(errorType, errorMessage, endpointReady, endpointId){
+	if (!Number.isInteger(errorType)){
+		throw new Error("Illegal Arguments");
+	}
 	let data = {
+		errorType: errorType,
 		errorMessage: errorMessage,
 		endpointReady: (endpointReady ? true : false)
 	};

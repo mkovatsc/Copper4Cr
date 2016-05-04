@@ -1,5 +1,6 @@
                      "shared/namespace.js",
 
+                     "shared/utils/TimeUtils.js",
                      "shared/utils/StringUtils.js",
                      "shared/utils/ByteUtils.js",
 

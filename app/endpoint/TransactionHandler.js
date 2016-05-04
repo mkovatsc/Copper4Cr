@@ -14,6 +14,7 @@
 *   STATE_CLOSED
 */
 
+
 Copper.TransactionHandler = function(udpClient, remoteAddress, remotePort, endpointId){
 	if (typeof(remoteAddress) !== "string" || !Number.isInteger(remotePort) || remotePort <= 0x0 || remotePort > 0xFFFF || !Number.isInteger(endpointId)) {
 		throw new Error("Illegal Arguments");
@@ -42,7 +43,7 @@ Copper.TransactionHandler.prototype.state = undefined;
 */
 Copper.TransactionHandler.prototype.bind = function(){
 	if (this.state !== Copper.TransactionHandler.STATE_CREATED){
-		Copper.Event.sendEvent(Copper.Event.createErrorEvent("Illegal State", this.state === Copper.TransactionHandler.STATE_READY, this.endpointId));
+		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", this.state === Copper.TransactionHandler.STATE_READY, this.endpointId));
 	}
 	else {
 		let thisRef = this;
@@ -52,7 +53,7 @@ Copper.TransactionHandler.prototype.bind = function(){
 									Copper.Event.sendEvent(Copper.Event.createClientRegisteredEvent(port, thisRef.endpointId));
 								}
 								else {
-									Copper.Event.sendEvent(Copper.Event.createErrorEvent("Error while binding socket: " + errorMsg, false, thisRef.endpointId));
+									Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_BIND, "Error while binding socket: " + errorMsg, false, thisRef.endpointId));
 									thisRef.close();
 								}
 							},
@@ -69,7 +70,7 @@ Copper.TransactionHandler.prototype.bind = function(){
 */
 Copper.TransactionHandler.prototype.sendCoapMessage = function(coapMessage){
 	if (this.state !== Copper.TransactionHandler.STATE_READY){
-		Copper.Event.sendEvent(Copper.Event.createErrorEvent("Illegal State", false, this.endpointId));
+		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false, this.endpointId));
 	}
 	else {
 		let thisRef = this;
@@ -78,7 +79,7 @@ Copper.TransactionHandler.prototype.sendCoapMessage = function(coapMessage){
 				Copper.Event.sendEvent(Copper.Event.createCoapMessageSentEvent(coapMessage, bytesSent, thisRef.endpointId));
 			}
 			else {
-				Copper.Event.sendEvent(Copper.Event.createErrorEvent("Error while sending: " + errorMsg, socketOpen, thisRef.endpointId));
+				Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_SEND, "Error while sending: " + errorMsg, socketOpen, thisRef.endpointId));
 			}
 		});
 	}
@@ -104,6 +105,6 @@ Copper.TransactionHandler.prototype.onReceiveDatagram = function(datagram, remot
 
 Copper.TransactionHandler.prototype.onReceiveDatagramError = function(socketOpen, errorMsg){
 	if (this.state !== Copper.TransactionHandler.STATE_CLOSED){
-		Copper.Event.sendEvent(Copper.Event.createErrorEvent("Error while receiving: " + errorMsg, socketOpen, this.endpointId));
+		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_RECEIVE, "Error while receiving: " + errorMsg, socketOpen, this.endpointId));
 	}
 };
