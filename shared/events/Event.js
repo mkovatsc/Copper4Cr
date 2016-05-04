@@ -105,10 +105,11 @@ Copper.Event.createErrorEvent = function(errorType, errorMessage, endpointReady,
 	return Copper.Event.createEvent(Copper.Event.TYPE_ERROR, data, endpointId);
 };
 
-Copper.Event.createRegisterClientEvent = function(remoteAddress, remotePort, endpointId){
+Copper.Event.createRegisterClientEvent = function(remoteAddress, remotePort, settings, endpointId){
 	let data = {
 		remoteAddress: remoteAddress,
-		remotePort: remotePort
+		remotePort: remotePort,
+		settings: settings
 	};
 	return Copper.Event.createEvent(Copper.Event.TYPE_REGISTER_CLIENT, data, endpointId);
 };

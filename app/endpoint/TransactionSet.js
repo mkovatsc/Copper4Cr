@@ -128,6 +128,13 @@ Copper.TransactionSet.prototype.unregisterToken = function(token){
 	}
 };
 
+/*
+* @return number of transactions in this set
+*/
+Copper.TransactionSet.prototype.getTransactionCount = function(){
+	return this.activeRequestTransactions.length + this.timeoutedRequestTransactions.length + this.responseTransactions.length;
+};
+
 
 /*
 * Checks each transaction if an action is necessary and calls the callback if this is the case

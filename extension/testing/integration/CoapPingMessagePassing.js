@@ -23,5 +23,5 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     };
 	clientPort.onMessage.addListener(onServerMessage);
 
-	clientPort.postMessage(Copper.Event.convertToJson(Copper.Event.createRegisterClientEvent("vs0.inf.ethz.ch", 5683, 0)));
+	clientPort.postMessage(Copper.Event.convertToJson(Copper.Event.createRegisterClientEvent("vs0.inf.ethz.ch", 5683, new Copper.Settings(), 0)));
 });

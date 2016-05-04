@@ -22,6 +22,8 @@ QUnit.test("TransactionSet: General", function(assert) {
 	transactionSet.addNewTransaction(conTransaction);
 	transactionSet.addNewTransaction(resTransaction);
 
+	assert.deepEqual(transactionSet.getTransactionCount(), 3);
+
 	assert.throws(function(){
 		transactionSet.addNewTransaction(new Copper.RequestTransaction(20, "0x03323", true, new ArrayBuffer(10)));
 	});	
@@ -59,12 +61,14 @@ QUnit.test("TransactionSet: General", function(assert) {
 	assert.deepEqual(retransmissionCounter, Copper.CoapConstants.MAX_RETRANSMIT);
 	assert.deepEqual(timeoutCounter, 2);
 	assert.deepEqual(endOfLifeCounter, 0);
+	assert.deepEqual(transactionSet.getTransactionCount(), 3);
 
 	elapsedTime = 1 + 1000*Copper.CoapConstants.NON_LIFETIME;
 	transactionSet.handleTransactions();
 	assert.deepEqual(retransmissionCounter, Copper.CoapConstants.MAX_RETRANSMIT);
 	assert.deepEqual(timeoutCounter, 2);
 	assert.deepEqual(endOfLifeCounter, 1);
+	assert.deepEqual(transactionSet.getTransactionCount(), 2);
 
 
 	elapsedTime = 1 + 1000*Copper.CoapConstants.EXCHANGE_LIFETIME;
@@ -75,6 +79,20 @@ QUnit.test("TransactionSet: General", function(assert) {
 
 	transactionSet.unregisterToken("0x033245");
 	assert.deepEqual(transactionSet.isTokenRegistered("0x033245"), false);
+
+	elapsedTime = 0;
+
+	conTransaction.isCompleted = false;
+	transactionSet.addNewTransaction(conTransaction);
+	transactionSet.getRequestTransaction(11, "0x033245").isCompleted = false;
+
+	transactionSet.handleTransactions();
+	assert.deepEqual(retransmissionCounter, Copper.CoapConstants.MAX_RETRANSMIT);
+	elapsedTime = 1 + conTransaction.timeout;
+
+	transactionSet.handleTransactions();
+	assert.deepEqual(retransmissionCounter, Copper.CoapConstants.MAX_RETRANSMIT);
+	assert.deepEqual(transactionSet.getTransactionCount(), 1);
 
 	// reset timer
 	Copper.TimeUtils.now = oldNowFunction;

@@ -61,7 +61,7 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 					return this.onError(event.data.errorType, event.data.errorMessage, event.data.endpointReady);
 
 				case Copper.Event.TYPE_REGISTER_CLIENT:
-					return this.onRegisterClient(event.data.remoteAddress, event.data.remotePort);
+					return this.onRegisterClient(event.data.remoteAddress, event.data.remotePort, event.data.settings);
 				case Copper.Event.TYPE_CLIENT_REGISTERED:
 					this.state = Copper.ServerEndpoint.STATE_UDP_SOCKET_READY;
 					this.port.sendClientMessage(event);
@@ -115,12 +115,12 @@ Copper.ServerEndpoint.prototype.onError = function(errorType, errorMessage, endp
 	return true;
 };
 
-Copper.ServerEndpoint.prototype.onRegisterClient = function(remoteAddress, remotePort){
+Copper.ServerEndpoint.prototype.onRegisterClient = function(remoteAddress, remotePort, settings){
 	if (this.state !== Copper.ServerEndpoint.STATE_CONNECTED){
 		this.onError(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", this.state === Copper.ServerEndpoint.STATE_UDP_SOCKET_READY);
 	}
 	else {
-		this.transactionHandler = new Copper.TransactionHandler(this.port.createUdpClient(), remoteAddress, remotePort, this.id);
+		this.transactionHandler = new Copper.TransactionHandler(this.port.createUdpClient(), remoteAddress, remotePort, settings, this.id);
 		this.transactionHandler.bind();
 	}
 	return true;

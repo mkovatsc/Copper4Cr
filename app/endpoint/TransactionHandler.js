@@ -15,13 +15,14 @@
 */
 
 
-Copper.TransactionHandler = function(udpClient, remoteAddress, remotePort, endpointId){
+Copper.TransactionHandler = function(udpClient, remoteAddress, remotePort, settings, endpointId){
 	if (typeof(remoteAddress) !== "string" || !Number.isInteger(remotePort) || remotePort <= 0x0 || remotePort > 0xFFFF || !Number.isInteger(endpointId)) {
 		throw new Error("Illegal Arguments");
 	}
 	this.udpClient = udpClient;
 	this.remoteAddress = remoteAddress;
 	this.remotePort = remotePort;
+	this.settings = settings;
 	this.endpointId = endpointId;
 	this.state = Copper.TransactionHandler.STATE_CREATED;
 };
@@ -35,6 +36,7 @@ Copper.TransactionHandler.STATE_CLOSED = 2;
 Copper.TransactionHandler.prototype.udpClient = undefined;
 Copper.TransactionHandler.prototype.remoteAddress = undefined;
 Copper.TransactionHandler.prototype.remotePort = undefined;
+Copper.TransactionHandler.prototype.settings = undefined;
 Copper.TransactionHandler.prototype.endpointId = undefined;
 Copper.TransactionHandler.prototype.state = undefined;
 
