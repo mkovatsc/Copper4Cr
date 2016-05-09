@@ -9,55 +9,45 @@
 	<link rel="stylesheet" type="text/css" href="css/reset.css"/>
 	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
+	<link rel="stylesheet" type="text/css" href="css/pure-min.css"/>
 
 </head>
 <body>
 
-<div id="menu-bar">
-	<div id= "menu-group" class="btn-group btn-group-lg" role="group" aria-label="...">
-		<button onclick="onClickDiscover()" type="button" class="btn btn-default">
-				<span class="glyphicon glyphicon-search" aria-hidden="true"></span> Discover
+<div id="main_toolbar">
+	<div class="toolbar_item"  style="background-color: pink;">
+		<button onclick="onClickPing()" type="button">
+				<img src="skin/tool_ping.png"></img> Ping
 		</button>
-		<button onclick="onClickPing()" type="button" class="btn btn-default border-right">
-				<span class="glyphicon glyphicon-record" aria-hidden="true"></span> Ping
-		</button>
-	</div>
-	
-	<div id= "menu-group" class="btn-group btn-group-lg" role="group" aria-label="...">
-		<button onclick="onClickGet()" type="button" class="btn btn-default">
-				<span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> GET
-		</button>
-		<button onclick="onClickPost()" type="button" class="btn btn-default">
-				<span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> POST
-		</button>
-		<button onclick="onClickPut()" type="button" class="btn btn-default">
-				<span class="glyphicon glyphicon-save" aria-hidden="true"></span> PUT
-		</button>
-		<button onclick="onClickDelete()" type="button" class="btn btn-default">
-				<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> DELETE
-		</button>
-		<button onclick="onClickObserve()" type="button" class="btn btn-default">
-				<span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span> Observe
+		<button onclick="onClickDiscover()" type="button">
+				<img src="skin/tool_discover.png"></img> Discover
 		</button>
 	</div>
 	
-	
-	<div id="payload-dropdown">
-		<div class="btn-group">
-		<button type="button" class="form-control btn btn-default dropdown-toggle" data-toggle="dropdown">
-				Payload
-			<!-- Display icon in button -->
-			<span class="caret"></span>
-			</button>
-			<ul class="dropdown-menu" role="menu">
-
-				<li><a href="#">Text</a></li>
-				<li><a href="#">File</a></li>
-			</ul>
-		</div>
+	<div class="toolbar_item" style="background-color: cyan;">
+		<button onclick="onClickGet()" type="button">
+				<img src="skin/tool_get.png"></img> GET
+		</button>
+		<button onclick="onClickPost()" type="button">
+				<img src="skin/tool_post.png"></img> POST
+		</button>
+		<button onclick="onClickPut()" type="button">
+				<img src="skin/tool_put.png"></img> PUT
+		</button>
+		<button onclick="onClickDelete()" type="button">
+				<img src="skin/tool_delete.png"></img> DELETE
+		</button>
+		<button onclick="onClickObserve()" type="button">
+				<img src="skin/tool_observe.png"></img> Observe
+		</button>
 	</div>
 	
-	<div id="behaviour-dropdown">
+	
+	<div id="menu_behavior">
+	
+	</div>
+	
+	<div id="menu_behavior">
 		<div class="btn-group">
 		<button type="button" class="form-control btn btn-default dropdown-toggle" data-toggle="dropdown">
 				Behaviour
@@ -82,12 +72,12 @@
 
 <!-- MENU BAR DONE -->
 <div id="container">
-	<div id="top-wrapper">
+	<div id="top_wrapper">
 		<div class="flex vbox" style="background-color: yellow; padding: 4px;">
 			<div class="flex hbox" style="background-color: pink;">
 				<div class="flex vbox" style="background-color: cyan;">
-					<div style="min-height: 66px;" >
-						<fieldset style="border: 1px black solid">
+					<div style="min-height: 70px;" >
+						<fieldset style="border: 1px black solid; height: 66px; padding: 2px;">
 							<legend style="border: none;">Status</legend>
 							<div class="hbox"><label class="flex" id="info_code">some Text<label></div>
 						</fieldset>
@@ -102,53 +92,79 @@
 						
 						<div id="message_pane" class="flex vbox" style="background-color: silver;">
 							<div class="hbox" style="min-height: 100px; background-color: lime;">
-								<div id="packet_header">
-									<table style="background-color: white;">
-										<col width="50px">
-										<col width="150px">
-										<tr>
-											<th>Header</th>
-											<th>Value</th>
-										</tr>
-										<tbody>
-										<tr>
-											<td>Type</td>
-											<td>Answer</td>
-										</tr>
-										<tr>
-											<td >Code</td>
-											<td>Answer</td>
-										</tr>
-										<tr>
-											<td >MID</td>
-											<td>Answer</td>
-										</tr>
-										<tr>
-											<td >Token</td>
-											<td>Answer</td>
-										</tr>
-										</tbody>
-									</table>
+								<div id="packet_header" class="vbox">
+									<div class="hbox table-head">
+												<p>Header</p>
+												<p>Value</p>
+									</div>
+									<div class="flex" style="display: inline-block; overflow-x: hidden;">
+						
+										<div class="table-body-row">
+											<p>Type</p>
+											<p id="packet_header_type">Answer</p>
+										</div>
+										<div class="table-body-row">
+											<p>Code</p>
+											<p id="packet_header_code">Answer</p>
+										</div>
+										<div class="table-body-row">
+											<p>MID</p>
+											<p id="packet_header_mid">Answer</p>
+										</div>
+										<div class="table-body-row">
+											<p>Token</p>
+											<p id="packet_header_token">Answer</p>
+										</div>
+									</div>
 								</div>
-								<div class="flex vbox" id="packet_options">
-									<table style="background-color: white;">
-										<col width="35%">
-										<col width="55%">
-										<col width="10%">
-										<tr>
-											<th>Option</th>
-											<th>Value</th>
-											<th>Info</th>
-										</tr>
-										<tr>
-											<td >Token</td>
-											<td>Answer</td>
-										</tr>
-									</table>
+								<div id="packet_options" class="flex vbox">
+									<div class="hbox table-head">
+										<p>Option</p>
+										<p>Value</p>
+										<p>Info</p>
+										<div style="float: right; width: 18px; height: 0;"></div> <!-- fix for firefox -> no "scrollbar: overlay;" support -->
+									</div>
+									<div class="flex" style="display: inline-block; overflow-y: scroll; overflow-x: hidden;">
+										<div class="table-body-row">
+											<p>Option</p>
+											<p>Value</p>
+											<p>Info</p>
+										</div>
+										<div class="table-body-row">
+											<p>Option</p>
+											<p>Value</p>
+											<p>Info</p>
+										</div>
+										<div class="table-body-row">
+											<p>Option</p>
+											<p>Value</p>
+											<p>Info</p>
+										</div>
+										<div class="table-body-row">
+											<p>Option</p>
+											<p>Value</p>
+											<p>Info</p>
+										</div>
+										<div class="table-body-row">
+											<p>Option</p>
+											<p>Value</p>
+											<p>Info</p>
+										</div>
+										<div class="table-body-row">
+											<p>Option</p>
+											<p>Value</p>
+											<p>Info</p>
+										</div>
+										<div class="table-body-row">
+											<p>Option</p>
+											<p>Value</p>
+											<p>Info</p>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="flex vbox" style="margin: 4px; background-color: gold;">
-								<div style="min-height: 25px;"><p class="box-label">Payload</p></div>
+								<div style="min-height: 25px; height: 25px; padding: 6px;">Payload</div>
 								
 								<div style="min-height: 40px;">
 									<ul class="nav nav-tabs">
@@ -157,7 +173,7 @@
 										<li><a href="#tab_outgoing" role="tab" data-toggle="tab">Outgoing</a></li>
 									</ul>
 								</div>
-								<div id="tabbed-pane-payload" class="tab-content" style="background-color: blue;">
+								<div id="tabbed_pane_payload" class="tab-content" style="background-color: blue;">
 										<div class="tab-pane active" id="tab_incoming" style="padding: 4px; background-color: red;">
 											<p>Incoming Tab</p>
 											<p>Incoming Tab</p>
@@ -221,17 +237,17 @@
 				
 				</div>
 				<div id="sidebar" class="vbox" style="background-color: green;">
-					<div style="padding: 0 10px;">
+					<div style="padding: 0 10px 5px 10px; min-height: 35px; height: 35px;">
 						<div class="checkbox" style="margin: 5px 0">
 							<label>
 								<input id="chk_debug_options" type="checkbox"><p>Debug Control</p>
 							</label>
-							<button id="reset-button" class="btn">Reset</button>
+							<button id="reset_button">Reset</button>
 						</div>
 						
 					</div>
 					
-					<div style="display: block; padding: 0 5px 0 9px; overflow-y: auto; background-color: orange;">
+					<div style="display: block; padding: 0 4px 0 4px; overflow-y: auto; background-color: orange;">
 						<div style="padding: 4px;">
 							<div style="text-align: center;"><label>Token</label></div>
 							<div class="flex hbox">
@@ -275,7 +291,7 @@
 								</span>		
 							</div>
 							
-							<div id="sidebar-block-size" class="hbox">
+							<div id="sidebar_block_size" class="hbox">
 								<div class="vbox" style="flex: 3; margin-left: 0;">
 									<p>Block1 (Req.)</p>
 									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_block1" placeholder="block no."><span onclick="clearInputText('debug_option_block1')" title="Clear">&times;</span></span>		
@@ -383,8 +399,10 @@
 			</div>
 		</div>
 		
-		<div class="vbox" style="height: 216px; background-color: pink;">
-			<p class="box-label">CoAP Message Log</p>
+		<div class="vbox" style="padding: 4px; height: 216px; background-color: pink;">
+			<div style="padding: 4px;">
+				CoAP Message Log
+			</div>
 			<div id="log_messages" class="flex vbox">
 				<div class="hbox table-head">
 					<p>Time</p>
@@ -396,96 +414,105 @@
 					<div style="float: right; width: 18px; height: 0;"></div> <!-- fix for firefox -> no "scrollbar: overlay;" support -->
 
 				</div>
-				<div style="display: inline-block; overflow-y: scroll; overflow-x: hidden;">
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
+				<div class="flex" style="display: inline-block; overflow-y: scroll; overflow-x: hidden;">
 					
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>OptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptions</p>
+						<p>PayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+			
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
+					<div class="table-body-row">
+						<p>Time</p>
+						<p>CoAP Message</p>
+						<p>MID</p>
+						<p>Token</p>
+						<p>Options</p>
+						<p>Payload</p>
+					</div>
 				</div>
 			</div>
 		</div>
