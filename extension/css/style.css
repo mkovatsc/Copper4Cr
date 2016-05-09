@@ -180,11 +180,6 @@ legend {
     flex: 1;
 }
 
-#message_pane th, td
-{
-	padding:0 5px;
-}
-
 #tabbed_pane_payload
 {
 	overflow-y: auto;
