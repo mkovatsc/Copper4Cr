@@ -199,19 +199,10 @@ legend {
 }
 
 #sidebar label {
-	margin-top: 10px;
+	margin-top: 5px;
 	margin-bottom: 5px;
 }
 
-#sidebar .btn
-{
-	border-radius: 5px;
-	border-width: 0px;
-	border-width: 1px;
-	background-color: white;
-	border-color: white;
-	color: black;
-}
 
 #sidebar .checkbox 
 {
@@ -244,7 +235,7 @@ legend {
 	background-color: white;
 	color: black;
 	margin-left: 13px;
-	height: 26px;
+	height: 23px;
 	padding: 0 17px;
 	align-items: center;
 }
@@ -258,6 +249,7 @@ legend {
   border:1px solid;
   padding:1px 5px 1px 1px;
   background: white;
+  height: 25px;
 }
 
 .text-input-custom  input {
