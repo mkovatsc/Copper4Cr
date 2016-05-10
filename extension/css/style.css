@@ -1,27 +1,82 @@
-﻿body {
+﻿html
+{
+	font-size: 10px;
+	font-family: sans-serif;
+}
+
+label 
+{
+	display: inline-block;
+	max-width: 100%;
+	font-weight: bold;
+}
+
+img {
+    vertical-align: middle;
+}
+
+* {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+*:before,
+*:after {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+body {
 	display: block;
 	text-align: center;
-	font-family: Arial;
+	font-family: sans-serif;
+	-webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
 	color: #333333;
 	font-size: 12px;
-	background-color: yellow;
+	background-color: #eee;
 	height: 100%;
 	width: 100%;
 	overflow: hidden;
+	box-sizing: border-box;
+	line-height: 1.42857;
 }
 
+button
+{
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  cursor: pointer;
+}
 
 * {
 	min-width: 0;
 	min-height: 0;
 }
 
+.white 
+{
+	background-color: white;
+}
+
+.border_solid
+{
+	border: 1px black solid;
+}
+
+.border_opacity
+{
+	border: 1px solid rgba(0, 0, 0, 0.2)
+}
+
 #main_toolbar {
 	display: flex;
 	overflow: hidden;
 	height: 35px;
-	background-color: white;
-	min-width: 800px;
+	min-width: 728px;
 	width: 100%;
 	border-top: 1px black solid;
 	border-bottom: 1px black solid;
@@ -29,8 +84,13 @@
 
 #main_toolbar .toolbar_item
 {
-	border-right: 1px black solid;
+	display: inline-block;
 	height: 100%;
+}
+
+#main_toolbar .border_right
+{
+	border-right: 1px black solid;
 }
 
 #main_toolbar button
@@ -38,12 +98,31 @@
 	border-radius: 0px;
 	border-width: 0px;
 	border-color: black;
-	background-color: white;
+	background-color: #eee;
 	color: black;
 	height: 100%;
 	font-size: 13px;
 	padding-right: 5px;
 	padding-left: 5px;
+}
+
+#main_toolbar button:not(.no_hover):hover
+{
+	background-color: #ddd;
+}
+
+#main_toolbar #toolbar_log
+{
+	padding: 0; 
+	margin: -18px 0 0 0; 
+	font-size: 350%;
+}
+
+#main_toolbar #toolbar_preferences
+{
+	padding: 0;
+	margin: -18px 5px 0 0;
+	font-size: 250%;
 }
 
 #content .wrapper
@@ -60,7 +139,6 @@
 	width: 100%;
 	top: 35px;
 	bottom: 0;
-	background-color: white;
 	text-align: left;
 }
 
@@ -68,7 +146,6 @@
 #top_wrapper{
 	display: flex;
 	position: relative;
-	background-color: green;
 	height: 100%;
 	flex-direction: column;
 }
@@ -106,6 +183,7 @@ legend {
 
 #resource_tree_container
 {
+	border-right: 1px black solid;
 	width: 16em;
 }
 
@@ -128,7 +206,6 @@ legend {
 	width: 200px;
 	margin: 4px;
 	border: 1px black solid;
-	background-color: white;
 }
 
 #packet_header p
@@ -159,7 +236,6 @@ legend {
 {
 	margin: 4px;
 	border: 1px black solid;
-	background-color: white;
 }
 
 #packet_options p:nth-child(1) {
@@ -178,13 +254,6 @@ legend {
     display: inline-block;
     flex-direction: column;
     flex: 1;
-}
-
-#tabbed_pane_payload
-{
-	overflow-y: auto;
-	width: 100%;
-	height: 100%;
 }
 
 #tabbed_pane_payload p
@@ -206,19 +275,16 @@ legend {
 
 #sidebar .checkbox 
 {
+	display: inline-block;
+	position: relative;
 	margin-bottom: 0;
-}
-
-#sidebar .checkbox > label
-{
-	margin-top: 0;
-	margin-bottom: 0;
-	text-align: left;
+	margin-top: 5px;
 }
 
 #sidebar .checkbox p {
 	margin: 0;
 	padding-top: 2px;
+	display: inline-block;
 }
 
 #sidebar p {
@@ -232,18 +298,15 @@ legend {
 	border-radius: 4px;
 	border-width: 1px;
 	border-color: black;
-	background-color: white;
+	background-color: #fff;
 	color: black;
 	margin-left: 13px;
 	height: 23px;
 	padding: 0 17px;
 	align-items: center;
+	text-transform: none;
 }
 
-#sidebar .caret
-{
-	padding: 0;
-}
 
 .text-input-custom {
   border:1px solid;
@@ -268,25 +331,6 @@ legend {
   font-weight:bold;
 }
 
-.dropdown-caret > a
-{
-	padding: 0;
-	padding-right: 7px;
-	padding-left: 3px;
-	width: 5px;
-}
-
-.dropdown-caret {
-	border-left: 1px solid;
-	margin-left: 1px;
-}
-
-
-.dropdown-menu > li > a:hover {
-    background-color: blue;
-	color: white;
-}
-
 #sidebar_block_size > div
 {
 	margin-left: 5px;
@@ -298,8 +342,6 @@ legend {
 }
 
 #log_messages {
-	background-color: white;
-	border: 1px solid;
 	padding-bottom: 1px;
 }
 

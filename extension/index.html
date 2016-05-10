@@ -7,52 +7,57 @@
 	<title>Copper</title>
 	
 	<link rel="stylesheet" type="text/css" href="css/reset.css"/>
-	<link rel="stylesheet" type="text/css" href="css/bootstrap.css">
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
-	<link rel="stylesheet" type="text/css" href="css/pure-min.css"/>
 
 </head>
 <body>
 
 <div id="main_toolbar">
-	<div class="toolbar_item"  style="background-color: pink;">
-		<button onclick="onClickPing()" type="button">
+	<div class="toolbar_item border_right">
+		<button id="toolbar_ping" type="button">
 				<img src="skin/tool_ping.png"></img> Ping
 		</button>
-		<button onclick="onClickDiscover()" type="button">
+		<button id="toolbar_discover" type="button">
 				<img src="skin/tool_discover.png"></img> Discover
 		</button>
 	</div>
 	
-	<div class="toolbar_item" style="background-color: cyan;">
-		<button onclick="onClickGet()" type="button">
+	<div class="toolbar_item border_right">
+		<button id="toolbar_get" type="button">
 				<img src="skin/tool_get.png"></img> GET
 		</button>
-		<button onclick="onClickPost()" type="button">
+		<button id="toolbar_post" type="button">
 				<img src="skin/tool_post.png"></img> POST
 		</button>
-		<button onclick="onClickPut()" type="button">
+		<button id="toolbar_put" type="button">
 				<img src="skin/tool_put.png"></img> PUT
 		</button>
-		<button onclick="onClickDelete()" type="button">
+		<button id="toolbar_delete" type="button">
 				<img src="skin/tool_delete.png"></img> DELETE
 		</button>
-		<button onclick="onClickObserve()" type="button">
+		<button id="toolbar_observe" type="button">
 				<img src="skin/tool_observe.png"></img> Observe
 		</button>
 	</div>
 	
 	<div class="toolbar_item">
-			<button type="button">
+			<button id="menu_payload" type="button">
 					Payload
 			</button> 
 		
-			<button type="button">
+			<button id="menu_behaviour" type="button">
 					Behaviour
 			</button>
-		
-			<button onclick="onClickCoap()" type="button" class="btn btn-default">
-				 Coap
+	</div>
+	<div class="flex"></div>
+	<div class="toolbar_item" >
+			
+			<button id="toolbar_log" class="no_hover" type="button">
+				&#x25A1
+			</button>
+			
+			<button id="toolbar_preferences" class="no_hover" type="button">
+				≡
 			</button>
 	</div>
 </div>
@@ -61,31 +66,31 @@
 <!-- MENU BAR DONE -->
 <div id="container">
 	<div id="top_wrapper">
-		<div class="flex vbox" style="background-color: yellow; padding: 4px;">
-			<div class="flex hbox" style="background-color: pink;">
-				<div class="flex vbox" style="background-color: cyan;">
+		<div class="flex vbox" style="padding: 4px;">
+			<div class="flex hbox">
+				<div class="flex vbox" style="overflow: hidden;">
 					<div style="min-height: 70px; height: 70px;" >
 						<fieldset style="border: 1px black solid; height: 62px; min-height: 62px; padding: 4px;">
 							<legend style="border: none;">Status</legend>
 							<div class="hbox"><label class="flex" id="info_code">some Text<label></div>
 						</fieldset>
 					</div>
-					<div class="flex hbox" style="background-color: green;">
+					<div class="flex hbox">
 					
-						<div id="resource_tree_container" style="background-color: brown;">
-							<div id="resource_tree">
+						<div class="vbox" id="resource_tree_container">
+							<div id="resource_tree" class="flex border_solid white">
 								<p>Tree View</p>
 							</div>
 						</div>
 						
-						<div id="message_pane" class="flex vbox" style="background-color: silver;">
-							<div class="hbox" style="min-height: 100px; height: 100px; background-color: lime;">
+						<div id="message_pane" class="flex vbox">
+							<div class="hbox" style="min-height: 100px; height: 100px;">
 								<div id="packet_header" class="vbox">
 									<div class="hbox table-head">
 												<p>Header</p>
 												<p>Value</p>
 									</div>
-									<div class="flex" style="display: inline-block; overflow-x: hidden;">
+									<div class="flex white" style="display: inline-block; overflow-x: hidden;">
 						
 										<div class="table-body-row">
 											<p>Type</p>
@@ -112,7 +117,7 @@
 										<p>Info</p>
 										<div style="float: right; width: 17px; height: 0;"></div> <!-- fix for firefox -> no "scrollbar: overlay;" support -->
 									</div>
-									<div class="flex" style="display: inline-block; overflow-y: scroll; overflow-x: hidden;">
+									<div class="flex white" style="display: inline-block; overflow-y: scroll; overflow-x: hidden;">
 										<div class="table-body-row">
 											<p>Option</p>
 											<p>Value</p>
@@ -151,7 +156,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="flex vbox" style="margin: 4px; background-color: gold;">
+							<div class="flex vbox" style="margin: 4px;">
 								<div style="min-height: 25px; height: 25px; padding: 6px;">Payload</div>
 								
 								<div style="min-height: 25px; height: 25px;">
@@ -167,31 +172,10 @@
 										</button>
 									</div>
 								</div>
-								<div id="tabbed_pane_payload" style="background-color: blue;">
-										<div id="tab_incoming" style="padding: 4px; background-color: red;">
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p><p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
+								<div id="tabbed_pane_payload" class="flex vbox white" style="padding: 4px; height: 100%;">
+									<div class="flex border_opacity" style="padding: 4px; overflow-y: auto">
+										<div id="tab_incoming" style="display: block;">
+			
 											<p>Incoming Tab</p>
 											<p>Incoming Tab</p>
 											<p>Incoming Tab</p>
@@ -217,12 +201,13 @@
 											<p>Incoming Tab</p>
 											<p>Incoming Tab</p>
 										</div>
-										<div id="tab_rendered" style="padding: 4px; background-color: cyan;">
+										<div id="tab_rendered" style="display: none; padding: 4px;">
 											<p>Rendered Tab</p>
 										</div>
-										<div id="tab_outgoing" style="padding: 4px; background-color: olive;">
+										<div id="tab_outgoing" style="display: none; padding: 4px;">
 											<p>Outgoing Tab</p>
 										</div>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -230,22 +215,24 @@
 					</div>
 				
 				</div>
-				<div id="sidebar" class="vbox" style="background-color: green;">
-					<div style="padding: 0 10px 5px 10px; min-height: 35px; height: 35px;">
-						<div class="checkbox" style="margin: 5px 0">
-							<label>
-								<input id="chk_debug_options" type="checkbox"><p>Debug Control</p>
-							</label>
+				<div id="sidebar" class="vbox" style="border-left: 1px black solid;">
+					<div style="padding: 0px 10px 0px 10px; min-height: 35px; height: 35px;">
+						<div class="checkbox">
+							<input id="chk_debug_options" type="checkbox">
+							<p>Debug Control</p>
 							<button id="reset_button">Reset</button>
 						</div>
 						
 					</div>
 					
-					<div style="display: block; padding: 0 4px 0 4px; overflow-y: auto; background-color: orange;">
+					<div style="display: block; padding: 0 4px 0 4px; overflow-y: auto;">
 						<div style="padding: 4px;">
 							<div style="text-align: center;"><label>Token</label></div>
 							<div class="flex hbox">
-								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_token" placeholder="use hex (0x..) or string"><span onclick="clearInputText('debug_option_token')" title="Clear">&times;</span></span>		
+								<span class="flex hbox text-input-custom">
+									<input class="flex" type="text" id="debug_option_token" placeholder="use hex (0x..) or string">
+									<span class="clear_text" title="Clear">&times;</span>
+								</span>		
 							</div>
 							
 							<div style="text-align: center;"><label style="padding-top: 2px; margin-bottom: 2px;">Request Options</label></div>
@@ -270,7 +257,10 @@
 							<div id="sidebar_block_size" class="hbox">
 								<div class="vbox" style="flex: 3; margin-left: 0;">
 									<p>Block1 (Req.)</p>
-									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_block1" placeholder="block no."><span onclick="clearInputText('debug_option_block1')" title="Clear">&times;</span></span>		
+									<span class="hbox text-input-custom">
+										<input class="flex" type="text" id="debug_option_block1" placeholder="block no.">
+										<span class="clear_text" title="Clear">&times;</span>
+									</span>		
 									<p>Size1</p>
 									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_size1" placeholder="total size"><span onclick="clearInputText('debug_option_size1')" title="Clear">&times;</span></span>		
 
@@ -278,13 +268,19 @@
 								
 								<div class="vbox" style="flex: 3;">
 									<p>Block2 (Res.)</p>
-									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_block2" placeholder="block no."><span onclick="clearInputText('debug_option_block2')" title="Clear">&times;</span></span>		
+									<span class="hbox text-input-custom">
+										<input class="flex" type="text" id="debug_option_block2" placeholder="block no.">
+										<span class="clear_text" title="Clear">&times;</span>
+									</span>		
 									<p>Size2</p>
-									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_size2" placeholder="total size"><span onclick="clearInputText('debug_option_size2')" title="Clear">&times;</span></span>		
+									<span class="hbox text-input-custom">
+										<input class="flex" type="text" id="debug_option_size2" placeholder="total size">
+										<span class="clear_text" title="Clear">&times;</span>
+									</span>		
 
 								</div>
 								
-								<div class="vbox" style="flex: 1;">
+								<div class="flex vbox">
 									<p style="margin-left: auto; margin-right: auto;" >Auto</p>
 									<input id="chk_debug_option_block_auto" type="checkbox">
 								</div>
@@ -292,64 +288,89 @@
 							
 							<p>Observe</p>
 							<div class="flex hbox">
-								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_observe" placeholder="use integer"><span onclick="clearInputText('debug_option_observe')" title="Clear">&times;</span></span>		
+								<span class="flex hbox text-input-custom">
+									<input class="flex" type="text" id="debug_option_observe" placeholder="use integer">
+									<span class="clear_text" title="Clear">&times;</span>
+								</span>		
 							</div>
 							
 							<p>ETag</p>
 							<div class="flex hbox">
-								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_etag" placeholder="use hex (0x..) or string"><span onclick="clearInputText('debug_option_etag')" title="Clear">&times;</span></span>		
+								<span class="flex hbox text-input-custom">
+									<input class="flex" type="text" id="debug_option_etag" placeholder="use hex (0x..) or string">
+									<span class="clear_text" title="Clear">&times;</span>
+								</span>		
 							</div>
 							
 							<p>If-Match</p>
 							<div class="flex hbox">
-								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_if_match" placeholder="use an Etag"><span onclick="clearInputText('debug_option_if_match')" title="Clear">&times;</span></span>		
+								<span class="flex hbox text-input-custom">
+									<input class="flex" type="text" id="debug_option_if_match" placeholder="use an Etag">
+									<span class="clear_text" title="Clear">&times;</span>
+								</span>		
 							</div>
 							
 							<div class="checkbox">
-								<label>
-									<input id="debug_option_if_none_match" type="checkbox"><p>If-None-Match</p>
-								</label>
+								<input id="debug_option_if_none_match" type="checkbox">
+								<p>If-None-Match</p>
 							</div>
 							
 							<div class="hbox">
 								<div class="flex">
 									<p>Uri-Host</p>
-									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_uri_host" placeholder="not set"><span onclick="clearInputText('debug_option_uri_host')" title="Clear">&times;</span></span>		
+									<span class="hbox text-input-custom">
+										<input class="flex" type="text" id="debug_option_uri_host" placeholder="not set">
+										<span class="clear_text" title="Clear">&times;</span>
+									</span>		
 								</div>
 								
 								<div style="margin-left: 6px; width: 4em;">
 									<p>Uri-Port</p>
-									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_uri_port" placeholder="n/s"><span onclick="clearInputText('debug_option_uri_port')" title="Clear">&times;</span></span>		
+									<span class="hbox text-input-custom">
+										<input class="flex" type="text" id="debug_option_uri_port" placeholder="n/s">
+										<span class="clear_text" title="Clear">&times;</span>
+									</span>		
 								</div>
 							</div>
 							
 							<p>Proxy-Uri</p>
 							<div class="flex hbox">
-								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_proxy_uri" placeholder="use an Etag"><span onclick="clearInputText('debug_option_proxy_uri')" title="Clear">&times;</span></span>		
+								<span class="flex hbox text-input-custom">
+									<input class="flex" type="text" id="debug_option_proxy_uri" placeholder="use an Etag">
+									<span class="clear_text" title="Clear">&times;</span>
+								</span>		
 							</div>
 							
 							<div class="checkbox">
-								<label>
-									<input id="debug_option_proxy_scheme" type="checkbox"><p>Use Proxy-Scheme option</p>
-								</label>
+								<input id="debug_option_proxy_scheme" type="checkbox">
+								<p>Use Proxy-Scheme option</p>
 							</div>
 							
 							<div style="text-align: center;"><label>Response Options</label></div>
 							
 							<p>Max-Age</p>
 							<div class="flex hbox">
-								<span class="flex hbox text-input-custom"><input class="flex" type="text" id="debug_option_max_age" placeholder="use integer"><span onclick="clearInputText('debug_option_max_age')" title="Clear">&times;</span></span>		
+								<span class="flex hbox text-input-custom">
+									<input class="flex" type="text" id="debug_option_max_age" placeholder="use integer">
+									<span class="clear_text" title="Clear">&times;</span>
+								</span>		
 							</div>
 							
 							<div class="hbox">
 								<div class="flex">
 									<p>Location-Path</p>
-									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_location_path" placeholder="not set"><span onclick="clearInputText('debug_option_location_path')" title="Clear">&times;</span></span>		
+									<span class="hbox text-input-custom">
+										<input class="flex" type="text" id="debug_option_location_path" placeholder="not set">
+										<span class="clear_text" title="Clear">&times;</span>
+									</span>		
 								</div>
 								
 								<div class="flex" style="margin-left: 6px;">
 									<p>Location-Query</p>
-									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_location_query" placeholder="not set"><span onclick="clearInputText('debug_option_location_query')" title="Clear">&times;</span></span>		
+									<span class="hbox text-input-custom">
+										<input class="flex" type="text" id="debug_option_location_query" placeholder="not set">
+										<span class="clear_text" title="Clear">&times;</span>
+									</span>		
 								</div>
 							</div>
 							
@@ -358,12 +379,18 @@
 							<div class="hbox">
 								<div style="flex: 1;">
 									<p>Number</p>
-									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_custom_number" placeholder="not set"><span onclick="clearInputText('debug_option_custom_number')" title="Clear">&times;</span></span>		
+									<span class="hbox text-input-custom">
+										<input class="flex" type="text" id="debug_option_custom_number" placeholder="not set">
+										<span class="clear_text" title="Clear">&times;</span>
+									</span>		
 								</div>
 								
 								<div style="margin-left: 6px; flex: 2;">
 									<p>Value</p>
-									<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_custom_value" placeholder="use hex (0x..) or string"><span onclick="clearInputText('debug_option_custom_value')" title="Clear">&times;</span></span>		
+									<span class="hbox text-input-custom">
+										<input class="flex" type="text" id="debug_option_custom_value" placeholder="use hex (0x..) or string">
+										<span class="clear_text" title="Clear">&times;</span>
+									</span>		
 								</div>
 							</div>
 							
@@ -375,11 +402,11 @@
 			</div>
 		</div>
 		
-		<div class="vbox" style="padding: 4px; height: 216px; background-color: pink;">
+		<div class="vbox" style="padding: 4px; height: 216px; border-top: 1px black solid;">
 			<div style="padding: 4px;">
 				CoAP Message Log
 			</div>
-			<div id="log_messages" class="flex vbox">
+			<div id="log_messages" class="flex vbox border_solid">
 				<div class="hbox table-head">
 					<p>Time</p>
 					<p>CoAP Message</p>
@@ -390,7 +417,7 @@
 					<div style="float: right; width: 17px; height: 0;"></div> <!-- fix for firefox -> no "scrollbar: overlay;" support -->
 
 				</div>
-				<div class="flex" style="display: inline-block; overflow-y: scroll; overflow-x: hidden;">
+				<div class="flex white" style="display: inline-block; overflow-y: scroll; overflow-x: hidden;">
 					
 					<div class="table-body-row">
 						<p>Time</p>
@@ -495,6 +522,5 @@
 	</div>
 </div>
 
-    <script type="text/javascript" src="index.js"></script>
 </body>
 </html>
