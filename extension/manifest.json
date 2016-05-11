@@ -6,15 +6,15 @@
   "version": "0.0.1",
   "description": "Talk to coap servers",
   "icons": {
-    "16":  "resources/Cu_16.png",
-    "24":  "resources/Cu_24.png",
-    "32":  "resources/Cu_32.png",
-    "48":  "resources/Cu_48.png",
-    "128": "resources/Cu_64.png"
+    "16":  "skin/Cu_16.png",
+    "24":  "skin/Cu_24.png",
+    "32":  "skin/Cu_32.png",
+    "48":  "skin/Cu_48.png",
+    "128": "skin/Cu_64.png"
   },
 
   "browser_action": {
-    "default_icon": "resources/Cu_32.png"
+    "default_icon": "skin/Cu_32.png"
   },
 
   "options_page": "index.html",
