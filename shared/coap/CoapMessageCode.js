@@ -28,11 +28,11 @@ Copper.CoapMessage.Code.prototype.getShortcode = function(){
 };
 
 Copper.CoapMessage.Code.prototype.isRequestCode = function(){
-	return this.number < 32;
+	return this.number > 0 && this.number < 32;
 };
 
 Copper.CoapMessage.Code.prototype.isResponseCode = function(){
-	return this.number >= 32;
+	return this.number >= 64;
 };
 
 Copper.CoapMessage.Code.prototype.isSuccessCode = function(){
@@ -51,9 +51,13 @@ Copper.CoapMessage.Code.prototype.clone = function() {
 	return new Copper.CoapMessage.Code(this.number, this.name);
 };
 
+Copper.CoapMessage.Code.prototype.equals = function(other){
+	return (other instanceof Copper.CoapMessage.Code) && this.number === other.number && this.name === other.name;
+};
+
 /* Registry */
 /* Request Codes */
-Copper.CoapMessage.Code.PING = new Copper.CoapMessage.Code(0, "PING");
+Copper.CoapMessage.Code.EMPTY = new Copper.CoapMessage.Code(0, "EMPTY");
 Copper.CoapMessage.Code.GET = new Copper.CoapMessage.Code(1, "GET");
 Copper.CoapMessage.Code.POST = new Copper.CoapMessage.Code(2, "POST");
 Copper.CoapMessage.Code.PUT = new Copper.CoapMessage.Code(3, "PUT");
@@ -90,7 +94,7 @@ Copper.CoapMessage.Code.GATEWAY_TIMEOUT = new Copper.CoapMessage.Code(164, "Gate
 Copper.CoapMessage.Code.PROXY_NOT_SUPPORTED = new Copper.CoapMessage.Code(165, "Proxy Not Supported");
 
 Copper.CoapMessage.Code.Registry = [
-	Copper.CoapMessage.Code.PING,
+	Copper.CoapMessage.Code.EMPTY,
 	Copper.CoapMessage.Code.GET,
 	Copper.CoapMessage.Code.POST,
 	Copper.CoapMessage.Code.PUT,

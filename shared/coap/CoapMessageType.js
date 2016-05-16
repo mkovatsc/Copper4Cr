@@ -13,6 +13,10 @@ Copper.CoapMessage.Type.prototype.clone = function() {
 	return new Copper.CoapMessage.Type(this.number, this.name);
 };
 
+Copper.CoapMessage.Type.prototype.equals = function(other){
+	return (other instanceof Copper.CoapMessage.Type) && this.number === other.number && this.name === other.name;
+};
+
 /* Registry */
 Copper.CoapMessage.Type.CON = new Copper.CoapMessage.Type(0, "CON");
 Copper.CoapMessage.Type.NON = new Copper.CoapMessage.Type(1, "NON");

@@ -10,6 +10,7 @@ QUnit.test("CoapMessageCode: RequestCode", function(assert) {
 	assert.deepEqual(post.isServerErrorCode(), false);
 
 	assert.deepEqual(Copper.CoapMessage.Code.getCode(2), post);
+	assert.deepEqual(Copper.CoapMessage.Code.getCode(2).equals(post), true);
 	assert.deepEqual(Copper.CoapMessage.Code.getCodeForName("POST"), post);
 	assert.deepEqual(Copper.CoapMessage.Code.getCodeForShortcode("POST"), post);
 
@@ -43,6 +44,9 @@ QUnit.test("CoapMessageCode: SuccessCode", function(assert) {
 	});
 	assert.throws(function() {
 		Copper.CoapMessage.Code.getCode(97);
+	});
+	assert.throws(function() {
+		Copper.CoapMessage.Code.getCode(225);
 	});
 });
 

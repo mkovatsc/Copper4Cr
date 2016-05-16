@@ -1,7 +1,9 @@
                      "shared/namespace.js",
 
+                     "shared/utils/TimeUtils.js",
                      "shared/utils/StringUtils.js",
                      "shared/utils/ByteUtils.js",
+                     "shared/utils/Settings.js",
 
                      "shared/logging/Log.js",
                      "shared/logging/ConsoleLogger.js",

@@ -18,8 +18,10 @@
         "scripts": [ // shared part
                      "shared/namespace.js",
 
+                     "shared/utils/TimeUtils.js",
                      "shared/utils/StringUtils.js",
                      "shared/utils/ByteUtils.js",
+                     "shared/utils/Settings.js",
 
                      "shared/logging/Log.js",
                      "shared/logging/ConsoleLogger.js",
@@ -39,6 +41,10 @@
                      //server part
                      "endpoint/ChromeUdpClient.js",
                      "endpoint/ChromeServerPort.js",
+                     "endpoint/RequestTransaction.js",
+                     "endpoint/ResponseTransaction.js",
+                     "endpoint/TransactionSet.js",
+                     "endpoint/TransactionHandler.js",
                      "endpoint/ServerEndpoint.js",
 
                      "background.js"

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Copper Tests</title>
+  <link rel="stylesheet" href="../shared/testing/qunit-1.22.0.css">
+</head>
+<body>
+  <!-- QUnit -->
+  <div id="qunit"></div>
+  <div id="qunit-fixture"></div>
+  <script src="../shared/testing/qunit-1.22.0.js"></script>
+
+  <!-- Scripts under Test -->
+  <!-- Shared -->
+  <script src="../shared/namespace.js"></script>
+  
+  <script src="../shared/utils/TimeUtils.js"></script>
+  <script src="../shared/utils/StringUtils.js"></script>
+  <script src="../shared/utils/ByteUtils.js"></script>
+  <script src="../shared/utils/Settings.js"></script>
+
+  <script src="../shared/logging/Log.js"></script>
+  <script src="../shared/logging/ConsoleLogger.js"></script>
+
+  <script src="../shared/events/Event.js"></script>
+
+  <script src="../shared/coap/Constants.js"></script>
+  <script src="../shared/coap/CoapMessage.js"></script>
+  <script src="../shared/coap/CoapMessageType.js"></script>
+  <script src="../shared/coap/CoapMessageCode.js"></script>
+  <script src="../shared/coap/CoapMessageOptionHeader.js"></script>
+  <script src="../shared/coap/CoapMessageBlockOption.js"></script>
+  <script src="../shared/coap/CoapMessageOption.js"></script>
+  <script src="../shared/coap/CoapMessageSerializer.js"></script>
+  
+  <!-- App -->
+  <script src="../endpoint/RequestTransaction.js"></script>
+  <script src="../endpoint/ResponseTransaction.js"></script>
+  <script src="../endpoint/TransactionSet.js"></script>
+  <script src="../endpoint/TransactionHandler.js"></script>
+  <script src="../endpoint/ServerEndpoint.js"></script>
+
+
+  <!-- Tests -->
+  <script src="tests/endpoint/RequestTransactionTest.js"></script>
+  <script src="tests/endpoint/ResponseTransactionTest.js"></script>
+  <script src="tests/endpoint/TransactionSetTest.js"></script>
+
+</body>
+</html>

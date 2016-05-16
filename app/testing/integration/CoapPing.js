@@ -4,14 +4,14 @@ chrome.app.runtime.onLaunched.addListener(function() {
 	
 	Copper.Log.registerLogger(Copper.ConsoleLogger.log);
 
-	let udpClient = new Copper.ChromeUdpClient("vs0.inf.ethz.ch", 5683);
+	let udpClient = new Copper.ChromeUdpClient();
 
-	let onBind = function(successful){
+	let onBind = function(successful, port, errorMsg){
 		/* onBind */
 		if (successful){
-			let pingMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.PING);
+			let pingMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.EMPTY);
 			pingMsg.setMid(0);
-			udpClient.send(Copper.CoapMessageSerializer.serialize(pingMsg));
+			udpClient.send(Copper.CoapMessageSerializer.serialize(pingMsg), "vs0.inf.ethz.ch", 5683);
 			Copper.Log.logInfo("Sent Ping");
 		}
 		else {
@@ -32,7 +32,7 @@ chrome.app.runtime.onLaunched.addListener(function() {
 		
 		udpClient.close();
 	};
-	let onReceiveError = function(socketOpen){
+	let onReceiveError = function(socketOpen, errorMsg){
 		/* onReceiveError */
 		Copper.Log.logError("Error");
 		udpClient.close();

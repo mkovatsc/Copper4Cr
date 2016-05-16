@@ -5,7 +5,7 @@ Copper.StringUtils = function(){
 * @return current datetime formatted as 23.03.2016 15:29:33.214
 */
 Copper.StringUtils.getDateTime = function() {
-	let currentdate = new Date(); 
+	let currentdate = new Date(Copper.TimeUtils.now()); 
 	let dd = currentdate.getDate().toString();
 	let mm = (currentdate.getMonth()+1).toString();
 	let yyyy = currentdate.getFullYear().toString();

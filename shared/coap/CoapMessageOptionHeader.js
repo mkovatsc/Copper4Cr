@@ -39,6 +39,11 @@ Copper.CoapMessage.OptionHeader.prototype.clone = function() {
 	return new Copper.CoapMessage.OptionHeader(this.number, this.name, this.type, this.minLen, this.maxLen, this.multipleValues, this.defaultVal);
 };
 
+Copper.CoapMessage.OptionHeader.prototype.equals = function(other){
+	return (other instanceof Copper.CoapMessage.OptionHeader) && this.number === other.number && this.name === other.name && this.type === other.type &&
+	       this.minLen === other.minLen && this.maxLen === other.maxLen && this.multipleValues === other.multipleValues && this.defaultVal === other.defaultVal;
+};
+
 /********************************************************************/
 
 /* Option Registry */

@@ -5,22 +5,23 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 
     let clientPort = chrome.runtime.connect("mbighlecbopknoggoappifafoffcnocc");
 
-    let onServerMessage = function(msg){
-    	msg = Copper.Event.createFromJson(msg);
-    	Copper.Log.logInfo(msg);
+    let onServerMessage = function(msgunparsed){
+    	msg = Copper.Event.createFromJson(msgunparsed);
+    	Copper.Log.logInfo(msgunparsed);
     	switch(msg.type){
     		case Copper.Event.TYPE_CLIENT_REGISTERED:
-    			let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.PING);
+    			let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.EMPTY);
 				coapMessage.setMid(4);
-    			clientPort.postMessage(Copper.Event.convertToJson(Copper.Event.createClientSendCoapMessageEvent(coapMessage, 0, 0)));
+    			clientPort.postMessage(Copper.Event.convertToJson(Copper.Event.createClientSendCoapMessageEvent(coapMessage, 0)));
     			break;
     		case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
     			Copper.Log.logInfo("Received Coap Message");
     			Copper.Log.logInfo(msg.data.coapMessage.toString());
+                clientPort.disconnect();
     			break;
     	}
     };
 	clientPort.onMessage.addListener(onServerMessage);
 
-	clientPort.postMessage(Copper.Event.convertToJson(Copper.Event.createRegisterClientEvent("vs0.inf.ethz.ch", 5683, 0, 0)));
+	clientPort.postMessage(Copper.Event.convertToJson(Copper.Event.createRegisterClientEvent("vs0.inf.ethz.ch", 5683, new Copper.Settings(), 0)));
 });
