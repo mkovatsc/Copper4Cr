@@ -28,11 +28,11 @@ Copper.CoapMessage.Code.prototype.getShortcode = function(){
 };
 
 Copper.CoapMessage.Code.prototype.isRequestCode = function(){
-	return this.number < 32;
+	return this.number > 0 && this.number < 32;
 };
 
 Copper.CoapMessage.Code.prototype.isResponseCode = function(){
-	return this.number >= 32;
+	return this.number >= 64;
 };
 
 Copper.CoapMessage.Code.prototype.isSuccessCode = function(){
@@ -49,6 +49,10 @@ Copper.CoapMessage.Code.prototype.isServerErrorCode = function(){
 
 Copper.CoapMessage.Code.prototype.clone = function() {
 	return new Copper.CoapMessage.Code(this.number, this.name);
+};
+
+Copper.CoapMessage.Code.prototype.equals = function(other){
+	return (other instanceof Copper.CoapMessage.Code) && this.number === other.number && this.name === other.name;
 };
 
 /* Registry */

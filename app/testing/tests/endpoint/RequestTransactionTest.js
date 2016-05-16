@@ -6,7 +6,8 @@ QUnit.test("RequestTransaction: NON-Transaction", function(assert) {
 	Copper.TimeUtils.now = function() {return timestamp + elapsedTime;};
 
 	// Test
-	let transaction = new Copper.RequestTransaction(10, "0x0332", false, new ArrayBuffer(10));
+	let nonMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.NON, Copper.CoapMessage.Code.GET).setMid(13424);
+	let transaction = new Copper.RequestTransaction(nonMsg);
 	assert.deepEqual(transaction.isRetransmissionNecessary(), false);
 	assert.throws(function(){
 		transaction.increaseRetransmissionCounter();
@@ -42,7 +43,8 @@ QUnit.test("RequestTransaction: CON-Transaction", function(assert) {
 	Copper.TimeUtils.now = function() {return timestamp + elapsedTime;};
 
 	// Test
-	let transaction = new Copper.RequestTransaction(10, "0x0332", true, new ArrayBuffer(10));
+	let conMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.GET).setMid(13424)
+	let transaction = new Copper.RequestTransaction(conMsg, true);
 	let minTimeout = 1000 * Copper.CoapConstants.ACK_TIMEOUT;
 	let maxTimeout = 1000 * Copper.CoapConstants.ACK_TIMEOUT * Copper.CoapConstants.ACK_RANDOM_FACTOR;
 

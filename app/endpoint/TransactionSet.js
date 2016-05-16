@@ -1,7 +1,7 @@
 /*
 * Creates a new transaction set which is capable of handling the different transactions. Handlers for the different
 * events can be passed, but are optional 
-* @arg onRetransmission: function(transaction) --> called for a transaction that should be retransmitted
+* @arg onRetransmission: function(transaction, retransmissionCount) --> called for a transaction that should be retransmitted
 * @arg onTimeout: function(transaction) --> called for a transaction that has timeouted
 * @arg onEndOfLife: function(transaction) --> called for a transaction that is end of life and thus removed
 */
@@ -14,19 +14,29 @@ Copper.TransactionSet = function(onRetransmission, onTimeout, onEndOfLife){
 	this.onRetransmission = onRetransmission;
 	this.onTimeout = onTimeout;
 	this.onEndOfLife = onEndOfLife;
-	this.registeredTokens = new Object();
-	this.activeRequestTransactions = [];
-	this.timeoutedRequestTransactions = [];
-	this.responseTransactions = [];
+	this.reset();
+	this.isHandlingTransactions = false;
 };
 
 /* Prototype */
 Copper.TransactionSet.prototype.onRetransmission = undefined;
 Copper.TransactionSet.prototype.onTimeout = undefined;
 Copper.TransactionSet.prototype.onEndOfLife = undefined;
+Copper.TransactionSet.prototype.registeredTokens = undefined;
 Copper.TransactionSet.prototype.activeRequestTransactions = undefined;
 Copper.TransactionSet.prototype.timeoutedRequestTransactions = undefined;
 Copper.TransactionSet.prototype.responseTransactions = undefined;
+Copper.TransactionSet.prototype.isHandlingTransactions = undefined;
+
+/*
+* Clears the transaction set
+*/
+Copper.TransactionSet.prototype.reset = function(){
+	this.registeredTokens = new Object();
+	this.activeRequestTransactions = [];
+	this.timeoutedRequestTransactions = [];
+	this.responseTransactions = [];
+};
 
 /**
 * Adds a new transaction to this set and registers the token.
@@ -37,17 +47,18 @@ Copper.TransactionSet.prototype.addNewTransaction = function(transaction){
 		throw new Error("Illegal Argument");
 	}
 	if (transaction instanceof Copper.RequestTransaction){
-		if (this.registeredTokens[transaction.token] !== undefined){
+		let tokenStr = Copper.ByteUtils.convertBytesToHexString(transaction.coapMessage.token);
+		if (this.registeredTokens[tokenStr] !== undefined){
 			throw new Error("Duplicate Token");
 		}
-		if (this.getRequestTransaction(transaction.mid, undefined) !== undefined){
+		if (this.getRequestTransaction(transaction.coapMessage.mid, undefined) !== undefined){
 			throw new Error("Duplicate MID");
 		}
-		this.registeredTokens[transaction.token] = transaction;
+		this.registeredTokens[tokenStr] = transaction;
 		this.activeRequestTransactions.push(transaction);
 	}
 	else {
-		if (this.getResponseTransaction(transaction.mid, transaction.remoteAddress, transaction.remotePort) !== undefined){
+		if (this.getResponseTransaction(transaction.coapMessage.mid, transaction.remoteAddress, transaction.remotePort) !== undefined){
 			throw new Error("Duplicate Transaction");
 		}
 		this.responseTransactions.push(transaction);
@@ -56,24 +67,25 @@ Copper.TransactionSet.prototype.addNewTransaction = function(transaction){
 
 /**
 * @arg mid: message id (optional if token is set)
-* @arg token: token (optional if mid is set)
+* @arg token: token as an ArrayBuffer (optional if mid is set)
 * @return: first transaction that matches mid and token.
 */
 Copper.TransactionSet.prototype.getRequestTransaction = function(mid, token){
 	if ((mid === undefined && token === undefined) || (mid !== undefined && (!Number.isInteger(mid) || mid < 0 || mid > 0xFFFF))
-		    || (token !== undefined && typeof(token) !== "string")){
+		    || (token !== undefined && !(token instanceof ArrayBuffer))){
 		throw new Error("Illegal Argument");
 	}
+	let tokenStr = token !== undefined ? Copper.ByteUtils.convertBytesToHexString(token) : undefined;
 	if (mid === undefined){
-		return this.registeredTokens[token];
+		return this.registeredTokens[tokenStr];
 	}
-	else if (token !== undefined && this.registeredTokens[token] !== undefined && this.registeredTokens[token].mid === mid){
+	else if (tokenStr !== undefined && this.registeredTokens[tokenStr] !== undefined && this.registeredTokens[tokenStr].mid === mid){
 		// MID's must not match, as a token can be reused after the first response is received
-		return this.registeredTokens[token];
+		return this.registeredTokens[tokenStr];
 	}
 	let transactions = this.activeRequestTransactions.concat(this.timeoutedRequestTransactions);
 	for (let i=0; i<transactions.length; i++){
-		if (mid === transactions[i].mid && (token === undefined || token === transactions[i].token)){
+		if (mid === transactions[i].coapMessage.mid && (tokenStr === undefined || tokenStr === Copper.ByteUtils.convertBytesToHexString(transactions[i].coapMessage.token))){
 			return transactions[i];
 		}
 	}
@@ -92,7 +104,7 @@ Copper.TransactionSet.prototype.getResponseTransaction = function(mid, remoteAdd
 		throw new Error("Illegal argument");
 	}
 	for (let i=0; i<this.responseTransactions.length; i++){
-		if (mid === this.responseTransactions[i].mid && remoteAddress === this.responseTransactions[i].remoteAddress && remotePort === this.responseTransactions[i].remotePort){
+		if (mid === this.responseTransactions[i].coapMessage.mid && remoteAddress === this.responseTransactions[i].remoteAddress && remotePort === this.responseTransactions[i].remotePort){
 			return this.responseTransactions[i];
 		}
 	}
@@ -100,14 +112,14 @@ Copper.TransactionSet.prototype.getResponseTransaction = function(mid, remoteAdd
 };
 
 /**
-* @arg token
+* @arg token as ArrayBuffer
 * @return: whether the token is in use
 */
 Copper.TransactionSet.prototype.isTokenRegistered = function(token){
-	if (typeof(token) !== "string"){
+	if (!(token instanceof ArrayBuffer)){
 		throw new Error("Illegal Argument");
 	}
-	return this.registeredTokens[token] !== undefined;
+	return this.registeredTokens[Copper.ByteUtils.convertBytesToHexString(token)] !== undefined;
 };
 
 /**
@@ -115,16 +127,32 @@ Copper.TransactionSet.prototype.isTokenRegistered = function(token){
 * @arg token
 */
 Copper.TransactionSet.prototype.unregisterToken = function(token){
-	if (typeof(token) !== "string"){
+	if (!(token instanceof ArrayBuffer)){
 		throw new Error("Illegal Argument");
 	}
-	if (this.registeredTokens[token] !== undefined){
-		if (this.registeredTokens[token].isCompleted || this.registeredTokens[token].isEndOfLife()){
-			delete this.registeredTokens[token];
+	let tokenStr = Copper.ByteUtils.convertBytesToHexString(token);
+	if (this.registeredTokens[tokenStr] !== undefined){
+		if (this.registeredTokens[tokenStr].isCompleted || this.registeredTokens[tokenStr].isEndOfLife()){
+			delete this.registeredTokens[tokenStr];
 		}
 		else {
 			throw new Error("Transaction not finished");
 		}
+	}
+};
+
+/**
+* Removes the token from the given transaction from the set of registered tokens if the registered token matches the transaction.
+* Is only allowed if the transaction has finished
+* @arg transaction
+*/
+Copper.TransactionSet.prototype.unregisterTokenFromTransaction = function(transaction){
+	if (!(transaction instanceof Copper.RequestTransaction)){
+		throw new Error("Illegal Argument");
+	}
+	let tokenStr = Copper.ByteUtils.convertBytesToHexString(transaction.coapMessage.token);
+	if (this.registeredTokens[tokenStr] === transaction){
+		this.unregisterToken(transaction.coapMessage.token);
 	}
 };
 
@@ -140,9 +168,16 @@ Copper.TransactionSet.prototype.getTransactionCount = function(){
 * Checks each transaction if an action is necessary and calls the callback if this is the case
 */
 Copper.TransactionSet.prototype.handleTransactions = function(){
-	this.handleRetransmissionNecessaryTransactions();
-	this.handleTimeoutedTransactions();
-	this.handleEndOfLifeTransactions();
+	if (!this.isHandlingTransactions){
+		this.isHandlingTransactions = true;
+		try {
+			this.handleRetransmissionNecessaryTransactions();
+			this.handleTimeoutedTransactions();
+			this.handleEndOfLifeTransactions();
+		} finally {
+			this.isHandlingTransactions = false;
+		}
+	}
 };
 
 /** Implementation **/
@@ -150,8 +185,8 @@ Copper.TransactionSet.prototype.handleTransactions = function(){
 Copper.TransactionSet.prototype.handleRetransmissionNecessaryTransactions = function(){
 	for (let i=0; i<this.activeRequestTransactions.length;i++){
 		if (this.activeRequestTransactions[i].isRetransmissionNecessary()){
-			if (this.onRetransmission !== undefined) this.onRetransmission(this.activeRequestTransactions[i]);
 			this.activeRequestTransactions[i].increaseRetransmissionCounter();
+			if (this.onRetransmission !== undefined) this.onRetransmission(this.activeRequestTransactions[i]);
 		}
 	}
 };
@@ -185,8 +220,8 @@ Copper.TransactionSet.prototype.getNonEndOfLifeTransactions = function(transacti
 		if (!transactionList[i].isEndOfLife()){
 			nonEndOfLifeTransactions.push(transactionList[i]);
 		}
-		else if (this.onEndOfLife !== undefined){
-			this.onEndOfLife(transactionList[i]);
+		else {
+			if (this.onEndOfLife !== undefined) {this.onEndOfLife(transactionList[i]);}
 		}
 	}
 	return nonEndOfLifeTransactions;

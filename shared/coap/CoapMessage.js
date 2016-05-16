@@ -15,6 +15,18 @@ Copper.CoapMessage = function(type, code){
 
 Copper.CoapMessage.prototype.version = Copper.CoapConstants.VERSION;
 
+Copper.CoapMessage.ack = function(mid, token){
+	return new Copper.CoapMessage(Copper.CoapMessage.Type.ACK, Copper.CoapMessage.Code.EMTPY).
+	       setMid(mid).
+	       setToken(token);
+};
+
+Copper.CoapMessage.reset = function(mid, token){
+	return new Copper.CoapMessage(Copper.CoapMessage.Type.RST, Copper.CoapMessage.Code.EMTPY).
+	       setMid(mid).
+	       setToken(token);
+};
+
 /*
 * Sets a message identifier
 * @return: this for method chaining
@@ -35,7 +47,7 @@ Copper.CoapMessage.prototype.setToken = function(token){
 	if (token === undefined || !(token instanceof ArrayBuffer) || token.byteLength > 8){
 		throw new Error("Illegal argument");	
 	}
-	if (this.code === Copper.CoapMessage.Code.EMPTY && token.byteLength > 0){
+	if (Copper.CoapMessage.Code.EMPTY.equals(this.code) && token.byteLength > 0){
 		throw new Error("Empty message cannot have a token");
 	}
 	this.token = token;
@@ -47,13 +59,16 @@ Copper.CoapMessage.prototype.setToken = function(token){
 * @arg optionHeader: header of the option to be set
 * @arg val: value of the option
 * @arg replace: true if a current option should be overridden
+* @arg opts: object with optional options. The following can be set:
+*             useUtf8 --> set to false if ascii encoding should be used
+*             strict --> set to true in order to throw errors instead of skipping error parts
 * @return: this for method chaining
 */
-Copper.CoapMessage.prototype.addOption = function(optionHeader, val, replace){
+Copper.CoapMessage.prototype.addOption = function(optionHeader, val, replace, opts){
 	if (!(optionHeader instanceof Copper.CoapMessage.OptionHeader)){
 		throw new Error("Illegal argument");
 	}
-	if (this.code === Copper.CoapMessage.Code.EMPTY){
+	if (Copper.CoapMessage.Code.EMPTY.equals(this.code)){
 		throw new Error("Empty message cannot have options");
 	}
 	if (!this.options[optionHeader.number]){
@@ -69,10 +84,10 @@ Copper.CoapMessage.prototype.addOption = function(optionHeader, val, replace){
 	}
 	else {
 		if (replace){
-			this.options[optionHeader.number].setValue(val);	
+			this.options[optionHeader.number].setValue(val, opts);	
 		}
 		else {
-			this.options[optionHeader.number].addValue(val);		
+			this.options[optionHeader.number].addValue(val, opts);		
 		}
 	}
 	return this;
@@ -129,7 +144,7 @@ Copper.CoapMessage.prototype.setPayload = function(payload){
 	if (payload === undefined || !(payload instanceof ArrayBuffer)){
 		throw new Error("Illegal argument");	
 	}
-	if (this.code === Copper.CoapMessage.Code.EMPTY && payload.byteLength > 0){
+	if (Copper.CoapMessage.Code.EMPTY.equals(this.code) && payload.byteLength > 0){
 		throw new Error("Empty message cannot have a payload");
 	}
 	this.payload = payload;

@@ -74,10 +74,26 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 				case Copper.Event.TYPE_COAP_MESSAGE_SENT:
 					this.port.sendClientMessage(event);
 					return true;
+				case Copper.Event.TYPE_COAP_MESSAGE_TIMED_OUT:
+					this.port.sendClientMessage(event);
+					return true;
+				case Copper.Event.TYPE_REQUEST_COMPLETED:
+					this.port.sendClientMessage(event);
+					return true;
 
 				case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
 					this.port.sendClientMessage(event);
 					return true;
+				case Copper.Event.TYPE_UNKNOWN_COAP_MESSAGE_RECEIVED:
+					this.port.sendClientMessage(event);
+					return true;
+				case Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED:
+					this.port.sendClientMessage(event);
+					return true;
+				case Copper.Event.TYPE_RECEIVED_PARSE_ERROR:
+					this.port.sendClientMessage(event);
+					return true;
+								
 
 				default:
 					Copper.Log.logWarning("Unknown event type " + event.type);
