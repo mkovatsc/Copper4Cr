@@ -9,6 +9,37 @@
 	<link rel="stylesheet" type="text/css" href="css/reset.css"/>
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 
+	<script src="shared/namespace.js"></script>
+	  
+	<script src="shared/utils/TimeUtils.js"></script>
+	<script src="shared/utils/StringUtils.js"></script>
+	<script src="shared/utils/ByteUtils.js"></script>
+	<script src="shared/utils/Settings.js"></script>
+	<script src="shared/utils/JsonUtils.js"></script>
+	<script src="shared/utils/ComponentFactory.js"></script>
+
+    <script src="shared/logging/Log.js"></script>
+    <script src="shared/logging/ConsoleLogger.js"></script>
+
+	<script src="shared/events/Event.js"></script>
+
+	<script src="shared/coap/Constants.js"></script>
+	<script src="shared/coap/CoapMessage.js"></script>
+	<script src="shared/coap/CoapMessageType.js"></script>
+	<script src="shared/coap/CoapMessageCode.js"></script>
+	<script src="shared/coap/CoapMessageOptionHeader.js"></script>
+	<script src="shared/coap/CoapMessageBlockOption.js"></script>
+	<script src="shared/coap/CoapMessageOption.js"></script>
+	<script src="shared/coap/CoapMessageSerializer.js"></script>
+	
+	<script src="shared/endpoint/ChromePort.js"></script>
+
+	<script src="gui/GuiAdapter.js"></script>
+	<script src="gui/PacketHeaderListener.js"></script>
+	<script src="gui/PayloadListener.js"></script>
+
+	<script src="endpoint/ClientEndpoint.js"></script>
+	<script src="endpoint/Startup.js"></script>
 </head>
 <body>
 
@@ -17,14 +48,14 @@
 		<button id="toolbar_ping" type="button">
 				<img src="skin/tool_ping.png"></img> Ping
 		</button>
-		<button id="toolbar_discover" type="button">
-				<img src="skin/tool_discover.png"></img> Discover
+		<button id="toolbar_discover" type="button">				
+            <img src="skin/tool_discover.png"></img> Discover
 		</button>
 	</div>
 	
-	<div class="toolbar_item border_right">
-		<button id="toolbar_get" type="button">
-				<img src="skin/tool_get.png"></img> GET
+	<div class="toolbar_item border_right">		
+        <button id="btn_get" type="button">				
+            <img src="skin/tool_get.png"></img> GET
 		</button>
 		<button id="toolbar_post" type="button">
 				<img src="skin/tool_post.png"></img> POST
@@ -175,31 +206,6 @@
 								<div id="tabbed_pane_payload" class="flex vbox white" style="padding: 4px; height: 100%;">
 									<div class="flex border_opacity" style="padding: 4px; overflow-y: auto">
 										<div id="tab_incoming" style="display: block;">
-			
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
-											<p>Incoming Tab</p>
 										</div>
 										<div id="tab_rendered" style="display: none; padding: 4px;">
 											<p>Rendered Tab</p>
@@ -521,6 +527,5 @@
 		</div>
 	</div>
 </div>
-
 </body>
 </html>

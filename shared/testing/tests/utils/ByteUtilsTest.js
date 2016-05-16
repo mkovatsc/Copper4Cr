@@ -112,9 +112,3 @@ QUnit.test("ByteUtils: convertBytesToHexString", function(assert) {
 	let num = 232414325;
 	assert.deepEqual(Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertUintToBytes(num)), "0x" + num.toString(16).toUpperCase());
 });
-
-QUnit.test("ByteUtils: convertBytesToJson", function(assert) {
-	let data = 0x43241349;
-	let json = Copper.ByteUtils.convertBytesToJson(Copper.ByteUtils.convertUintToBytes(data));
-	assert.deepEqual(Copper.ByteUtils.convertBytesToUint(Copper.ByteUtils.convertJsonToBytes(json)), data);
-});
