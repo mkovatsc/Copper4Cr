@@ -29,7 +29,7 @@ Copper.ServerEndpoint = function(port, id){
 	this.eventCallback = function(event){
 		return thisRef.dispatchEvent(event);
 	};
-	Copper.Event.registerCallback(this.eventCallback);
+	Copper.Event.registerCallback(this.eventCallback, this.id);
 
 	this.state = Copper.ServerEndpoint.STATE_CONNECTED;
 	Copper.Log.logFine("Server Endpoint " + this.id + " created");
@@ -54,55 +54,53 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 	if (!Number.isInteger(event.type)){
 		throw new Error("Illegal Arguments");
 	}
-	if (event.endpointId === this.id){
-		try {
-			switch(event.type){
-				case Copper.Event.TYPE_ERROR:
-					return this.onError(event.data.errorType, event.data.errorMessage, event.data.endpointReady);
+	try {
+		switch(event.type){
+			case Copper.Event.TYPE_ERROR:
+				return this.onError(event.data.errorType, event.data.errorMessage, event.data.endpointReady);
 
-				case Copper.Event.TYPE_REGISTER_CLIENT:
-					return this.onRegisterClient(event.data.remoteAddress, event.data.remotePort, event.data.settings);
-				case Copper.Event.TYPE_CLIENT_REGISTERED:
-					this.state = Copper.ServerEndpoint.STATE_UDP_SOCKET_READY;
-					this.port.sendClientMessage(event);
-					return true;
-				case Copper.Event.TYPE_UNREGISTER_CLIENT:
-					return this.onUnregisterClient();
+			case Copper.Event.TYPE_REGISTER_CLIENT:
+				return this.onRegisterClient(event.data.remoteAddress, event.data.remotePort, event.data.settings);
+			case Copper.Event.TYPE_CLIENT_REGISTERED:
+				this.state = Copper.ServerEndpoint.STATE_UDP_SOCKET_READY;
+				this.port.sendMessage(event);
+				return true;
+			case Copper.Event.TYPE_UNREGISTER_CLIENT:
+				return this.onUnregisterClient();
 
-				case Copper.Event.TYPE_SEND_COAP_MESSAGE:
-					return this.onClientSendCoapMessage(event.data.coapMessage);
-				case Copper.Event.TYPE_COAP_MESSAGE_SENT:
-					this.port.sendClientMessage(event);
-					return true;
-				case Copper.Event.TYPE_COAP_MESSAGE_TIMED_OUT:
-					this.port.sendClientMessage(event);
-					return true;
-				case Copper.Event.TYPE_REQUEST_COMPLETED:
-					this.port.sendClientMessage(event);
-					return true;
+			case Copper.Event.TYPE_SEND_COAP_MESSAGE:
+				return this.onClientSendCoapMessage(event.data.coapMessage);
+			case Copper.Event.TYPE_COAP_MESSAGE_SENT:
+				this.port.sendMessage(event);
+				return true;
+			case Copper.Event.TYPE_COAP_MESSAGE_TIMED_OUT:
+				this.port.sendMessage(event);
+				return true;
+			case Copper.Event.TYPE_REQUEST_COMPLETED:
+				this.port.sendMessage(event);
+				return true;
 
-				case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
-					this.port.sendClientMessage(event);
-					return true;
-				case Copper.Event.TYPE_UNKNOWN_COAP_MESSAGE_RECEIVED:
-					this.port.sendClientMessage(event);
-					return true;
-				case Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED:
-					this.port.sendClientMessage(event);
-					return true;
-				case Copper.Event.TYPE_RECEIVED_PARSE_ERROR:
-					this.port.sendClientMessage(event);
-					return true;
-								
+			case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
+				this.port.sendMessage(event);
+				return true;
+			case Copper.Event.TYPE_UNKNOWN_COAP_MESSAGE_RECEIVED:
+				this.port.sendMessage(event);
+				return true;
+			case Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED:
+				this.port.sendMessage(event);
+				return true;
+			case Copper.Event.TYPE_RECEIVED_PARSE_ERROR:
+				this.port.sendMessage(event);
+				return true;
+							
 
-				default:
-					Copper.Log.logWarning("Unknown event type " + event.type);
-					return false;
-			}
-		} catch (exception) {
-			Copper.Log.logError("Error on endpoint " + this.id + ": " + exception.message);
-			return this.onError(Copper.Event.ERROR_GENERAL, "Endpoint Error: " + exception.message, false);
+			default:
+				Copper.Log.logWarning("Unknown event type " + event.type);
+				return false;
 		}
+	} catch (exception) {
+		Copper.Log.logError("Error on endpoint " + this.id + ": " + exception.message);
+		return this.onError(Copper.Event.ERROR_GENERAL, "Endpoint Error: " + exception.message, false);
 	}
 };
 
@@ -115,7 +113,7 @@ Copper.ServerEndpoint.prototype.handleClientDisconnected = function(){
 	if (this.state !== Copper.ServerEndpoint.STATE_DISCONNECTED){
 		this.state = Copper.ServerEndpoint.STATE_DISCONNECTED;
 		Copper.Event.removeEventsForEndpoint(this.id);
-		Copper.Event.unregisterCallback(this.eventCallback);
+		Copper.Event.unregisterCallback(this.eventCallback, this.id);
 		Copper.Log.logFine("Server Endpoint " + this.id + " closed");
 	}
 };
@@ -127,7 +125,7 @@ Copper.ServerEndpoint.prototype.onError = function(errorType, errorMessage, endp
 		this.transactionHandler = undefined;
 		this.state = Copper.ServerEndpoint.STATE_CONNECTED;
 	}
-	this.port.sendClientMessage(Copper.Event.createErrorEvent(errorType, errorMessage, endpointReady, this.id));
+	this.port.sendMessage(Copper.Event.createErrorEvent(errorType, errorMessage, endpointReady, this.id));
 	return true;
 };
 
@@ -136,7 +134,7 @@ Copper.ServerEndpoint.prototype.onRegisterClient = function(remoteAddress, remot
 		this.onError(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", this.state === Copper.ServerEndpoint.STATE_UDP_SOCKET_READY);
 	}
 	else {
-		this.transactionHandler = new Copper.TransactionHandler(this.port.createUdpClient(), remoteAddress, remotePort, settings, this.id);
+		this.transactionHandler = new Copper.TransactionHandler(Copper.ComponentFactory.createUdpClient(), remoteAddress, remotePort, settings, this.id);
 		this.transactionHandler.bind();
 	}
 	return true;

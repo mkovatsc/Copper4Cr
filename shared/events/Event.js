@@ -5,23 +5,26 @@ Copper.Event.callbacks = [];
 Copper.Event.queue = [];
 Copper.Event.isDispatching = false;
 
-Copper.Event.registerCallback = function(callback){
-	if (!(typeof(callback) === "function")){
+Copper.Event.registerCallback = function(callback, endpointId){
+	if (!(typeof(callback) === "function") || !Number.isInteger(endpointId)){
 		throw new Error("Illegal Arguments");
 	}
-	if (this.callbacks.indexOf(callback) > -1){
-		throw new Error("Callback already registered");
-	}
-	this.callbacks.push(callback);
+	this.callbacks.push({
+		endpointId: endpointId,
+		callback: callback
+	});
 };
 
-Copper.Event.unregisterCallback = function(callback){
-	if (!(typeof(callback) === "function")){
+Copper.Event.unregisterCallback = function(callback, endpointId){
+	if (!(typeof(callback) === "function") || !Number.isInteger(endpointId)){
 		throw new Error("Illegal Arguments");
 	}
-	let index = this.callbacks.indexOf(callback);
-	if (index > -1){
-		this.callbacks.splice(index, 1);
+	let oldCallbacks = this.callbacks;
+	this.callbacks = [];
+	for (let i=0; i<oldCallbacks.length; i++){
+		if (oldCallbacks[i].endpointId !== endpointId || oldCallbacks[i].callback !== callback){
+			this.callbacks.push(oldCallbacks[i]);
+		}
 	}
 };
 
@@ -39,7 +42,7 @@ Copper.Event.removeEventsForEndpoint = function(endpointId){
 };
 
 Copper.Event.sendEvent = function(event) {
-	if (!Number.isInteger(event.type)){
+	if (!Number.isInteger(event.type) || !Number.isInteger(event.endpointId)){
 		throw new Error("Illegal Arguments");
 	}
 	Copper.Event.queue.push(event);
@@ -49,18 +52,23 @@ Copper.Event.sendEvent = function(event) {
 Copper.Event.dispatchEvents = function(){
 	if (!Copper.Event.isDispatching){
 		Copper.Event.isDispatching = true;
-		let oldQueue = Copper.Event.queue;
-		Copper.Event.queue = [];
-		for (let i = 0; i < oldQueue.length; i++){
-			let processed = false;
-			for (let j = 0; j < this.callbacks.length; j++){
-				processed = this.callbacks[j](oldQueue[i]) || processed;
+		try{
+			let oldQueue = Copper.Event.queue;
+			Copper.Event.queue = [];
+			for (let i = 0; i < oldQueue.length; i++){
+				let processed = false;
+				for (let j = 0; j < this.callbacks.length; j++){
+					if (this.callbacks[j].endpointId === oldQueue[i].endpointId){
+						processed = this.callbacks[j].callback(oldQueue[i]) || processed;
+					}
+				}
+				if (!processed){
+					Copper.Log.logWarning("Unprocessed event for endpointId " + oldQueue[i].endpointId + ": " + oldQueue[i].type);
+				}
 			}
-			if (!processed){
-				Copper.Log.logWarning("Unprocessed event for endpointId " + oldQueue[i].endpointId + ": " + oldQueue[i].type);
-			}
+		} finally {
+			Copper.Event.isDispatching = false;
 		}
-		Copper.Event.isDispatching = false;
 	}
 };
 
@@ -94,7 +102,7 @@ Copper.Event.createEvent = function(type, data, endpointId){
 		type: type,
 		data: data,
 		endpointId: endpointId,
-		timestamp: Date.now()
+		timestamp: Copper.TimeUtils.now()
 	};
 	return event;
 };

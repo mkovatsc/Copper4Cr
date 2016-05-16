@@ -22,6 +22,8 @@
                      "shared/utils/StringUtils.js",
                      "shared/utils/ByteUtils.js",
                      "shared/utils/Settings.js",
+                     "shared/utils/JsonUtils.js",
+                     "shared/utils/ComponentFactory.js",
 
                      "shared/logging/Log.js",
                      "shared/logging/ConsoleLogger.js",
@@ -37,10 +39,10 @@
                      "shared/coap/CoapMessageOption.js",
                      "shared/coap/CoapMessageSerializer.js",
 
+                     "shared/endpoint/ChromePort.js",
                      
                      //server part
                      "endpoint/ChromeUdpClient.js",
-                     "endpoint/ChromeServerPort.js",
                      "endpoint/RequestTransaction.js",
                      "endpoint/ResponseTransaction.js",
                      "endpoint/TransactionSet.js",

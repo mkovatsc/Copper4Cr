@@ -202,7 +202,7 @@ Copper.TransactionHandler.prototype.handleReceivedCoapMessage = function(coapMes
 			Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
 			requestTransaction.isConfirmed = true;
 			this.completeRequestTransaction(requestTransaction);
-			if (Copper.CoapMessage.Type.RST.equals(coapMessage.type) || Copper.CoapMessage.Code.EMPTY.equals(coapMessage.code)){
+			if (Copper.CoapMessage.Type.RST.equals(coapMessage.type) || !Copper.CoapMessage.Code.EMPTY.equals(coapMessage.code)){
 				this.transactionSet.unregisterToken(requestTransaction.coapMessage.token);
 			}
 		}

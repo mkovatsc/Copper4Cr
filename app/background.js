@@ -1,5 +1,7 @@
 ﻿chrome.app.runtime.onLaunched.addListener(function() {
 	
+	Copper.ComponentFactory = Copper.ChromeComponentFactory;
+
 	Copper.Log.registerLogger(Copper.ConsoleLogger.log);
 
 	let endpointId = 1;
@@ -10,7 +12,7 @@
 		}
 		Copper.Log.logFine("new connection from extension, app or website" + (externalid !== undefined ? (" (" + externalid + ")") : ""));
 		let newEndpointId = endpointId++;
-		new Copper.ServerEndpoint(new Copper.ChromeServerPort(port, newEndpointId), newEndpointId);
+		new Copper.ServerEndpoint(Copper.ComponentFactory.createPort(port, newEndpointId), newEndpointId);
 	});
 
 	Copper.Log.logFine("Listening for new connection...");
