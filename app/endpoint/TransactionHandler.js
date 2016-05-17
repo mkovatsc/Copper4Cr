@@ -36,7 +36,7 @@ Copper.TransactionHandler = function(udpClient, remoteAddress, remotePort, setti
 
 	let periodicFunction = function(){
 		thisRef.transactionSet.handleTransactions();
-		this.timer = Copper.TimeUtils.setTimeout(periodicFunction, 50);
+		thisRef.timer = Copper.TimeUtils.setTimeout(periodicFunction, 50);
 	}
 	periodicFunction();
 
@@ -125,10 +125,9 @@ Copper.TransactionHandler.prototype.sendCoapMessage = function(coapMessage){
 	if (this.state !== Copper.TransactionHandler.STATE_READY){
 		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false, this.endpointId));
 	}
-	//TODO: rewrite serialization --> mid is not used anymore --> uncomment
-	//else if (coapMessage.mid !== undefined){
-	//	Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_ILLEGAL_ARGUMENT, "Mid must not be set", true, this.endpointId));
-	//}
+	else if (coapMessage.mid !== undefined){
+		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_ILLEGAL_ARGUMENT, "Mid must not be set", true, this.endpointId));
+	}
 	else {
 		coapMessage.setMid(this.midGenerator());
 		if (this.transactionSet.isTokenRegistered(coapMessage.token)){

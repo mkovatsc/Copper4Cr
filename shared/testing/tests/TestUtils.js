@@ -54,3 +54,25 @@ Copper.TestUtils.applyTestsOnDifferentCoapMessages = function(tests){
 	
 	applier(creator().addOption(etagHeader, "0x42312").addOption(ifNoneMatchHeader));
 };
+
+/**
+* Generates a mocking udp client
+* packetHandler: function(datagram) -> datagram: 
+*    transforms the received packet into a response (should be undefined if no response is set)
+*/
+Copper.TestUtils.generateUdpClientMock = function(packetHandler){
+	return {
+		bind: function(onBind, onReceive, onReceiveError){
+		      	this.onReceive = onReceive;
+		      	this.onReceiveError = onReceiveError;
+		      	onBind(true, 1234, undefined);
+		      },
+		send: function(datagram, remoteAddress, remotePort, onSent){
+				if (onSent !== undefined) onSent(true, datagram.byteLength, true, undefined);
+				let response = packetHandler(datagram);
+				if (response !== undefined) this.onReceive(response, remoteAddress, remotePort);
+			  },
+	    close: function(){
+	    	  }
+	};
+};
