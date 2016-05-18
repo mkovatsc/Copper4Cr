@@ -72,7 +72,7 @@ Copper.Event.dispatchEvents = function(){
 	}
 };
 
-Copper.Event.TYPE_ERROR = 1;
+Copper.Event.TYPE_ERROR_ON_SERVER = 1;
 Copper.Event.ERROR_GENERAL = 10;
 Copper.Event.ERROR_ILLEGAL_STATE = 11;
 Copper.Event.ERROR_ILLEGAL_ARGUMENT = 12;
@@ -83,16 +83,19 @@ Copper.Event.ERROR_RECEIVE = 15;
 Copper.Event.TYPE_REGISTER_CLIENT = 20;
 Copper.Event.TYPE_CLIENT_REGISTERED = 21;
 Copper.Event.TYPE_UNREGISTER_CLIENT = 22;
+Copper.Event.TYPE_UPDATE_SETTINGS = 23;
 
 Copper.Event.TYPE_SEND_COAP_MESSAGE = 30;
 Copper.Event.TYPE_COAP_MESSAGE_SENT = 31;
 Copper.Event.TYPE_COAP_MESSAGE_TIMED_OUT = 32;
-Copper.Event.TYPE_REQUEST_COMPLETED = 33;
+Copper.Event.TYPE_MESSAGE_CONFIRMED = 33;
+Copper.Event.TYPE_REQUEST_COMPLETED = 34;
 
 Copper.Event.TYPE_COAP_MESSAGE_RECEIVED = 40;
-Copper.Event.TYPE_UNKNOWN_COAP_MESSAGE_RECEIVED = 42;
-Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED = 43;
-Copper.Event.TYPE_RECEIVED_PARSE_ERROR = 44;
+Copper.Event.TYPE_UNKNOWN_COAP_MESSAGE_RECEIVED = 41;
+Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED = 42;
+Copper.Event.TYPE_RECEIVED_PARSE_ERROR = 43;
+
 
 Copper.Event.createEvent = function(type, data, endpointId){
 	if (!Number.isInteger(type) || !Number.isInteger(endpointId)){
@@ -107,7 +110,7 @@ Copper.Event.createEvent = function(type, data, endpointId){
 	return event;
 };
 
-Copper.Event.createErrorEvent = function(errorType, errorMessage, endpointReady, endpointId){
+Copper.Event.createErrorOnServerEvent = function(errorType, errorMessage, endpointReady, endpointId){
 	if (!Number.isInteger(errorType)){
 		throw new Error("Illegal Arguments");
 	}
@@ -116,7 +119,7 @@ Copper.Event.createErrorEvent = function(errorType, errorMessage, endpointReady,
 		errorMessage: errorMessage,
 		endpointReady: (endpointReady ? true : false)
 	};
-	return Copper.Event.createEvent(Copper.Event.TYPE_ERROR, data, endpointId);
+	return Copper.Event.createEvent(Copper.Event.TYPE_ERROR_ON_SERVER, data, endpointId);
 };
 
 Copper.Event.createRegisterClientEvent = function(remoteAddress, remotePort, settings, endpointId){
@@ -138,6 +141,13 @@ Copper.Event.createClientRegisteredEvent = function(port, endpointId){
 Copper.Event.createClientUnregisterEvent = function(endpointId){
 	let data = {};
 	return Copper.Event.createEvent(Copper.Event.TYPE_UNREGISTER_CLIENT, data, endpointId);
+};
+
+Copper.Event.createUpdateSettingsEvent = function(settings, endpointId){
+	let data = {
+		settings: settings
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_UPDATE_SETTINGS, data, endpointId);
 };
 
 Copper.Event.createClientSendCoapMessageEvent = function(coapMessage, endpointId){
@@ -165,10 +175,19 @@ Copper.Event.createCoapMessageTimedOutEvent = function(mid, token, firstTransmis
 	return Copper.Event.createEvent(Copper.Event.TYPE_COAP_MESSAGE_TIMED_OUT, data, endpointId);
 };
 
-Copper.Event.createRequestCompletedEvent = function(coapMessage, rtt, endpointId){
+Copper.Event.createMessageConfirmedEvent = function(coapMessage, rtt, endpointId){
 	let data = {
 		coapMessage: coapMessage,
 		rtt: rtt
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_MESSAGE_CONFIRMED, data, endpointId);
+};
+
+Copper.Event.createRequestCompletedEvent = function(requestCoapMessage, responseCoapMessage, transactionTime, endpointId){
+	let data = {
+		requestCoapMessage: requestCoapMessage,
+		responseCoapMessage: responseCoapMessage,
+		transactionTime: transactionTime
 	};
 	return Copper.Event.createEvent(Copper.Event.TYPE_REQUEST_COMPLETED, data, endpointId);
 };

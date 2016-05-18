@@ -56,7 +56,7 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 	}
 	try {
 		switch(event.type){
-			case Copper.Event.TYPE_ERROR:
+			case Copper.Event.TYPE_ERROR_ON_SERVER:
 				return this.onError(event.data.errorType, event.data.errorMessage, event.data.endpointReady);
 
 			case Copper.Event.TYPE_REGISTER_CLIENT:
@@ -67,28 +67,21 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 				return true;
 			case Copper.Event.TYPE_UNREGISTER_CLIENT:
 				return this.onUnregisterClient();
+			case Copper.Event.TYPE_UPDATE_SETTINGS:
+				return this.onUpdateSettings(event.data.settings);
 
 			case Copper.Event.TYPE_SEND_COAP_MESSAGE:
 				return this.onClientSendCoapMessage(event.data.coapMessage);
 			case Copper.Event.TYPE_COAP_MESSAGE_SENT:
-				this.port.sendMessage(event);
-				return true;
 			case Copper.Event.TYPE_COAP_MESSAGE_TIMED_OUT:
-				this.port.sendMessage(event);
-				return true;
+			case Copper.Event.TYPE_MESSAGE_CONFIRMED:
 			case Copper.Event.TYPE_REQUEST_COMPLETED:
 				this.port.sendMessage(event);
 				return true;
 
 			case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
-				this.port.sendMessage(event);
-				return true;
 			case Copper.Event.TYPE_UNKNOWN_COAP_MESSAGE_RECEIVED:
-				this.port.sendMessage(event);
-				return true;
 			case Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED:
-				this.port.sendMessage(event);
-				return true;
 			case Copper.Event.TYPE_RECEIVED_PARSE_ERROR:
 				this.port.sendMessage(event);
 				return true;
@@ -125,7 +118,7 @@ Copper.ServerEndpoint.prototype.onError = function(errorType, errorMessage, endp
 		this.transactionHandler = undefined;
 		this.state = Copper.ServerEndpoint.STATE_CONNECTED;
 	}
-	this.port.sendMessage(Copper.Event.createErrorEvent(errorType, errorMessage, endpointReady, this.id));
+	this.port.sendMessage(Copper.Event.createErrorOnServerEvent(errorType, errorMessage, endpointReady, this.id));
 	return true;
 };
 
@@ -149,6 +142,13 @@ Copper.ServerEndpoint.prototype.onUnregisterClient = function(){
 		this.transactionHandler = undefined;
 		this.state = Copper.ServerEndpoint.STATE_CONNECTED;
 		Copper.Log.logFine("Server Endpoint " + this.id + ": Client unregistered");
+	}
+	return true;
+};
+
+Copper.ServerEndpoint.prototype.onUpdateSettings = function(settings){
+	if (this.transactionHandler !== undefined){
+		this.transactionHandler.updateSettings(settings);
 	}
 	return true;
 };

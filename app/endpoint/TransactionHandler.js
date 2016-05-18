@@ -14,7 +14,8 @@
 *   STATE_CLOSED
 */
 Copper.TransactionHandler = function(udpClient, remoteAddress, remotePort, settings, endpointId){
-	if (typeof(remoteAddress) !== "string" || !Number.isInteger(remotePort) || remotePort <= 0x0 || remotePort > 0xFFFF || !Number.isInteger(endpointId)) {
+	if (typeof(remoteAddress) !== "string" || !Number.isInteger(remotePort) || remotePort <= 0x0 || remotePort > 0xFFFF || 
+		    !(settings instanceof Copper.Settings) || !Number.isInteger(endpointId)) {
 		throw new Error("Illegal Arguments");
 	}
 	this.udpClient = udpClient;
@@ -36,7 +37,7 @@ Copper.TransactionHandler = function(udpClient, remoteAddress, remotePort, setti
 
 	let periodicFunction = function(){
 		thisRef.transactionSet.handleTransactions();
-		this.timer = Copper.TimeUtils.setTimeout(periodicFunction, 50);
+		thisRef.timer = Copper.TimeUtils.setTimeout(periodicFunction, 50);
 	}
 	periodicFunction();
 
@@ -96,7 +97,7 @@ Copper.TransactionHandler.prototype.unregisterRequestCallback = function(callbac
 */
 Copper.TransactionHandler.prototype.bind = function(){
 	if (this.state !== Copper.TransactionHandler.STATE_CREATED){
-		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", this.state === Copper.TransactionHandler.STATE_READY, this.endpointId));
+		Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", this.state === Copper.TransactionHandler.STATE_READY, this.endpointId));
 	}
 	else {
 		let thisRef = this;
@@ -106,7 +107,7 @@ Copper.TransactionHandler.prototype.bind = function(){
 									Copper.Event.sendEvent(Copper.Event.createClientRegisteredEvent(port, thisRef.endpointId));
 								}
 								else {
-									Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_BIND, "Error while binding socket: " + errorMsg, false, thisRef.endpointId));
+									Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_BIND, "Error while binding socket: " + errorMsg, false, thisRef.endpointId));
 									thisRef.close();
 								}
 							},
@@ -117,18 +118,28 @@ Copper.TransactionHandler.prototype.bind = function(){
 };
 
 /*
+*  Updates the settings
+*  @arg settings: new settings
+*/
+Copper.TransactionHandler.prototype.updateSettings = function(settings){
+	if (!(settings instanceof Copper.Settings)){
+		throw new Error("Illegal Arguments");
+	}
+	this.settings = settings;
+};
+
+/*
 *  Creates a new transaction and starts sending the coap message
 *
 * @arg coapMessage: message to send
 */
 Copper.TransactionHandler.prototype.sendCoapMessage = function(coapMessage){
 	if (this.state !== Copper.TransactionHandler.STATE_READY){
-		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false, this.endpointId));
+		Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false, this.endpointId));
 	}
-	//TODO: rewrite serialization --> mid is not used anymore --> uncomment
-	//else if (coapMessage.mid !== undefined){
-	//	Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_ILLEGAL_ARGUMENT, "Mid must not be set", true, this.endpointId));
-	//}
+	else if (coapMessage.mid !== undefined){
+		Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_ILLEGAL_ARGUMENT, "Mid must not be set", true, this.endpointId));
+	}
 	else {
 		coapMessage.setMid(this.midGenerator());
 		if (this.transactionSet.isTokenRegistered(coapMessage.token)){
@@ -171,7 +182,7 @@ Copper.TransactionHandler.prototype.sendCoapMessageInternal = function(coapMessa
 				Copper.Event.sendEvent(Copper.Event.createCoapMessageSentEvent(coapMessage, bytesSent, retransmissionCount, thisRef.endpointId));
 			}
 			else {
-				Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_SEND, "Error while sending: " + errorMsg, socketOpen, thisRef.endpointId));
+				Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_SEND, "Error while sending: " + errorMsg, socketOpen, thisRef.endpointId));
 			}
 		}
 	});
@@ -200,10 +211,12 @@ Copper.TransactionHandler.prototype.handleReceivedCoapMessage = function(coapMes
 		}
 		else {
 			Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-			requestTransaction.isConfirmed = true;
-			this.completeRequestTransaction(requestTransaction);
-			if (Copper.CoapMessage.Type.RST.equals(coapMessage.type) || !Copper.CoapMessage.Code.EMPTY.equals(coapMessage.code)){
-				this.transactionSet.unregisterToken(requestTransaction.coapMessage.token);
+			this.confirmRequestTransaction(requestTransaction);
+			if (requestTransaction.coapMessage.code.isResponseCode()){
+				this.completeRequestTransaction(requestTransaction, undefined);
+			}
+			else if (Copper.CoapMessage.Type.RST.equals(coapMessage.type) || !Copper.CoapMessage.Code.EMPTY.equals(coapMessage.code)){
+				this.completeRequestTransaction(requestTransaction, coapMessage);
 			}
 		}
 	}
@@ -223,8 +236,7 @@ Copper.TransactionHandler.prototype.handleReceivedCoapMessage = function(coapMes
 				let requestTransaction = this.transactionSet.getRequestTransaction(undefined, coapMessage.token);
 				if (requestTransaction !== undefined){
 					Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-					this.completeRequestTransaction(requestTransaction);
-					this.transactionSet.unregisterToken(requestTransaction.coapMessage.token);
+					this.completeRequestTransaction(requestTransaction, coapMessage);
 					if (Copper.CoapMessage.Type.CON.equals(coapMessage.type)){
 						responseTransaction.addResponse(Copper.CoapMessage.ack(coapMessage.mid, coapMessage.token));
 					}
@@ -248,6 +260,7 @@ Copper.TransactionHandler.prototype.handleReceivedCoapMessage = function(coapMes
 					i++;
 				}
 				if (res !== undefined){
+					Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
 					if (Copper.CoapMessage.Type.CON.equals(responseTransaction.coapMessage.type) && 
 						      !Copper.CoapMessage.Type.ACK.equals(res.type) && !Copper.CoapMessage.Type.RST.equals(res.type)){
 						// add ACK for the CON message
@@ -276,7 +289,7 @@ Copper.TransactionHandler.prototype.handleReceivedCoapMessage = function(coapMes
 			this.transactionSet.addNewTransaction(responseTransaction);
 		}
 		for (let i=0; i<responseTransaction.responses.length; i++) {
-			sendCoapMessageInternal(responseTransaction.responses[i].coapMessage, responseTransaction.remoteAddress, responseTransaction.remotePort, responseTransaction.retransmissionCounter);
+			this.sendCoapMessageInternal(responseTransaction.responses[i], responseTransaction.remoteAddress, responseTransaction.remotePort, responseTransaction.retransmissionCounter);
 		}
 		if (responseCoapMessage !== undefined){
 			if (!Copper.CoapMessage.Type.CON.equals(responseCoapMessage.type)){
@@ -288,20 +301,33 @@ Copper.TransactionHandler.prototype.handleReceivedCoapMessage = function(coapMes
 	}
 };
 
-Copper.TransactionHandler.prototype.completeRequestTransaction = function(requestTransaction){
+Copper.TransactionHandler.prototype.confirmRequestTransaction = function(requestTransaction){
 	if (!(requestTransaction instanceof Copper.RequestTransaction)){
+		throw new Error("Illegal Arguments");
+	}
+	if (!requestTransaction.isConfirmed){
+		requestTransaction.isConfirmed = true;
+		Copper.Event.sendEvent(Copper.Event.createMessageConfirmedEvent(requestTransaction.coapMessage, Copper.TimeUtils.now()-requestTransaction.lastTransmissionStart, this.endpointId));
+	}
+};
+
+Copper.TransactionHandler.prototype.completeRequestTransaction = function(requestTransaction, response){
+	if (!(requestTransaction instanceof Copper.RequestTransaction) || (response !== undefined && !(response instanceof Copper.CoapMessage))){
 		throw new Error("Illegal Arguments");
 	}
 	if (!requestTransaction.isCompleted){
 		requestTransaction.isCompleted = true;
-		Copper.Event.sendEvent(Copper.Event.createRequestCompletedEvent(requestTransaction.coapMessage, Copper.TimeUtils.now()-requestTransaction.firstTransmissionStart, this.endpointId));
+		this.transactionSet.unregisterToken(requestTransaction.coapMessage.token);
+		if (response !== undefined){
+			Copper.Event.sendEvent(Copper.Event.createRequestCompletedEvent(requestTransaction.coapMessage, response, Copper.TimeUtils.now()-requestTransaction.firstTransmissionStart, this.endpointId));
+		}
 	}
 };
 
 // -------- Transaction Set Callbacks -----------
-Copper.TransactionHandler.prototype.onRetransmission = function(transaction, retransmissionCount){
+Copper.TransactionHandler.prototype.onRetransmission = function(transaction){
 	Copper.Log.logFine("Retransmit Transaction " + transaction.coapMessage.mid + " to " + this.remoteAddress + ":" + this.remotePort);
-	this.sendCoapMessageInternal(transaction.coapMessage, this.remoteAddress, this.remotePort, retransmissionCount);
+	this.sendCoapMessageInternal(transaction.coapMessage, this.remoteAddress, this.remotePort, transaction.retransmissionCounter);
 };
 
 Copper.TransactionHandler.prototype.onTimeout = function(transaction){
@@ -334,6 +360,6 @@ Copper.TransactionHandler.prototype.onReceiveDatagram = function(datagram, remot
 
 Copper.TransactionHandler.prototype.onReceiveDatagramError = function(socketOpen, errorMsg){
 	if (this.state !== Copper.TransactionHandler.STATE_CLOSED){
-		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_RECEIVE, "Error while receiving: " + errorMsg, socketOpen, this.endpointId));
+		Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_RECEIVE, "Error while receiving: " + errorMsg, socketOpen, this.endpointId));
 	}
 };

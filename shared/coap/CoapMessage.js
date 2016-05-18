@@ -16,13 +16,13 @@ Copper.CoapMessage = function(type, code){
 Copper.CoapMessage.prototype.version = Copper.CoapConstants.VERSION;
 
 Copper.CoapMessage.ack = function(mid, token){
-	return new Copper.CoapMessage(Copper.CoapMessage.Type.ACK, Copper.CoapMessage.Code.EMTPY).
+	return new Copper.CoapMessage(Copper.CoapMessage.Type.ACK, Copper.CoapMessage.Code.EMPTY).
 	       setMid(mid).
 	       setToken(token);
 };
 
 Copper.CoapMessage.reset = function(mid, token){
-	return new Copper.CoapMessage(Copper.CoapMessage.Type.RST, Copper.CoapMessage.Code.EMTPY).
+	return new Copper.CoapMessage(Copper.CoapMessage.Type.RST, Copper.CoapMessage.Code.EMPTY).
 	       setMid(mid).
 	       setToken(token);
 };
