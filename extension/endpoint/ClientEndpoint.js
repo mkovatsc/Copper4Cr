@@ -25,11 +25,11 @@ Copper.ClientEndpoint.prototype.dispatchEvent = function(event){
 	if (!Number.isInteger(event.type)){
 		throw new Error("Illegal Arguments");
 	}
-	Copper.Log.logInfo(event);
 	try {
 		switch(event.type){
 			case Copper.Event.TYPE_SEND_COAP_MESSAGE:
 				return this.onSendCoapMessage(event.data.coapMessage);
+				
 			default:
 				return true;
 		}

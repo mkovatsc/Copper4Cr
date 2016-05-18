@@ -14,7 +14,8 @@
 *   STATE_CLOSED
 */
 Copper.TransactionHandler = function(udpClient, remoteAddress, remotePort, settings, endpointId){
-	if (typeof(remoteAddress) !== "string" || !Number.isInteger(remotePort) || remotePort <= 0x0 || remotePort > 0xFFFF || !Number.isInteger(endpointId)) {
+	if (typeof(remoteAddress) !== "string" || !Number.isInteger(remotePort) || remotePort <= 0x0 || remotePort > 0xFFFF || 
+		    !(settings instanceof Copper.Settings) || !Number.isInteger(endpointId)) {
 		throw new Error("Illegal Arguments");
 	}
 	this.udpClient = udpClient;
@@ -96,7 +97,7 @@ Copper.TransactionHandler.prototype.unregisterRequestCallback = function(callbac
 */
 Copper.TransactionHandler.prototype.bind = function(){
 	if (this.state !== Copper.TransactionHandler.STATE_CREATED){
-		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", this.state === Copper.TransactionHandler.STATE_READY, this.endpointId));
+		Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", this.state === Copper.TransactionHandler.STATE_READY, this.endpointId));
 	}
 	else {
 		let thisRef = this;
@@ -106,7 +107,7 @@ Copper.TransactionHandler.prototype.bind = function(){
 									Copper.Event.sendEvent(Copper.Event.createClientRegisteredEvent(port, thisRef.endpointId));
 								}
 								else {
-									Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_BIND, "Error while binding socket: " + errorMsg, false, thisRef.endpointId));
+									Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_BIND, "Error while binding socket: " + errorMsg, false, thisRef.endpointId));
 									thisRef.close();
 								}
 							},
@@ -117,16 +118,27 @@ Copper.TransactionHandler.prototype.bind = function(){
 };
 
 /*
+*  Updates the settings
+*  @arg settings: new settings
+*/
+Copper.TransactionHandler.prototype.updateSettings = function(settings){
+	if (!(settings instanceof Copper.Settings)){
+		throw new Error("Illegal Arguments");
+	}
+	this.settings = settings;
+};
+
+/*
 *  Creates a new transaction and starts sending the coap message
 *
 * @arg coapMessage: message to send
 */
 Copper.TransactionHandler.prototype.sendCoapMessage = function(coapMessage){
 	if (this.state !== Copper.TransactionHandler.STATE_READY){
-		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false, this.endpointId));
+		Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false, this.endpointId));
 	}
 	else if (coapMessage.mid !== undefined){
-		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_ILLEGAL_ARGUMENT, "Mid must not be set", true, this.endpointId));
+		Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_ILLEGAL_ARGUMENT, "Mid must not be set", true, this.endpointId));
 	}
 	else {
 		coapMessage.setMid(this.midGenerator());
@@ -170,7 +182,7 @@ Copper.TransactionHandler.prototype.sendCoapMessageInternal = function(coapMessa
 				Copper.Event.sendEvent(Copper.Event.createCoapMessageSentEvent(coapMessage, bytesSent, retransmissionCount, thisRef.endpointId));
 			}
 			else {
-				Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_SEND, "Error while sending: " + errorMsg, socketOpen, thisRef.endpointId));
+				Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_SEND, "Error while sending: " + errorMsg, socketOpen, thisRef.endpointId));
 			}
 		}
 	});
@@ -348,6 +360,6 @@ Copper.TransactionHandler.prototype.onReceiveDatagram = function(datagram, remot
 
 Copper.TransactionHandler.prototype.onReceiveDatagramError = function(socketOpen, errorMsg){
 	if (this.state !== Copper.TransactionHandler.STATE_CLOSED){
-		Copper.Event.sendEvent(Copper.Event.createErrorEvent(Copper.Event.ERROR_RECEIVE, "Error while receiving: " + errorMsg, socketOpen, this.endpointId));
+		Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_RECEIVE, "Error while receiving: " + errorMsg, socketOpen, this.endpointId));
 	}
 };
