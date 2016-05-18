@@ -36,3 +36,32 @@ Copper.StringUtils.lpad = function(str, len, pad){
 		return res.join("");
 	}
 };
+
+Copper.StringUtils.parseUri = function(rawUri){
+	if (!rawUri){
+		return undefined;
+	}
+	// use HTML <a> tag as a parser
+	let parser = document.createElement("a");
+	// we have to set a valid protocol
+	if (rawUri.startsWith("coap://")){
+		parser.href = rawUri.replace(/^coap/, "http");
+	}
+	else if (!rawUri.startsWith("http://") && !rawUri.startsWith("https://")){
+		parser.href = "http://" + rawUri;
+	}
+	else {
+		parser.href = rawUri;	
+	}
+	if (parser.host && parser.host !== window.location.host){
+		// if an invalid href is entered, host points in some browser versions to current location
+		return {
+			address: parser.hostname,
+			port: (Number.isNaN(parseInt(parser.port)) ? undefined : parseInt(parser.port)),
+			path: parser.pathname
+		}
+	}
+	else {
+		return undefined;
+	}
+};

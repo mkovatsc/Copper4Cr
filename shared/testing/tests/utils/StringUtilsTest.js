@@ -26,3 +26,9 @@ QUnit.test("StringUtils: lpadTest", function(assert) {
 QUnit.test("StringUtils: getDateTimeTest", function(assert) {
 	assert.ok(Copper.StringUtils.getDateTime().match("^\\d\\d\\.\\d\\d\\.20\\d\\d [0-2]\\d:[0-5]\\d:[0-5]\\d\\.\\d\\d\\d$"), "getDateTime format");
 });
+
+QUnit.test("StringUtils: parseUri", function(assert){
+	assert.deepEqual(Copper.StringUtils.parseUri("vs0.inf.ethz.ch"), {address: "vs0.inf.ethz.ch", path: "/", port: undefined});
+	assert.deepEqual(Copper.StringUtils.parseUri("www.vs0.inf.ethz.ch.ch:230/hello"), {address: "www.vs0.inf.ethz.ch.ch", path: "/hello", port: 230});
+	assert.deepEqual(Copper.StringUtils.parseUri("coap://vs0.inf.ethz.ch:230/hello"), {address: "vs0.inf.ethz.ch", path: "/hello", port: 230});
+});
