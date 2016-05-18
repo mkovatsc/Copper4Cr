@@ -10,3 +10,5 @@ Copper.CoapConstants.MAX_RETRANSMIT = 4;
 Copper.CoapConstants.EXCHANGE_LIFETIME = 247;
 Copper.CoapConstants.NON_LIFETIME = 145;
 Copper.CoapConstants.NON_TIMEOUT = 5;
+
+Copper.CoapConstants.DEFAULT_PORT = 5683;

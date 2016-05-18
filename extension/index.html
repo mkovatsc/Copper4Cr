@@ -34,15 +34,18 @@
 	
 	<script src="shared/endpoint/ChromePort.js"></script>
 
-	<script src="gui/GuiAdapter.js"></script>
-	<script src="gui/PacketHeaderListener.js"></script>
-	<script src="gui/PayloadListener.js"></script>
+	<script src="gui/OverlayAdapter.js"></script>
+	
+	<script src="gui/PacketHeaderAdapter.js"></script>
+	<script src="gui/PayloadAdapter.js"></script>
+	<script src="gui/ToolbarAdapter.js"></script>
 
 	<script src="endpoint/ClientEndpoint.js"></script>
-	<script src="endpoint/Startup.js"></script>
+	<script src="endpoint/ChromeStartup.js"></script>
+
+	<script src="Session.js"></script>
 </head>
 <body>
-
 <div id="main_toolbar">
 	<div class="toolbar_item border_right">
 		<button id="toolbar_ping" type="button">
