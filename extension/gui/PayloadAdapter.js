@@ -1,9 +1,6 @@
 Copper.PayloadAdapter = function(){
 };
 
-Copper.PayloadAdapter.init = function(){
-};
-
 Copper.PayloadAdapter.onEvent = function(event){
 	switch(event.type){
 		case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:

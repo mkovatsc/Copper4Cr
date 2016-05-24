@@ -19,6 +19,12 @@ Copper.Session.path = undefined;
 Copper.Session.clientEndpoint = undefined;
 Copper.Session.localPort = undefined;
 
+Copper.Session.guiAdapters = [
+        Copper.PacketHeaderAdapter,
+        Copper.PayloadAdapter,
+        Copper.ToolbarAdapter
+    ];
+
 // setup session
 // register client
 // bind HTML to javascript
@@ -40,7 +46,7 @@ Copper.Session.registerClient = function(clientId, port, remoteAddress, remotePo
                 Copper.Session.startExtension();
                 break;
             case Copper.Event.TYPE_ERROR_ON_SERVER: 
-                Copper.OverlayAdapter.addTitleTextOverlay("Error", "Error " + event.errorType + ": " + event.errorMessage);
+                Copper.OverlayAdapter.addTitleTextOverlay("Error", "Error " + event.data.errorType + ": " + event.data.errorMessage);
                 break;
             default:
                 Copper.OverlayAdapter.addTitleTextOverlay("Error: Invalid Event", "Received invalid event(" + event.type + ") from app. Please restart the extension.");
@@ -53,21 +59,26 @@ Copper.Session.registerClient = function(clientId, port, remoteAddress, remotePo
 };
 
 Copper.Session.startExtension = function(){
-    let guiAdapters = [
-        Copper.PacketHeaderAdapter,
-        Copper.PayloadAdapter,
-        Copper.ToolbarAdapter
-    ];
-
+    let guiAdapters = Copper.Session.guiAdapters;
+    
     // init
     for (let i=0; i<guiAdapters.length; i++){
-        guiAdapters[i].init();
+        if (typeof(guiAdapters[i].init) === "function"){
+            guiAdapters[i].init();
+        }
     }
 
     // event callback
     Copper.Event.registerCallback(function(event){
         for (let i=0; i<guiAdapters.length; i++){
-            guiAdapters[i].onEvent(event);
+            if (typeof(guiAdapters[i].onEvent) === "function"){
+                guiAdapters[i].onEvent(event);
+            }
+        }
+        switch (event.type){
+            case Copper.Event.TYPE_ERROR_ON_SERVER:
+                Copper.OverlayAdapter.addErrorMsgOverlay("Error " + event.data.errorType, event.data.errorMessage);
+                break;
         }
         return true;
     }, Copper.Session.clientId);

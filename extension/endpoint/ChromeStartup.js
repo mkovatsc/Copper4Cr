@@ -8,12 +8,13 @@ Copper.ChromeStartup.resolvePortAndCoapEndpoint = function(clientId, finalDiscon
 	let resolveEndpointFunction = function(){
 		Copper.ChromeStartup.resolveCoapEndpoint(clientId, port, finalDisconnectHandler, callback);
 	};
-    let firstTimeout = Copper.TimeUtils.setTimeout(resolveEndpointFunction, 20);
+    let firstTimeout = Copper.TimeUtils.setTimeout(resolveEndpointFunction, 350);
 
     port.registerDisconnectCallback(function(){
         // app not started
+        Copper.Log.logFine("Starting application");
         Copper.TimeUtils.clearTimeout(firstTimeout);
-        Copper.TimeUtils.setTimeout(resolveEndpointFunction, 500)
+        Copper.TimeUtils.setTimeout(resolveEndpointFunction, 750)
         Copper.OverlayAdapter.addTitleTextOverlay("Starting...", "Try to start the Copper Application");
         chrome.management.launchApp(appId, function(){
             port = Copper.ComponentFactory.createPort(chrome.runtime.connect(appId), clientId);
