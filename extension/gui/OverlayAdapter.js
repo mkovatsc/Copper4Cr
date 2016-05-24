@@ -20,7 +20,14 @@ Copper.OverlayAdapter.getNewContentNode = function(){
 	container.style.cssText = "position: fixed; top: 20%; bottom: 20%; left: 20%; right: 20%; background-color: #FFF; opacity: 1; z-index: 101; border-radius: 10px; padding: 20px; overflow: auto; ";
 	container.id = Copper.OverlayAdapter.overlayContentId;
 	return container;
-}
+};
+
+Copper.OverlayAdapter.getNewMessageBoxNode = function(){
+	let container = document.createElement("div");
+	container.style.cssText = "position: fixed; top: 30%; bottom: 30%; left: 30%; right: 30%; background-color: #FFF; opacity: 1; z-index: 101; border-radius: 10px; padding: 20px; overflow: auto; ";
+	container.id = Copper.OverlayAdapter.overlayContentId;
+	return container;
+};
 
 Copper.OverlayAdapter.addTitleTextOverlay = function(title, text){
 	return Copper.OverlayAdapter.addInputOverlay(title, text);
@@ -64,6 +71,32 @@ Copper.OverlayAdapter.addInputOverlay = function(title, text, errorMsg, inputVal
 		};
 		container.appendChild(buttonElement);
 	}
+
+	Copper.OverlayAdapter.addOverlay(container);
+};
+
+Copper.OverlayAdapter.addErrorMsgOverlay = function(title, text){
+	if (typeof(title) !== "string" || typeof(text) !== "string"){
+		throw new Error("Illegal Argument");
+	}
+	let container = Copper.OverlayAdapter.getNewMessageBoxNode();
+	
+	let titleElement = document.createElement("p");
+	titleElement.style.cssText = "margin-bottom: 10px; font-weight: bold; font-size: 20px; ";
+	titleElement.innerHTML = title;
+	container.appendChild(titleElement);
+	
+	let textElement = document.createElement("p");
+	textElement.style.cssText = "margin-bottom: 10px; font-size: 14px; ";
+	textElement.innerHTML = text;
+	container.appendChild(textElement);
+
+	let buttonElement = document.createElement("button");
+	buttonElement.innerHTML = "OK";
+	buttonElement.onclick = function(){ 
+		Copper.OverlayAdapter.removeOverlay();
+	};
+	container.appendChild(buttonElement);
 
 	Copper.OverlayAdapter.addOverlay(container);
 };

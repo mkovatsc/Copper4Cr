@@ -1,9 +1,6 @@
 Copper.PacketHeaderAdapter = function(){
 };
 
-Copper.PacketHeaderAdapter.init = function(){
-};
-
 Copper.PacketHeaderAdapter.onEvent = function(event){
 	switch(event.type){
 		case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
