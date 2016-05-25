@@ -55,11 +55,19 @@ Copper.StringUtils.parseUri = function(rawUri){
 	}
 	if (parser.host && parser.host !== window.location.host){
 		// if an invalid href is entered, host points in some browser versions to current location
-		return {
-			address: parser.hostname,
-			port: (Number.isNaN(parseInt(parser.port)) ? undefined : parseInt(parser.port)),
-			path: parser.pathname
+		let result = {
+			address: parser.hostname
+		};
+		if (!Number.isNaN(parseInt(parser.port))){
+			result["port"] = parseInt(parser.port);
 		}
+		if (typeof(parser.pathname) === "string" && parser.pathname.length > 1){
+			result["path"] = parser.pathname.substring(1);
+		}
+		if (typeof(parser.search) === "string"  && parser.search.length > 1){
+			result["query"] = parser.search.substring(1);
+		}
+		return result;
 	}
 	else {
 		return undefined;

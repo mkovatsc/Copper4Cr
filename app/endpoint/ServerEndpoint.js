@@ -92,7 +92,7 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 				return false;
 		}
 	} catch (exception) {
-		Copper.Log.logError("Error on endpoint " + this.id + ": " + exception.message);
+		Copper.Log.logError("Error on endpoint " + this.id + ": " + exception.stack);
 		return this.onError(Copper.Event.ERROR_GENERAL, "Endpoint Error: " + exception.message, false);
 	}
 };
