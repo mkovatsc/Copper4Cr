@@ -107,8 +107,7 @@ Copper.CoapMessage.prototype.removeOption = function(optionHeader){
 /*
 * @arg optionHeader: header of the option of which the values should be retrieved
 * @return if option is not set: default value (which may be undefined)
-*         if multi-valued option: array containing the converted option values. Empty array if option contains no value
-*         if single-valued option: converted value of the option (or undefined if no value is set)
+*         array containing the converted option values. Empty array if option contains no value
 */
 Copper.CoapMessage.prototype.getOption = function(optionHeader){
 	if (!(optionHeader instanceof Copper.CoapMessage.OptionHeader)){

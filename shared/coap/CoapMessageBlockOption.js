@@ -26,6 +26,10 @@ Copper.CoapMessage.BlockOption.prototype.toString = function(){
 	return this.num + "/" + this.getSize() + "/" + (this.more ? "1" : "0"); 
 };
 
+Copper.CoapMessage.BlockOption.prototype.equals = function(other){
+	return (other instanceof Copper.CoapMessage.BlockOption) && this.num === other.num && this.szExp === other.szExp && this.more === other.more;
+};
+
 /*
 * @blockVal: integer representing the block option
 * @return: block option object

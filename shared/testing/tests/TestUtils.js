@@ -47,12 +47,14 @@ Copper.TestUtils.applyTestsOnDifferentCoapMessages = function(tests){
 	let bigHeader = new Copper.CoapMessage.OptionHeader(305, "Unknown", Copper.CoapMessage.OptionHeader.TYPE_OPAQUE, 0, Number.MAX_VALUE, true);
 	let ifNoneMatchHeader = new Copper.CoapMessage.OptionHeader(5, "If-None-Match", Copper.CoapMessage.OptionHeader.TYPE_EMPTY, 0, 0, false);
     let uriPortHeader = new Copper.CoapMessage.OptionHeader(7, "Uri-Port", Copper.CoapMessage.OptionHeader.TYPE_UINT, 0, 2, true);
+    let block2Header = new Copper.CoapMessage.OptionHeader(23, "Block2", Copper.CoapMessage.OptionHeader.TYPE_BLOCK, 0, 3, false);
 
     applier(creator().addOption(etagHeader, "0x4444"));
     applier(creator().addOption(uriOptionHeader, "vs0.inf.ethz.ch").addOption(uriOptionHeader, "vs1.inf.ethz.ch", true).addOption(etagHeader, "0xF3F2F1F0"));
 	applier(creator().addOption(bigHeader, new ArrayBuffer(306)).addOption(bigHeader, new ArrayBuffer(400)));
 	
 	applier(creator().addOption(etagHeader, "0x42312").addOption(ifNoneMatchHeader));
+	applier(creator().addOption(block2Header, new Copper.CoapMessage.BlockOption(1, 4, 1)));
 };
 
 /**

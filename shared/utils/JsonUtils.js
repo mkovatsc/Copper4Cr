@@ -51,7 +51,7 @@ Copper.JsonUtils.arrayBufferToJson = function(buf){
 	if (!(buf instanceof ArrayBuffer)){
 		throw new Error("Illegal Arguments");
 	}
-	return Array.apply(null, new Uint8Array(buf));
+	return Array.from(new Uint8Array(buf));
 };
 
 Copper.JsonUtils.jsonToArrayBuffer = function(data){

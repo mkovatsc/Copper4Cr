@@ -24,6 +24,7 @@ Copper.Session.localPort = undefined;
 
 Copper.Session.guiAdapters = [
         Copper.PacketHeaderAdapter,
+        Copper.PacketOptionsAdapter,
         Copper.PayloadAdapter,
         Copper.ToolbarAdapter
     ];

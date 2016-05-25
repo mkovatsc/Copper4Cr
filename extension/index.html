@@ -37,6 +37,7 @@
 	<script src="gui/OverlayAdapter.js"></script>
 	
 	<script src="gui/PacketHeaderAdapter.js"></script>
+	<script src="gui/PacketOptionsAdapter.js"></script>
 	<script src="gui/PayloadAdapter.js"></script>
 	<script src="gui/ToolbarAdapter.js"></script>
 
@@ -100,30 +101,30 @@
   <!-- MENU BAR DONE -->
 
 	<div class="main-content vbox">
-		<div class="flex hbox">
-			<div class="flex vbox" style="overflow: hidden;">
-				<div style="min-height: 70px; height: 70px;" >
-					<fieldset style="border: 1px black solid; height: 62px; min-height: 62px; padding: 4px;">
-						<legend style="border: none;">Status</legend>
-						<div class="hbox"><label class="flex" id="info_code">some Text<label></div>
+		<div class="hbox flex-filler">
+			<div class="vbox flex-filler">
+				<div class="main-content-top-box">
+					<fieldset>
+						<legend>Status</legend>
+						<div class="hbox"><label class="flex-filler">some Text<label></div>
 					</fieldset>
 				</div>
-				<div class="flex hbox">
+				<div class="hbox flex-filler">
 				
-					<div class="vbox" id="resource_tree_container">
-						<div id="resource_tree" class="flex border_solid white">
+					<div class="sidebar-left hbox">
+						<div class="border_solid white flex-filler">
 							<p>Tree View</p>
 						</div>
 					</div>
 					
-					<div id="message_pane" class="flex vbox">
-						<div id="copper-packet-in" class="hbox">
-							<div id="copper-packet-header" class="vbox">
-								<div class="hbox table-head">
+					<div class="vbox flex-filler">
+						<div class="hbox center-box-top">
+							<div id="copper-packet-header" class="table no-scroll">
+								<div class="table-head">
 									<span class="packet-header-element">Header</span>
 									<span class="packet-header-value">Value</span>
 								</div>
-								<div class="flex white">
+								<div class="table-body">
 									<div class="table-body-row">
 										<span class="packet-header-element">Type</span>
 										<span id="copper-packet-header-type" class="packet-header-value"></span>
@@ -142,49 +143,18 @@
 									</div>
 								</div>
 							</div>
-							<div id="packet_options" class="flex vbox">
-								<div class="hbox table-head">
-									<p>Option</p>
-									<p>Value</p>
-									<p>Info</p>
-									<div style="float: right; width: 17px; height: 0;"></div> <!-- fix for firefox -> no "scrollbar: overlay;" support -->
+							<div id="copper-packet-options" class="table">
+								<div class="table-head">
+									<span class="packet-option">
+										Option
+									</span><span class="packet-value">
+										Value
+									</span><span class="packet-raw">
+										Raw
+									</span>
 								</div>
-								<div class="flex white" style="display: inline-block; overflow-y: scroll; overflow-x: hidden;">
-									<div class="table-body-row">
-										<p>Option</p>
-										<p>Value</p>
-										<p>Info</p>
-									</div>
-									<div class="table-body-row">
-										<p>Option</p>
-										<p>Value</p>
-										<p>Info</p>
-									</div>
-									<div class="table-body-row">
-										<p>Option</p>
-										<p>Value</p>
-										<p>Info</p>
-									</div>
-									<div class="table-body-row">
-										<p>Option</p>
-										<p>Value</p>
-										<p>Info</p>
-									</div>
-									<div class="table-body-row">
-										<p>Option</p>
-										<p>Value</p>
-										<p>Info</p>
-									</div>
-									<div class="table-body-row">
-										<p>Option</p>
-										<p>Value</p>
-										<p>Info</p>
-									</div>
-									<div class="table-body-row">
-										<p>Option</p>
-										<p>Value</p>
-										<p>Info</p>
-									</div>
+								<div class="table-head-scrollbar"></div>
+								<div id="copper-packet-options-table" class="table-body">
 								</div>
 							</div>
 						</div>
@@ -222,7 +192,7 @@
 				</div>
 			
 			</div>
-			<div id="sidebar" class="vbox" style="border-left: 1px black solid;">
+			<div id="sidebar" class="sidebar-right vbox">
 				<div style="padding: 0px 10px 0px 10px; min-height: 35px; height: 35px;">
 					<div class="checkbox">
 						<input id="chk_debug_options" type="checkbox">
@@ -412,115 +382,26 @@
 			<div style="padding: 4px;">
 				CoAP Message Log
 			</div>
-			<div id="log_messages" class="flex vbox border_solid">
-				<div class="hbox table-head">
-					<p>Time</p>
-					<p>CoAP Message</p>
-					<p>MID</p>
-					<p>Token</p>
-					<p>Options</p>
-					<p>Payload</p>
-					<div style="float: right; width: 17px; height: 0;"></div> <!-- fix for firefox -> no "scrollbar: overlay;" support -->
-
+			<div id="copper-coap-message-log" class="table flex-filler">
+				<div class="table-head">
+					<span class="coap-message-time">Time</span>
+					<span class="coap-message-type">Type</span>
+					<span class="coap-message-code">Code</span>
+					<span class="coap-message-mid">MID</span>
+					<span class="coap-message-token">Token</span>
+					<span class="coap-message-options">Options</span>
+					<span class="coap-message-payload">Payload</span>
 				</div>
-				<div class="flex white" style="display: inline-block; overflow-y: scroll; overflow-x: hidden;">
-					
+				<div class="table-head-scrollbar"></div>
+				<div id="copper-coap-message-log-table" class="table-body">
 					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>OptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptionsOptions</p>
-						<p>PayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayloadPayload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-			
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
-					</div>
-					<div class="table-body-row">
-						<p>Time</p>
-						<p>CoAP Message</p>
-						<p>MID</p>
-						<p>Token</p>
-						<p>Options</p>
-						<p>Payload</p>
+						<span class="coap-message-time">15:29:14</span>
+						<span class="coap-message-type">Reset</span>
+						<span class="coap-message-code">2.31 Continue</span>
+						<span class="coap-message-mid">47634</span>
+						<span class="coap-message-token">0xC91D2F</span>
+						<span class="coap-message-options">Location-Path: blah, Uri-Path: large-create/10, Max-Age: 5, Accept: 41, Block1: 4/1/64</span>
+						<span class="coap-message-payload">PayloadPayloadPayloadPayloadPayload PayloadPayloadPayloadPayloadPayload PayloadPayloadPayloadPayloadPayload</span>
 					</div>
 				</div>
 			</div>
