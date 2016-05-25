@@ -2,7 +2,7 @@ Copper.ToolbarAdapter = function(){
 };
 
 Copper.ToolbarAdapter.init = function(){
-	document.getElementById("btn_get").onclick = Copper.ToolbarAdapter.doGet;
+	document.getElementById("copper-toolbar-get").onclick = Copper.ToolbarAdapter.doGet;
 };
 
 Copper.ToolbarAdapter.onEvent = function(event){
