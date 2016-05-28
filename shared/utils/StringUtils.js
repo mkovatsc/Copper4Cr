@@ -18,6 +18,22 @@ Copper.StringUtils.getDateTime = function() {
 };
 
 /**
+* @arg withMilliseconds: if set to true, milliseconds is added
+* @return current datetime formatted as 15:29:33(.214?)
+*/
+Copper.StringUtils.getTime = function(withMilliseconds) {
+	let currentdate = new Date(Copper.TimeUtils.now()); 
+	let hh = currentdate.getHours().toString();
+	let mi = currentdate.getMinutes().toString();
+	let ss = currentdate.getSeconds().toString();
+    let res = this.lpad(hh, 2) + ":" + this.lpad(mi, 2) + ":" + this.lpad(ss, 2); 
+    if (withMilliseconds){
+    	res = res + "." + this.lpad(currentdate.getMilliseconds().toString(), 3);
+    }
+    return res;
+};
+
+/**
 * @return String of length len using the first len characters of str optionally left padding it with pad (default 0)
 */
 Copper.StringUtils.lpad = function(str, len, pad){

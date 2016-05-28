@@ -9,8 +9,8 @@ Copper.PacketHeaderAdapter.onEvent = function(event){
 };
 
 Copper.PacketHeaderAdapter.updatePacketHeader = function(coapMessage){
-	document.getElementById("copper-packet-header-type").innerHTML = coapMessage.type.name;
-	document.getElementById("copper-packet-header-code").innerHTML = coapMessage.code.getName();
-	document.getElementById("copper-packet-header-mid").innerHTML = coapMessage.mid;
-	document.getElementById("copper-packet-header-token").innerHTML = Copper.ByteUtils.convertBytesToHexString(coapMessage.token);
+	document.getElementById("copper-packet-header-type").textContent = coapMessage.type.name;
+	document.getElementById("copper-packet-header-code").textContent = coapMessage.code.getName();
+	document.getElementById("copper-packet-header-mid").textContent = coapMessage.mid;
+	document.getElementById("copper-packet-header-token").textContent = Copper.ByteUtils.convertBytesToHexString(coapMessage.token);
 };

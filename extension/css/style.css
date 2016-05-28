@@ -86,14 +86,8 @@ button
 	overflow: hidden;
 	margin: 4px;
 	border: 1px black solid;
-}
-
-.table span {
-	display: inline-block;
-	vertical-align: middle;
-	overflow-x: hidden;
-	padding-left: 4px;
-	padding-top: 1px;
+	display: flex;
+	flex-direction: row;
 }
 
 .table-head-scrollbar{
@@ -108,6 +102,7 @@ button
 
 .table-head {
 	position: absolute;
+	display: flex;
 	top: 0;
 	left: 0;
 	right: 17px;
@@ -120,7 +115,13 @@ button
 	right: 0;
 }
 
-.table-head p, .table-head span{
+.table-head > span{
+	display: inline-block;
+	vertical-align: middle;
+	overflow-x: hidden;
+	padding-left: 4px;
+	padding-top: 1px;
+
 	font-weight: bold;
 }
 
@@ -139,11 +140,23 @@ button
 }
 
 .table-body-row {
-	display: block;
+	display: flex;
+	align-items: center;
 }
 
-.table-body-row p, .table-body-row span{
+.table-body-row > span
+{
+	display: inline-block;
+	vertical-align: middle;
+	overflow-x: hidden;
+	padding-left: 4px;
+	padding-top: 1px;
+}
 
+/* Others */
+.no-wrap
+{
+	white-space: nowrap;
 }
 
 /* Container */
@@ -252,19 +265,15 @@ button
 	flex: 1;
 }
 
-#copper-packet-header span
-{
-	padding-left: 4px;
-}
-
 #copper-packet-header .packet-header-element 
 {
-    width: 25%;
     min-width: 40px;
+    flex: 1;
 }
 
 #copper-packet-header .packet-header-value 
 {
+	flex: 3;
 }
 
 /* Packet options table */
@@ -275,18 +284,19 @@ button
 
 #copper-packet-options .packet-option
 {
-	width: 33%;
     min-width: 90px;
+    flex: 1;
 }
 
 #copper-packet-options .packet-value
 {
-	width: 33%;
-    min-width: 90px;
+	min-width: 90px;
+	flex: 1;
 }
 
 #copper-packet-options .packet-raw
 {
+	flex: 1;
 }
 
 #tabbed_pane_payload p
@@ -377,54 +387,82 @@ button
 	margin-right: auto;
 }
 
-#log_messages {
-	margin: 4px;
-	padding-bottom: 1px;
+/* Coap Message Log Box */
+.main-content-bottom-box 
+{
+	height: 220px;
+	min-height: 220px; 
+	border-top: 1px black solid;
+	position: relative;
 }
 
-#log_messages p {
-	padding-left: 4px;
+.main-content-bottom-box h2 
+{
+	font-size: 14px;
+	padding-left: 8px;
+	padding-top: 4px;
 }
 
-#packet_options p:nth-child(1) {
-    flex: 3.5;
+.main-content-bottom-box .table 
+{
+	position: absolute;
+	top: 25px;
+	bottom: 0;
+	left: 0;
+	right: 0;
 }
 
-#packet_options  p:nth-child(2){
-	flex: 5.5 1;
+#copper-coap-message-log .coap-message-time 
+{
+	width: 55px;
+	min-width: 55px;
 }
 
-#packet_options p:nth-child(3){
-    flex: 1;
+#copper-coap-message-log .coap-message-type
+{
+	width: 40px;
+	min-width: 40px;
 }
 
-#log_messages p:nth-child(1) {
-    width: 50px;
+#copper-coap-message-log .coap-message-code 
+{
+	width: 95px;
+	min-width: 95px;
 }
 
-#log_messages  p:nth-child(2){
-    width: 100px;
+#copper-coap-message-log .coap-message-mid
+{
+	width: 65px;
+	min-width: 65px;
 }
 
-#log_messages p:nth-child(3){
-    width: 50px;
+#copper-coap-message-log .coap-message-token
+{
+	width: 90px;
+	min-width: 90px;
 }
 
-#log_messages p:nth-child(4) {
-    width: 65px;
+#copper-coap-message-log .coap-message-options
+{
+	flex: 3;
+	min-width: 280px;
 }
 
-#log_messages p:nth-child(5) {
-    display: inline-block;
-    flex-direction: column;
-    flex: 1;
+#copper-coap-message-log .coap-message-payload
+{
+	flex: 4;
 }
 
-#log_messages p:nth-child(6) {
-    display: inline-block;
-    flex-direction: column;
-    flex: 1;
+#copper-coap-message-log .sent
+{
+	background-color: #ACF;
 }
+
+#copper-coap-message-log .received
+{
+	background-color: #CFC;
+}
+
 
 #copper-overlay{
 	position: fixed; 

@@ -36,6 +36,7 @@
 
 	<script src="gui/OverlayAdapter.js"></script>
 	
+	<script src="gui/MessageLogAdapter.js"></script>
 	<script src="gui/PacketHeaderAdapter.js"></script>
 	<script src="gui/PacketOptionsAdapter.js"></script>
 	<script src="gui/PayloadAdapter.js"></script>
@@ -378,11 +379,9 @@
 			</div>
 		</div>
 		
-		<div class="vbox" style="height: 216px; border-top: 1px black solid;">
-			<div style="padding: 4px;">
-				CoAP Message Log
-			</div>
-			<div id="copper-coap-message-log" class="table flex-filler">
+		<div class="main-content-bottom-box">
+			<h2>CoAP Message Log</h2>
+			<div id="copper-coap-message-log" class="table vbox">
 				<div class="table-head">
 					<span class="coap-message-time">Time</span>
 					<span class="coap-message-type">Type</span>
@@ -394,15 +393,6 @@
 				</div>
 				<div class="table-head-scrollbar"></div>
 				<div id="copper-coap-message-log-table" class="table-body">
-					<div class="table-body-row">
-						<span class="coap-message-time">15:29:14</span>
-						<span class="coap-message-type">Reset</span>
-						<span class="coap-message-code">2.31 Continue</span>
-						<span class="coap-message-mid">47634</span>
-						<span class="coap-message-token">0xC91D2F</span>
-						<span class="coap-message-options">Location-Path: blah, Uri-Path: large-create/10, Max-Age: 5, Accept: 41, Block1: 4/1/64</span>
-						<span class="coap-message-payload">PayloadPayloadPayloadPayloadPayload PayloadPayloadPayloadPayloadPayload PayloadPayloadPayloadPayloadPayload</span>
-					</div>
 				</div>
 			</div>
 		</div>

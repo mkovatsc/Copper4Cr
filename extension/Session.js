@@ -1,7 +1,6 @@
 window.onload = function(){
 	Copper.ComponentFactory = Copper.ChromeComponentFactory;
     Copper.Log.registerLogger(Copper.ConsoleLogger.log);
-    Copper.OverlayAdapter.addOverlay();
 
     let clientId = 1;
     // resolve port, remoteAddress:port in a browser dependent way
@@ -23,6 +22,7 @@ Copper.Session.clientEndpoint = undefined;
 Copper.Session.localPort = undefined;
 
 Copper.Session.guiAdapters = [
+        Copper.MessageLogAdapter,
         Copper.PacketHeaderAdapter,
         Copper.PacketOptionsAdapter,
         Copper.PayloadAdapter,

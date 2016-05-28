@@ -37,17 +37,17 @@ Copper.OverlayAdapter.addInputOverlay = function(title, text, errorMsg, inputVal
 	let container = Copper.OverlayAdapter.getNewContentNode();
 	
 	let titleElement = document.createElement("h1");
-	titleElement.innerHTML = title;
+	titleElement.textContent = title;
 	container.appendChild(titleElement);
 	
 	let textElement = document.createElement("p");
-	textElement.innerHTML = text;
+	textElement.textContent = text;
 	container.appendChild(textElement);
 
 	if (onClick !== undefined){
 		let errorElement = document.createElement("p");
 		errorElement.classList.add("error-message");
-		errorElement.innerHTML = errorMsg !== undefined ? errorMsg : "";
+		errorElement.textContent = errorMsg !== undefined ? errorMsg : "";
 		container.appendChild(errorElement);
 
 		let inputElement = document.createElement("input");
@@ -58,10 +58,10 @@ Copper.OverlayAdapter.addInputOverlay = function(title, text, errorMsg, inputVal
 		container.appendChild(inputElement);
 
 		let buttonElement = document.createElement("button");
-		buttonElement.innerHTML = buttonText;
+		buttonElement.textContent = buttonText;
 		buttonElement.onclick = function(){ 
 			onClick(inputElement.value, function(newErrorMsg){
-				errorElement.innerHTML = newErrorMsg !== undefined ? newErrorMsg : "";
+				errorElement.textContent = newErrorMsg !== undefined ? newErrorMsg : "";
 			}); 
 		};
 		container.appendChild(buttonElement);
@@ -77,15 +77,15 @@ Copper.OverlayAdapter.addErrorMsgOverlay = function(title, text){
 	let container = Copper.OverlayAdapter.getNewMessageBoxNode();
 	
 	let titleElement = document.createElement("h1");
-	titleElement.innerHTML = title;
+	titleElement.textContent = title;
 	container.appendChild(titleElement);
 	
 	let textElement = document.createElement("p");
-	textElement.innerHTML = text;
+	textElement.textContent = text;
 	container.appendChild(textElement);
 
 	let buttonElement = document.createElement("button");
-	buttonElement.innerHTML = "OK";
+	buttonElement.textContent = "OK";
 	buttonElement.onclick = function(){ 
 		Copper.OverlayAdapter.removeOverlay();
 	};

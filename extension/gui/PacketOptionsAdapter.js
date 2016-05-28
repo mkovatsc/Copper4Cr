@@ -25,17 +25,17 @@ Copper.PacketOptionsAdapter.updatePacketOptions = function(coapMessage){
 			
 			let optionElement = document.createElement("span");
 			optionElement.classList.add("packet-option");
-			optionElement.innerHTML = optionHeader.name + " (" + optionHeader.number + ")";
+			optionElement.textContent = optionHeader.name + " (" + optionHeader.number + ")";
 			optionRowElement.appendChild(optionElement);
 
 			let valueElement = document.createElement("span");
 			valueElement.classList.add("packet-value");
-			valueElement.innerHTML = "" + value[j];
+			valueElement.textContent = "" + value[j];
 			optionRowElement.appendChild(valueElement);
 
 			let rawElement = document.createElement("span");
 			rawElement.classList.add("packet-raw");
-			rawElement.innerHTML = Copper.ByteUtils.convertBytesToHexString(rawValue[j]);
+			rawElement.textContent = Copper.ByteUtils.convertBytesToHexString(rawValue[j]);
 			optionRowElement.appendChild(rawElement);
 			
 			rootElement.appendChild(optionRowElement);
