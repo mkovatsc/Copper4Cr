@@ -45,12 +45,13 @@ Copper.ChromeStartup.resolveCoapEndpoint = function(clientId, port, finalDisconn
                     errorCallback("Please enter a valid URL");
                 }
                 else {
-                    window.location.search = "?" + encodeURIComponent("coap://" + uri.address + ":" + (uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT) + uri.path);
+                    window.location.search = "?" + encodeURIComponent("coap://" + uri.address + ":" + (uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT) + 
+                        (uri.path ? ("/" + uri.path) : "") + (uri.query ? ("?" + uri.query) : ""));
                 }
             });
         }
         else {
-            callback(clientId, port, uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path);
+            callback(clientId, port, uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query);
         }
     }
 };

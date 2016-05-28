@@ -59,7 +59,11 @@ Copper.Event.dispatchEvents = function(){
 				let processed = false;
 				for (let j = 0; j < this.callbacks.length; j++){
 					if (this.callbacks[j].endpointId === oldQueue[i].endpointId){
-						processed = this.callbacks[j].callback(oldQueue[i]) || processed;
+						try {
+							processed = this.callbacks[j].callback(oldQueue[i]) || processed;
+						} catch (exception){
+							Copper.Log.logError("Error when dispatching event " + oldQueue[i].type + ":" + exception.stack);
+						}
 					}
 				}
 				if (!processed){

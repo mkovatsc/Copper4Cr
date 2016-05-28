@@ -123,15 +123,14 @@ Copper.CoapMessage.Option.prototype.setValue = function(val, opts) {
 * @arg opts: object with optional options. The following can be set:
 *             useUtf8 --> set to false if ascii encoding should be used
 *             strict --> set to true in order to throw errors instead of skipping error parts
-* @return: for multi-valued options: array containing all converted values, empty if no value set,
-*          for single-valued: converted value, undefined if not set
+* @return: array containing all converted values, empty if no value set
 */
 Copper.CoapMessage.Option.prototype.getValue = function(opts) {
 	let ascii = opts !== undefined && opts.useUtf8 === false;
 	let strict = opts !== undefined && opts.strict === true;
 	let val = this.val;
 	if (val.length === 0){
-		return this.header.multipleValues ? [] : undefined;
+		return [];
 	}
 	else {
 		let Types = Copper.CoapMessage.OptionHeader;
@@ -158,6 +157,6 @@ Copper.CoapMessage.Option.prototype.getValue = function(opts) {
 					throw new Error("Unknown Type");
 			}
 		}
-		return this.header.multipleValues ? res : res[0];
+		return res;
 	}
 };

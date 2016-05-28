@@ -1,7 +1,8 @@
 QUnit.test("JsonUtils: ArrayBuffer", function(assert) {
-	let data = new Uint8Array([23, 21, 42, 254]).buffer;
+	let data = new Uint8Array([23, 21, 42]).buffer;
 	let json = Copper.JsonUtils.stringify(data);
 	assert.deepEqual(Copper.JsonUtils.parse(json), data);
+	assert.deepEqual(Copper.JsonUtils.parse(json).byteLength, data.byteLength);
 });
 
 QUnit.test("JsonUtils: Settings", function(assert) {
@@ -10,6 +11,15 @@ QUnit.test("JsonUtils: Settings", function(assert) {
 	let json = Copper.JsonUtils.stringify(data);
 	assert.deepEqual(Copper.JsonUtils.parse(json), data);
 	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Settings), true);
+});
+
+QUnit.test("JsonUtils: CoapMessageOption", function(assert) {
+	let block2Header = new Copper.CoapMessage.OptionHeader(23, "Block2", Copper.CoapMessage.OptionHeader.TYPE_BLOCK, 0, 3, false);
+	let data = new Copper.CoapMessage.Option(block2Header).addValue(new Copper.CoapMessage.BlockOption(1, 4, 1));
+	let json = Copper.JsonUtils.stringify(data);
+	assert.deepEqual(Copper.JsonUtils.parse(json), data);
+	assert.deepEqual(Copper.JsonUtils.parse(json).getValue(), data.getValue());
+	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.CoapMessage.Option), true);
 });
 
 QUnit.test("JsonUtils: CoapMessage", function(assert) {

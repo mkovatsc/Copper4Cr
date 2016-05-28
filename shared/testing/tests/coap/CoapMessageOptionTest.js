@@ -28,15 +28,15 @@ QUnit.test("CoapMessageOption: Object, addByteValue", function(assert) {
 
 QUnit.test("CoapMessageOption: values", function(assert) {
 	let emptyHeader = new Copper.CoapMessage.OptionHeader(5, "If-None-Match", Copper.CoapMessage.OptionHeader.TYPE_EMPTY, 0, 0, false);
-	assert.deepEqual(new Copper.CoapMessage.Option(emptyHeader).getValue(), undefined);
-	assert.deepEqual(new Copper.CoapMessage.Option(emptyHeader).setValue(null).getValue(), null);
-	assert.deepEqual(new Copper.CoapMessage.Option(emptyHeader).setValue(0).getValue(), null);
+	assert.deepEqual(new Copper.CoapMessage.Option(emptyHeader).getValue(), []);
+	assert.deepEqual(new Copper.CoapMessage.Option(emptyHeader).setValue(null).getValue(), [null]);
+	assert.deepEqual(new Copper.CoapMessage.Option(emptyHeader).setValue(0).getValue(), [null]);
 	assert.throws(function(){
 		new Copper.CoapMessage.Option(emptyHeader).setValue("test");
 	});
 
 	let stringHeader = new Copper.CoapMessage.OptionHeader(3, "Uri-Host", Copper.CoapMessage.OptionHeader.TYPE_STRING, 1, 255, false);
-	assert.deepEqual(new Copper.CoapMessage.Option(stringHeader).setValue("http://vs0.inf.ethz.ch").getValue(), "http://vs0.inf.ethz.ch");
+	assert.deepEqual(new Copper.CoapMessage.Option(stringHeader).setValue("http://vs0.inf.ethz.ch").getValue(), ["http://vs0.inf.ethz.ch"]);
 	
 	let opaqueHeader = new Copper.CoapMessage.OptionHeader(4, "Etag", Copper.CoapMessage.OptionHeader.TYPE_OPAQUE, 1, 8, true);
 	assert.deepEqual(new Copper.CoapMessage.Option(opaqueHeader).getValue(), []);
@@ -47,13 +47,13 @@ QUnit.test("CoapMessageOption: values", function(assert) {
 	assert.throws(function(){
 		new Copper.CoapMessage.Option(uintHeader).setValue("0x33");
 	});
-	assert.deepEqual(new Copper.CoapMessage.Option(uintHeader).setValue(0x33).setValue(0x34).getValue(), 0x34);
+	assert.deepEqual(new Copper.CoapMessage.Option(uintHeader).setValue(0x33).setValue(0x34).getValue(), [0x34]);
 
 	let blockHeader = new Copper.CoapMessage.OptionHeader(23, "Block2", Copper.CoapMessage.OptionHeader.TYPE_BLOCK, 0, 3, false);
 	let blockOption = new Copper.CoapMessage.BlockOption(0, 6, 1);
-	assert.deepEqual(new Copper.CoapMessage.Option(blockHeader).setValue(blockOption).getValue(), blockOption);
+	assert.deepEqual(new Copper.CoapMessage.Option(blockHeader).setValue(blockOption).getValue(), [blockOption]);
 	blockOption = new Copper.CoapMessage.BlockOption(0, 4, 0);
-	assert.deepEqual(new Copper.CoapMessage.Option(blockHeader).setValue(blockOption).getValue(), blockOption);
+	assert.deepEqual(new Copper.CoapMessage.Option(blockHeader).setValue(blockOption).getValue(), [blockOption]);
 	assert.throws(function(){
 		new Copper.CoapMessage.Option(blockHeader).setValue(0);
 	});
