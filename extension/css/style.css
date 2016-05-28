@@ -60,11 +60,6 @@ button
 	border: 1px black solid;
 }
 
-.border_opacity
-{
-	border: 1px solid rgba(0, 0, 0, 0.2)
-}
-
 /* Flex Boxes */
 .vbox {
 	display: flex;
@@ -169,18 +164,6 @@ button
 	min-height: 600px;
 }
 
-.main-content
-{
-	position: absolute;
-	width: 100%;
-	top: 35px;
-	bottom: 0;
-}
-
-.main-content > *{
-	margin: 4px;
-}
-
 /* Toolbar */
 .main-toolbar {
 	overflow: hidden;
@@ -217,6 +200,18 @@ button
 .main-toolbar button:not(.no-hover):hover
 {
 	background-color: #ddd;
+}
+
+.main-content
+{
+	position: absolute;
+	width: 100%;
+	top: 35px;
+	bottom: 0;
+}
+
+.main-content > *{
+	margin: 4px;
 }
 
 /* Status Box */
@@ -299,10 +294,49 @@ button
 	flex: 1;
 }
 
-#tabbed_pane_payload p
+/* Payload */
+.main-content .center-box-bottom
 {
-	margin: 0; 
-	padding: 0;
+	position: relative;
+}
+
+.main-content .center-box-bottom > *
+{
+	margin: 4px;
+}
+
+.main-content .center-box-bottom h2
+{
+	font-size: 14px;
+	padding-top: 4px;
+}
+
+.main-content .center-box-bottom .pane
+{
+	position: absolute;
+	top: 60px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: 4px;
+}
+
+.main-content .center-box-bottom .innerpane
+{
+	width: 100%;
+	height: 100%;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	padding: 4px;
+}
+
+.main-content .center-box-bottom .visible
+{
+	display: block;
+}
+
+.main-content .center-box-bottom .hidden
+{
+	display: none;
 }
 
 /* Debug options */

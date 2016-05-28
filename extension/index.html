@@ -159,33 +159,21 @@
 								</div>
 							</div>
 						</div>
-						<div class="flex vbox" style="margin: 4px;">
-							<div style="min-height: 25px; height: 25px; padding: 6px;">Payload</div>
-							
-							<div style="min-height: 25px; height: 25px;">
-								<div>
-									<button onclick="onClickPayloadIn()" type="button">
-										<img src="skin/payload_in.png"></img> Incoming
-									</button>
-									<button onclick="onClickPayloadRendered()" type="button">
-										<img src="skin/payload_rendered.png"></img> Rendered
-									</button>
-									<button onclick="onClickPayloadOut()" type="button">
-										<img src="skin/payload_out.png"></img> Incoming
-									</button>
-								</div>
-							</div>
-							<div id="tabbed_pane_payload" class="flex vbox white" style="padding: 4px; height: 100%;">
-								<div class="flex border_opacity" style="padding: 4px; overflow-y: auto">
-									<div id="tab_incoming" style="display: block;">
-									</div>
-									<div id="tab_rendered" style="display: none; padding: 4px;">
-										<p>Rendered Tab</p>
-									</div>
-									<div id="tab_outgoing" style="display: none; padding: 4px;">
-										<p>Outgoing Tab</p>
-									</div>
-								</div>
+						<div class="center-box-bottom flex-filler">
+							<h2>Payload</h2>
+							<button id="copper-payload-btn-in" type="button">
+								<img src="skin/payload_in.png"></img> Incoming
+							</button>
+							<button id="copper-payload-btn-rendered" type="button">
+								<img src="skin/payload_rendered.png"></img> Rendered
+							</button>
+							<button id="copper-payload-btn-out" type="button">
+								<img src="skin/payload_out.png"></img> Outgoing
+							</button>
+							<div class="pane white">
+								<div id="copper-payload-tab-in" class="innerpane visible"></div>
+								<div id="copper-payload-tab-rendered" class="innerpane hidden"></div>
+								<textarea id="copper-payload-tab-out" class="innerpane hidden"></textarea>
 							</div>
 						</div>
 					</div>
