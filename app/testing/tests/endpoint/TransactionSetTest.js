@@ -6,12 +6,14 @@ QUnit.test("TransactionSet: General", function(assert) {
 	Copper.TimeUtils.now = function() {return timestamp + elapsedTime;};
 
 	// Test
-	let nonMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.NON, Copper.CoapMessage.Code.GET).setMid(20465);
+	let emptyToken = new ArrayBuffer(0);
 	let token = Copper.ByteUtils.convertUintToBytes(234);
+	let nonMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.NON, Copper.CoapMessage.Code.GET).setMid(20465);
 	let conMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.GET).setMid(20466).setToken(token);
 	let ackMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.ACK, Copper.CoapMessage.Code.CONTENT).setMid(20466).setToken(token).setPayload(new ArrayBuffer(20));
-	let nonTransaction = new Copper.RequestTransaction(nonMsg);
-	let conTransaction = new Copper.RequestTransaction(conMsg);
+	let requestHandler = {completeRequestTransaction: function(){}};
+	let nonTransaction = new Copper.RequestTransaction(nonMsg,  requestHandler);
+	let conTransaction = new Copper.RequestTransaction(conMsg,  requestHandler);
 	let resTransaction = new Copper.ResponseTransaction(conMsg, "10.3.2.1", 7832);
 	resTransaction.addResponse(ackMsg);
 
@@ -22,6 +24,8 @@ QUnit.test("TransactionSet: General", function(assert) {
 	let transactionSet = new Copper.TransactionSet(function(transaction){retransmissionCounter++;}, function(transaction){timeoutCounter++;},
 		                                           function(transaction){endOfLifeCounter++;})
 
+	transactionSet.registerToken(emptyToken, requestHandler);
+	transactionSet.registerToken(token, requestHandler);
 	transactionSet.addNewTransaction(nonTransaction);
 	transactionSet.addNewTransaction(conTransaction);
 	transactionSet.addNewTransaction(resTransaction);
@@ -41,9 +45,6 @@ QUnit.test("TransactionSet: General", function(assert) {
 		transactionSet.addNewTransaction(new Copper.ResponseTransaction(conMsg, "10.3.2.1", 7832));
 	});		
 	assert.deepEqual(transactionSet.isTokenRegistered(token), true);
-	assert.throws(function(){
-		transactionSet.unregisterToken(token);
-	});	
 	transactionSet.unregisterToken(Copper.ByteUtils.convertUintToBytes(25353));
 
 	transactionSet.handleTransactions();
@@ -72,7 +73,7 @@ QUnit.test("TransactionSet: General", function(assert) {
 
 	elapsedTime = 1 + 1000*Copper.CoapConstants.NON_LIFETIME;
 	transactionSet.handleTransactions();
-	transactionSet.unregisterTokenFromTransaction(nonTransaction);
+	transactionSet.unregisterToken(emptyToken);
 	assert.deepEqual(retransmissionCounter, Copper.CoapConstants.MAX_RETRANSMIT);
 	assert.deepEqual(timeoutCounter, 2);
 	assert.deepEqual(endOfLifeCounter, 1);
@@ -81,7 +82,7 @@ QUnit.test("TransactionSet: General", function(assert) {
 
 	elapsedTime = 1 + 1000*Copper.CoapConstants.EXCHANGE_LIFETIME;
 	transactionSet.handleTransactions();
-	transactionSet.unregisterTokenFromTransaction(conTransaction);
+	transactionSet.unregisterToken(token);
 	assert.deepEqual(retransmissionCounter, Copper.CoapConstants.MAX_RETRANSMIT);
 	assert.deepEqual(timeoutCounter, 2);
 	assert.deepEqual(endOfLifeCounter, 3);
@@ -93,6 +94,7 @@ QUnit.test("TransactionSet: General", function(assert) {
 	elapsedTime = 0;
 
 	conTransaction.isCompleted = false;
+	transactionSet.registerToken(token, requestHandler);
 	transactionSet.addNewTransaction(conTransaction);
 	transactionSet.getRequestTransaction(20466, token).isCompleted = false;
 

@@ -39,6 +39,52 @@ Copper.TransactionSet.prototype.reset = function(){
 };
 
 /**
+* Registers a token with a given object
+*/
+Copper.TransactionSet.prototype.registerToken = function(token, objectToRegister){
+	if (!(token instanceof ArrayBuffer) || objectToRegister === undefined){
+		throw new Error("Illegal Argument");
+	}
+	this.registeredTokens[Copper.ByteUtils.convertBytesToHexString(token)] = objectToRegister;
+};
+
+/**
+* @arg token as ArrayBuffer
+* @return: whether the token is in use
+*/
+Copper.TransactionSet.prototype.isTokenRegistered = function(token){
+	if (!(token instanceof ArrayBuffer)){
+		throw new Error("Illegal Argument");
+	}
+	return this.registeredTokens[Copper.ByteUtils.convertBytesToHexString(token)] !== undefined;
+};
+
+/**
+* @arg token as ArrayBuffer
+* @return: object registered with the given token
+*/
+Copper.TransactionSet.prototype.getRegisteredObjectForToken = function(token){
+	if (!(token instanceof ArrayBuffer)){
+		throw new Error("Illegal Argument");
+	}
+	return this.registeredTokens[Copper.ByteUtils.convertBytesToHexString(token)];
+};
+
+/**
+* Removes the token from the set of registered tokens. Is only allowed if the transaction has finished.
+* @arg token
+*/
+Copper.TransactionSet.prototype.unregisterToken = function(token){
+	if (!(token instanceof ArrayBuffer)){
+		throw new Error("Illegal Argument");
+	}
+	let tokenStr = Copper.ByteUtils.convertBytesToHexString(token);
+	if (this.registeredTokens[tokenStr] !== undefined){
+		delete this.registeredTokens[tokenStr];
+	}
+};
+
+/**
 * Adds a new transaction to this set and registers the token.
 * @arg transaction: Transaction which is not end of life and has a unique token and a unique mid
 */
@@ -47,14 +93,9 @@ Copper.TransactionSet.prototype.addNewTransaction = function(transaction){
 		throw new Error("Illegal Argument");
 	}
 	if (transaction instanceof Copper.RequestTransaction){
-		let tokenStr = Copper.ByteUtils.convertBytesToHexString(transaction.coapMessage.token);
-		if (this.registeredTokens[tokenStr] !== undefined){
-			throw new Error("Duplicate Token");
-		}
 		if (this.getRequestTransaction(transaction.coapMessage.mid, undefined) !== undefined){
 			throw new Error("Duplicate MID");
 		}
-		this.registeredTokens[tokenStr] = transaction;
 		this.activeRequestTransactions.push(transaction);
 	}
 	else {
@@ -66,23 +107,15 @@ Copper.TransactionSet.prototype.addNewTransaction = function(transaction){
 };
 
 /**
-* @arg mid: message id (optional if token is set)
-* @arg token: token as an ArrayBuffer (optional if mid is set)
+* @arg mid: message id
+* @arg token: token as an ArrayBuffer (optional)
 * @return: first transaction that matches mid and token.
 */
 Copper.TransactionSet.prototype.getRequestTransaction = function(mid, token){
-	if ((mid === undefined && token === undefined) || (mid !== undefined && (!Number.isInteger(mid) || mid < 0 || mid > 0xFFFF))
-		    || (token !== undefined && !(token instanceof ArrayBuffer))){
+	if (!Number.isInteger(mid) || mid < 0 || mid > 0xFFFF){
 		throw new Error("Illegal Argument");
 	}
 	let tokenStr = token !== undefined ? Copper.ByteUtils.convertBytesToHexString(token) : undefined;
-	if (mid === undefined){
-		return this.registeredTokens[tokenStr];
-	}
-	else if (tokenStr !== undefined && this.registeredTokens[tokenStr] !== undefined && this.registeredTokens[tokenStr].mid === mid){
-		// MID's must not match, as a token can be reused after the first response is received
-		return this.registeredTokens[tokenStr];
-	}
 	let transactions = this.activeRequestTransactions.concat(this.timeoutedRequestTransactions);
 	for (let i=0; i<transactions.length; i++){
 		if (mid === transactions[i].coapMessage.mid && (tokenStr === undefined || tokenStr === Copper.ByteUtils.convertBytesToHexString(transactions[i].coapMessage.token))){
@@ -109,51 +142,6 @@ Copper.TransactionSet.prototype.getResponseTransaction = function(mid, remoteAdd
 		}
 	}
 	return undefined;
-};
-
-/**
-* @arg token as ArrayBuffer
-* @return: whether the token is in use
-*/
-Copper.TransactionSet.prototype.isTokenRegistered = function(token){
-	if (!(token instanceof ArrayBuffer)){
-		throw new Error("Illegal Argument");
-	}
-	return this.registeredTokens[Copper.ByteUtils.convertBytesToHexString(token)] !== undefined;
-};
-
-/**
-* Removes the token from the set of registered tokens. Is only allowed if the transaction has finished.
-* @arg token
-*/
-Copper.TransactionSet.prototype.unregisterToken = function(token){
-	if (!(token instanceof ArrayBuffer)){
-		throw new Error("Illegal Argument");
-	}
-	let tokenStr = Copper.ByteUtils.convertBytesToHexString(token);
-	if (this.registeredTokens[tokenStr] !== undefined){
-		if (this.registeredTokens[tokenStr].isCompleted || this.registeredTokens[tokenStr].isEndOfLife()){
-			delete this.registeredTokens[tokenStr];
-		}
-		else {
-			throw new Error("Transaction not finished");
-		}
-	}
-};
-
-/**
-* Removes the token from the given transaction from the set of registered tokens if the registered token matches the transaction.
-* Is only allowed if the transaction has finished
-* @arg transaction
-*/
-Copper.TransactionSet.prototype.unregisterTokenFromTransaction = function(transaction){
-	if (!(transaction instanceof Copper.RequestTransaction)){
-		throw new Error("Illegal Argument");
-	}
-	let tokenStr = Copper.ByteUtils.convertBytesToHexString(transaction.coapMessage.token);
-	if (this.registeredTokens[tokenStr] === transaction){
-		this.unregisterToken(transaction.coapMessage.token);
-	}
 };
 
 /*

@@ -158,7 +158,7 @@ Copper.ServerEndpoint.prototype.onClientSendCoapMessage = function(coapMessage){
 		this.onError(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false);
 	}
 	else {
-		this.transactionHandler.sendCoapMessage(coapMessage);
+		new Copper.SingleRequestHandler(coapMessage, this.transactionHandler, this.transactionHandler.settings, this.id);
 	}
 	return true;
 };

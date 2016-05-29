@@ -25,7 +25,7 @@ Copper.TransactionHandlerTest.runTest = function(assert, coapMessage, expEvents,
 	transactionHandler.bind();
 
 	if (coapMessage !== undefined){
-		transactionHandler.sendCoapMessage(coapMessage);
+		new Copper.SingleRequestHandler(coapMessage, transactionHandler, settings, id);
 	}
 
 	for (let i=0; i<steps.length; i++){

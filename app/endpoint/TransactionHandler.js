@@ -128,27 +128,80 @@ Copper.TransactionHandler.prototype.updateSettings = function(settings){
 	this.settings = settings;
 };
 
+Copper.TransactionHandler.prototype.isTokenRegistered = function(token){
+	if (!(token instanceof ArrayBuffer)){
+		throw new Error("Illegal Arguments");
+	}
+	return this.transactionSet.isTokenRegistered(token);
+};
+
+Copper.TransactionHandler.prototype.registerToken = function(token, requestHandler){
+	if (!(token instanceof ArrayBuffer) || typeof(requestHandler.completeRequestTransaction) !== "function"){
+		throw new Error("Illegal Arguments");
+	}
+	if (this.transactionSet.isTokenRegistered(token)){
+		throw new Error("Token is already registered");
+	}
+	this.transactionSet.registerToken(token, {requestHandler: requestHandler});
+};
+
+Copper.TransactionHandler.prototype.getRequestHandlerForToken = function(token){
+	if (!(token instanceof ArrayBuffer)){
+		throw new Error("Illegal Arguments");
+	}
+	let registeredObject = this.transactionSet.getRegisteredObjectForToken(token);
+	return registeredObject !== undefined ? registeredObject.requestHandler : undefined;
+};
+
+Copper.TransactionHandler.prototype.setRequestTransactionForToken = function(token, requestTransaction){
+	if (!(token instanceof ArrayBuffer) || !(requestTransaction instanceof Copper.RequestTransaction)){
+		throw new Error("Illegal Arguments");
+	}
+	let registeredObject = this.transactionSet.getRegisteredObjectForToken(token);
+	if (registeredObject === undefined){
+		throw new Error("Illegal Argument");
+	}
+	registeredObject.requestTransaction = requestTransaction;
+};
+
+Copper.TransactionHandler.prototype.getRequestTransactionForToken = function(token){
+	if (!(token instanceof ArrayBuffer)){
+		throw new Error("Illegal Arguments");
+	}
+	let registeredObject = this.transactionSet.getRegisteredObjectForToken(token);
+	return registeredObject !== undefined ? registeredObject.requestTransaction : undefined;
+};
+
+Copper.TransactionHandler.prototype.unregisterToken = function(token, requestHandler){
+	if (!(token instanceof ArrayBuffer)){
+		throw new Error("Illegal Arguments");
+	}
+	if (requestHandler === undefined || this.getRequestHandlerForToken(token) === requestHandler){
+		this.transactionSet.unregisterToken(token);
+	}
+};
+
 /*
 *  Creates a new transaction and starts sending the coap message
 *
 * @arg coapMessage: message to send
 */
-Copper.TransactionHandler.prototype.sendCoapMessage = function(coapMessage){
+Copper.TransactionHandler.prototype.sendCoapMessage = function(coapMessage, requestHandler){
 	if (this.state !== Copper.TransactionHandler.STATE_READY){
 		Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false, this.endpointId));
 	}
 	else if (coapMessage.mid !== undefined){
 		Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_ILLEGAL_ARGUMENT, "Mid must not be set", true, this.endpointId));
 	}
+	else if (requestHandler !== undefined && this.getRequestHandlerForToken(coapMessage.token) !== requestHandler){
+		throw new Error("Request Handler must match token");
+	}
 	else {
 		coapMessage.setMid(this.midGenerator());
-		if (this.transactionSet.isTokenRegistered(coapMessage.token)){
-			Copper.Log.logInfo("Token " + Copper.ByteUtils.convertBytesToHexString(coapMessage.token) + " is in use. Another token is used.");
-			do {
-				coapMessage.setToken(Copper.ByteUtils.convertUintToBytes(parseInt(Math.random()*0x10000000)));
-			} while (this.transactionSet.isTokenRegistered(coapMessage.token));
+		let transaction = new Copper.RequestTransaction(coapMessage, requestHandler, this.settings.retransmission);
+		if (requestHandler !== undefined){
+			this.setRequestTransactionForToken(coapMessage.token, transaction);
 		}
-		let transaction = new Copper.RequestTransaction(coapMessage, this.settings.retransmission);
 		this.transactionSet.addNewTransaction(transaction);
 		this.sendCoapMessageInternal(transaction.coapMessage, this.remoteAddress, this.remotePort, 0);
 	}
@@ -209,14 +262,21 @@ Copper.TransactionHandler.prototype.handleReceivedCoapMessage = function(coapMes
 		else if (requestTransaction.isConfirmed){
 			Copper.Event.sendEvent(Copper.Event.createReceivedDuplicateCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
 		}
+		else if (requestTransaction.requestHandler !== undefined && requestTransaction.requestHandler !== this.getRequestHandlerForToken(coapMessage.token)) {
+			Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
+		}
 		else {
 			Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-			this.confirmRequestTransaction(requestTransaction);
-			if (requestTransaction.coapMessage.code.isResponseCode()){
-				this.completeRequestTransaction(requestTransaction, undefined);
+			requestTransaction.isConfirmed = true;
+			Copper.Event.sendEvent(Copper.Event.createMessageConfirmedEvent(requestTransaction.coapMessage, Copper.TimeUtils.now()-requestTransaction.lastTransmissionStart, this.endpointId));
+			if (requestTransaction.requestHandler === undefined){
+				requestTransaction.isCompleted = true;
 			}
 			else if (Copper.CoapMessage.Type.RST.equals(coapMessage.type) || !Copper.CoapMessage.Code.EMPTY.equals(coapMessage.code)){
-				this.completeRequestTransaction(requestTransaction, coapMessage);
+				if (!requestTransaction.isCompleted){
+					requestTransaction.isCompleted = true;
+					requestTransaction.requestHandler.completeRequestTransaction(coapMessage, requestTransaction, undefined);
+				}
 			}
 		}
 	}
@@ -233,12 +293,12 @@ Copper.TransactionHandler.prototype.handleReceivedCoapMessage = function(coapMes
 			responseTransaction = new Copper.ResponseTransaction(coapMessage, remoteAddress, remotePort);
 			if (coapMessage.code.isResponseCode()) {
 				// reponse to a previous request. should match using the token 
-				let requestTransaction = this.transactionSet.getRequestTransaction(undefined, coapMessage.token);
+				let requestTransaction = this.getRequestTransactionForToken(coapMessage.token);
 				if (requestTransaction !== undefined){
 					Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-					this.completeRequestTransaction(requestTransaction, coapMessage);
-					if (Copper.CoapMessage.Type.CON.equals(coapMessage.type)){
-						responseTransaction.addResponse(Copper.CoapMessage.ack(coapMessage.mid, coapMessage.token));
+					if (!requestTransaction.isCompleted){
+						requestTransaction.isCompleted = true;
+						requestTransaction.requestHandler.completeRequestTransaction(coapMessage, requestTransaction, responseTransaction);
 					}
 				}
 				else {
@@ -253,7 +313,7 @@ Copper.TransactionHandler.prototype.handleReceivedCoapMessage = function(coapMes
 				let i=0;
 				while (res === undefined && i < this.requestCallbacks.length){
 					let tmpRes = this.requestCallbacks[i](coapMessage, remoteAddress, remotePort);
-					if (tmpRes !== undefined && !(tmpRes instanceof Copper.CoapMessage)){
+					if (tmpRes !== undefined && (!(tmpRes instanceof Copper.CoapMessage)) || !tmpRes.code.isResponseCode()){
 						throw new Error("Illegal return value from callback");
 					}
 					res = tmpRes;
@@ -296,30 +356,7 @@ Copper.TransactionHandler.prototype.handleReceivedCoapMessage = function(coapMes
 				throw new Error("Illegal response message");
 			}
 			// create new transaction and send reliably
-			this.sendCoapMessage(responseCoapMessage);
-		}
-	}
-};
-
-Copper.TransactionHandler.prototype.confirmRequestTransaction = function(requestTransaction){
-	if (!(requestTransaction instanceof Copper.RequestTransaction)){
-		throw new Error("Illegal Arguments");
-	}
-	if (!requestTransaction.isConfirmed){
-		requestTransaction.isConfirmed = true;
-		Copper.Event.sendEvent(Copper.Event.createMessageConfirmedEvent(requestTransaction.coapMessage, Copper.TimeUtils.now()-requestTransaction.lastTransmissionStart, this.endpointId));
-	}
-};
-
-Copper.TransactionHandler.prototype.completeRequestTransaction = function(requestTransaction, response){
-	if (!(requestTransaction instanceof Copper.RequestTransaction) || (response !== undefined && !(response instanceof Copper.CoapMessage))){
-		throw new Error("Illegal Arguments");
-	}
-	if (!requestTransaction.isCompleted){
-		requestTransaction.isCompleted = true;
-		this.transactionSet.unregisterToken(requestTransaction.coapMessage.token);
-		if (response !== undefined){
-			Copper.Event.sendEvent(Copper.Event.createRequestCompletedEvent(requestTransaction.coapMessage, response, Copper.TimeUtils.now()-requestTransaction.firstTransmissionStart, this.endpointId));
+			this.sendCoapMessage(responseCoapMessage, undefined);
 		}
 	}
 };
@@ -332,13 +369,17 @@ Copper.TransactionHandler.prototype.onRetransmission = function(transaction){
 
 Copper.TransactionHandler.prototype.onTimeout = function(transaction){
 	Copper.Log.logFine("Request Transaction " + transaction.coapMessage.mid + " to " + this.remoteAddress + ":" + this.remotePort + " has timeouted");
-	Copper.Event.sendEvent(Copper.Event.createCoapMessageTimedOutEvent(transaction.mid, transaction.token, transaction.firstTransmissionStart, this.endpointId));
+	if (transaction.requestHandler !== undefined){
+		transaction.requestHandler.onTimeout(transaction);
+	}
 };
 
 Copper.TransactionHandler.prototype.onEndOfLife = function(transaction){
 	if (transaction instanceof Copper.RequestTransaction){
-		this.transactionSet.unregisterTokenFromTransaction(transaction);
 		Copper.Log.logFine("Request Transaction " + transaction.coapMessage.mid + " to " + this.remoteAddress + ":" + this.remotePort + " is end of life");
+		if (transaction.requestHandler !== undefined){
+			transaction.requestHandler.onEndOfLife(transaction);
+		}
 	}
 	else {
 		Copper.Log.logFine("Response Transaction " + transaction.coapMessage.mid + " from " + transaction.remoteAddress + ":" + transaction.remotePort + " is end of life");

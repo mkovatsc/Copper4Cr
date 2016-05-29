@@ -1,8 +1,12 @@
-Copper.RequestTransaction = function(coapMessage, doRetransmissions){
+Copper.RequestTransaction = function(coapMessage, requestHandler, doRetransmissions){
 	if (!(coapMessage instanceof Copper.CoapMessage) || coapMessage.mid === undefined){
 		throw new Error("Illegal argument");
 	}
+	if (!coapMessage.code.isResponseCode() && typeof(requestHandler.completeRequestTransaction) !== "function"){
+		throw new Error("Request Handler must be set");
+	}
 	this.coapMessage = coapMessage;
+	this.requestHandler = requestHandler;
 	this.firstTransmissionStart = Copper.TimeUtils.now();
 	this.lastTransmissionStart = this.firstTransmissionStart;
 	this.doRetransmissions = doRetransmissions !== undefined ? doRetransmissions : Copper.CoapMessage.Type.CON.equals(coapMessage.type);
@@ -16,6 +20,7 @@ Copper.RequestTransaction = function(coapMessage, doRetransmissions){
 };
 
 Copper.RequestTransaction.prototype.coapMessage = undefined;
+Copper.RequestTransaction.prototype.requestHandler = undefined;
 Copper.RequestTransaction.prototype.firstTransmissionStart = undefined;
 Copper.RequestTransaction.prototype.lastTransmissionStart = undefined;
 Copper.RequestTransaction.prototype.timeout = undefined;
