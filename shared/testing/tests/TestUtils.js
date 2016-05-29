@@ -78,3 +78,11 @@ Copper.TestUtils.generateUdpClientMock = function(packetHandler){
 	    	  }
 	};
 };
+
+Copper.TestUtils.generateRequestHandlerMock = function(){
+	return {
+		handleResponse: function(){
+			
+		}
+	};
+};

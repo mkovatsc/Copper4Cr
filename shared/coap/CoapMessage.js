@@ -28,6 +28,32 @@ Copper.CoapMessage.reset = function(mid, token){
 };
 
 /*
+* Clones the message
+*/
+Copper.CoapMessage.prototype.clone = function(payloadOffset, payloadLength){
+	let res = new Copper.CoapMessage(this.type.clone(), this.code.clone()).
+			setMid(this.mid).
+			setToken(this.token);
+	
+	let optionNos = Object.keys(this.options);
+	for (let i=0; i<optionNos.length; i++){
+		res.options[optionNos[i]] = this.options[optionNos[i]];
+	}
+
+	if (payloadOffset === undefined && payloadLength === undefined){
+		res.setPayload(this.payload);
+	}
+	else {
+		payloadOffset = payloadOffset ? payloadOffset : 0;
+		payloadLength = payloadLength ? payloadLength : (this.payload.byteLength - payloadOffset);
+		if (payloadOffset < this.payload.byteLength){
+			res.setPayload(this.payload.slice(payloadOffset, Math.min(this.payload.byteLength, payloadOffset + payloadLength)));
+		}
+	}
+	return res;
+};
+
+/*
 * Sets a message identifier
 * @return: this for method chaining
 */
@@ -116,8 +142,11 @@ Copper.CoapMessage.prototype.getOption = function(optionHeader){
 	if (this.options[optionHeader.number]){
 		return this.options[optionHeader.number].getValue();
 	}
+	else if (optionHeader.defaultValue !== undefined) {
+		return [optionHeader.defaultValue];
+	}
 	else {
-		return optionHeader.defaultValue;
+		return [];
 	}
 };
 

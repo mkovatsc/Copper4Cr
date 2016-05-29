@@ -2,7 +2,7 @@ Copper.RequestTransaction = function(coapMessage, requestHandler, doRetransmissi
 	if (!(coapMessage instanceof Copper.CoapMessage) || coapMessage.mid === undefined){
 		throw new Error("Illegal argument");
 	}
-	if (!coapMessage.code.isResponseCode() && typeof(requestHandler.completeRequestTransaction) !== "function"){
+	if (!coapMessage.code.isResponseCode() && requestHandler === undefined){
 		throw new Error("Request Handler must be set");
 	}
 	this.coapMessage = coapMessage;
@@ -34,7 +34,7 @@ Copper.RequestTransaction.prototype.isConfirmable = function(){
 }
 
 Copper.RequestTransaction.prototype.isRetransmissionNecessary = function(){
-	return this.isConfirmable() && !this.isCompleted && this.retransmissionCounter < Copper.CoapConstants.MAX_RETRANSMIT 
+	return this.isConfirmable() && !this.isCompleted && !this.isConfirmed && this.retransmissionCounter < Copper.CoapConstants.MAX_RETRANSMIT 
 	            && Copper.TimeUtils.isOlderThan(this.lastTransmissionStart, this.timeout);
 };
 
@@ -48,7 +48,7 @@ Copper.RequestTransaction.prototype.increaseRetransmissionCounter = function(){
 };
 
 Copper.RequestTransaction.prototype.isTimeout = function(){
-	return !this.isCompleted && 
+	return !this.isCompleted && !this.isConfirmed && 
 	            ((this.isConfirmable() && this.retransmissionCounter >= Copper.CoapConstants.MAX_RETRANSMIT && 
 	         	    Copper.TimeUtils.isOlderThan(this.lastTransmissionStart, this.timeout/2)) ||
 	            (!this.isConfirmable() && Copper.TimeUtils.isOlderThan(this.lastTransmissionStart, 1000*Copper.CoapConstants.NON_TIMEOUT)));

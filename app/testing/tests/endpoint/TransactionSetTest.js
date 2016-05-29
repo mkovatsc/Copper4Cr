@@ -11,7 +11,7 @@ QUnit.test("TransactionSet: General", function(assert) {
 	let nonMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.NON, Copper.CoapMessage.Code.GET).setMid(20465);
 	let conMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.GET).setMid(20466).setToken(token);
 	let ackMsg = new Copper.CoapMessage(Copper.CoapMessage.Type.ACK, Copper.CoapMessage.Code.CONTENT).setMid(20466).setToken(token).setPayload(new ArrayBuffer(20));
-	let requestHandler = {completeRequestTransaction: function(){}};
+	let requestHandler = Copper.TestUtils.generateRequestHandlerMock();
 	let nonTransaction = new Copper.RequestTransaction(nonMsg,  requestHandler);
 	let conTransaction = new Copper.RequestTransaction(conMsg,  requestHandler);
 	let resTransaction = new Copper.ResponseTransaction(conMsg, "10.3.2.1", 7832);

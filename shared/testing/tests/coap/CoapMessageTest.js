@@ -26,9 +26,9 @@ QUnit.test("CoapMessage: Object", function(assert) {
 	let etagHeader = new Copper.CoapMessage.OptionHeader(4, "Etag", Copper.CoapMessage.OptionHeader.TYPE_OPAQUE, 1, 8, true);
 	let maxAgeHeader = new Copper.CoapMessage.OptionHeader(14, "Max-Age", Copper.CoapMessage.OptionHeader.TYPE_UINT, 0, 4, false, 60);
 
-	assert.deepEqual(msg.getOption(uriOptionHeader), undefined);
-	assert.deepEqual(msg.getOption(etagHeader), undefined);
-	assert.deepEqual(msg.getOption(maxAgeHeader), 60); // default value
+	assert.deepEqual(msg.getOption(uriOptionHeader), []);
+	assert.deepEqual(msg.getOption(etagHeader), []);
+	assert.deepEqual(msg.getOption(maxAgeHeader), [60]); // default value
 
 	msg.addOption(etagHeader, "0x4444");
 	assert.deepEqual(msg.getOption(etagHeader), ["0x4444"]);
@@ -52,4 +52,10 @@ QUnit.test("CoapMessage: Object", function(assert) {
 	assert.throws(function(){
 		new Copper.CoapMessage(conType, Copper.CoapMessage.Code.EMPTY).setPayload(payload);
 	});
+});
+
+QUnit.test("CoapMessage: clone", function(assert) {
+	Copper.TestUtils.applyTestsOnDifferentCoapMessages([function(msg){
+		Copper.TestUtils.checkCoapMessageEquality(assert, msg.clone(), msg);
+	}]);
 });

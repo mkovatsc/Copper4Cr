@@ -17,6 +17,11 @@ Copper.CoapMessage.Option.prototype.resetValue = function() {
 	return this;
 };
 
+Copper.CoapMessage.Option.prototype.clone = function() {
+	let res = new Copper.CoapMessage.Option(this.header.clone());
+	res.val = this.val.slice(0);
+};
+
 /**
 * Sets the option value or adds a value in case of options that support multiple values. 
 * @byteVal: ArrayBuffer containing the data
@@ -80,7 +85,7 @@ Copper.CoapMessage.Option.prototype.addValue = function(val, opts) {
 			this.addByteValue(Copper.ByteUtils.convertToByteArray(val));
 			break;
 		case Types.TYPE_UINT:
-			if (Number.isInteger(val) && val > 0){
+			if (Number.isInteger(val) && val >= 0){
 				this.addByteValue(Copper.ByteUtils.convertUintToBytes(val));
 				break;
 			}
