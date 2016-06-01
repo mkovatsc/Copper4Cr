@@ -3,13 +3,13 @@
 * - It performs blockwise transfer where appropriate
 * - It handles observable resources
 */
-Copper.SingleRequestHandler = function(coapMessage, transactionHandler, settings, endpointId){
-	if (!(coapMessage instanceof Copper.CoapMessage) || !(transactionHandler instanceof Copper.TransactionHandler) || !(settings instanceof Copper.Settings)
+Copper.SingleRequestHandler = function(coapMessage, transmissionHandler, settings, endpointId){
+	if (!(coapMessage instanceof Copper.CoapMessage) || !(transmissionHandler instanceof Copper.TransmissionHandler) || !(settings instanceof Copper.Settings)
 			|| !Number.isInteger(endpointId)){
 		throw new Error("Illegal Argument");
 	}
 	this.coapMessageTemplate = coapMessage;
-	this.transactionHandler = transactionHandler;
+	this.transmissionHandler = transmissionHandler;
 	this.settings = settings;
 	this.endpointId = endpointId;
 
@@ -22,7 +22,7 @@ Copper.SingleRequestHandler = function(coapMessage, transactionHandler, settings
 };
 
 Copper.SingleRequestHandler.prototype.coapMessageTemplate = undefined;
-Copper.SingleRequestHandler.prototype.transactionHandler = undefined;
+Copper.SingleRequestHandler.prototype.transmissionHandler = undefined;
 Copper.SingleRequestHandler.prototype.settings = undefined;
 Copper.SingleRequestHandler.prototype.endpointId = undefined;
 Copper.SingleRequestHandler.prototype.token = undefined;
@@ -32,14 +32,14 @@ Copper.SingleRequestHandler.prototype.observing = undefined;
 
 
 Copper.SingleRequestHandler.prototype.registerToken = function(initialToken){
-	if (this.transactionHandler.isTokenRegistered(initialToken)){
+	if (this.transmissionHandler.isTokenRegistered(initialToken)){
 		Copper.Log.logInfo("Token " + Copper.ByteUtils.convertBytesToHexString(initialToken) + " is in use. Another token is used.");
 		do {
 			initialToken = Copper.ByteUtils.convertUintToBytes(parseInt(Math.random()*0x10000000));
-		} while (this.transactionHandler.isTokenRegistered(initialToken));
+		} while (this.transmissionHandler.isTokenRegistered(initialToken));
 	}
 	this.token = initialToken;
-	this.transactionHandler.registerToken(initialToken, this);
+	this.transmissionHandler.registerToken(initialToken, this);
 };
 
 Copper.SingleRequestHandler.prototype.sendCoapMessage = function(){
@@ -47,7 +47,7 @@ Copper.SingleRequestHandler.prototype.sendCoapMessage = function(){
 	let coapMessage = this.coapMessageTemplate.clone();
 	coapMessage.setToken(this.token);
 	this.numberOfSentRequests++;
-	this.transactionHandler.sendCoapMessage(coapMessage, this);
+	this.transmissionHandler.sendCoapMessage(coapMessage, this);
 };
 
 /*
@@ -56,8 +56,8 @@ Copper.SingleRequestHandler.prototype.sendCoapMessage = function(){
 		* Requests in case of missing replies (max-age + 5-15s) (see RFC, 3.3.1)
 		* Reordering (out of order detection) (see RFC)
 */
-Copper.SingleRequestHandler.prototype.handleResponse = function(coapMessage, responseTransaction){
-	if (!(coapMessage instanceof Copper.CoapMessage) || (responseTransaction !== undefined && !(responseTransaction instanceof Copper.ResponseTransaction))) {
+Copper.SingleRequestHandler.prototype.handleResponse = function(coapMessage, responseTransmission){
+	if (!(coapMessage instanceof Copper.CoapMessage) || (responseTransmission !== undefined && !(responseTransmission instanceof Copper.ResponseMessageTransmission))) {
 		throw new Error("Illegal Argument");
 	}
 	let templateObserveOption = this.coapMessageTemplate.getOption(Copper.CoapMessage.OptionHeader.OBSERVE);
@@ -66,27 +66,25 @@ Copper.SingleRequestHandler.prototype.handleResponse = function(coapMessage, res
 		this.observing = true;
 	}
 	if (!this.observing){
-		this.transactionHandler.unregisterToken(this.token);
-		Copper.Event.sendEvent(Copper.Event.createRequestCompletedEvent(this.coapMessageTemplate, coapMessage, Copper.TimeUtils.now()-this.requestStart, this.endpointId));
+		this.transmissionHandler.unregisterToken(this.token);
 	}
 	else {
 
 	}
 	if (Copper.CoapMessage.Type.CON.equals(coapMessage.type)){
-		responseTransaction.addResponse(Copper.CoapMessage.ack(coapMessage.mid, coapMessage.token));
+		responseTransmission.addResponse(Copper.CoapMessage.ack(coapMessage.mid, coapMessage.token));
 	}
 };
 
 Copper.SingleRequestHandler.prototype.cancelRequest = function(){
-	this.transactionHandler.unregisterToken(this.token, this);
+	this.transmissionHandler.unregisterToken(this.token, this);
 };
 
-Copper.SingleRequestHandler.prototype.onTimeout = function(requestTransaction){
-	Copper.Event.sendEvent(Copper.Event.createCoapMessageTimedOutEvent(requestTransaction.coapMessage.mid, requestTransaction.coapMessage.token, requestTransaction.firstTransmissionStart, this.endpointId));
+Copper.SingleRequestHandler.prototype.onTimeout = function(requestTransmission){
 };
 
-Copper.SingleRequestHandler.prototype.onEndOfLife = function(requestTransaction){
+Copper.SingleRequestHandler.prototype.onEndOfLife = function(requestTransmission){
 	if (!this.observing){
-		this.transactionHandler.unregisterToken(this.token, this);
+		this.transmissionHandler.unregisterToken(this.token, this);
 	}
 };

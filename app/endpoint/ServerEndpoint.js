@@ -44,7 +44,7 @@ Copper.ServerEndpoint.STATE_DISCONNECTED = 2;
 Copper.ServerEndpoint.prototype.port = undefined;
 Copper.ServerEndpoint.prototype.id = undefined;
 Copper.ServerEndpoint.prototype.state = undefined;
-Copper.ServerEndpoint.prototype.transactionHandler = undefined;
+Copper.ServerEndpoint.prototype.transmissionHandler = undefined;
 Copper.ServerEndpoint.prototype.eventCallback = undefined;
 
 
@@ -73,9 +73,9 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 			case Copper.Event.TYPE_SEND_COAP_MESSAGE:
 				return this.onClientSendCoapMessage(event.data.coapMessage);
 			case Copper.Event.TYPE_COAP_MESSAGE_SENT:
-			case Copper.Event.TYPE_COAP_MESSAGE_TIMED_OUT:
-			case Copper.Event.TYPE_MESSAGE_CONFIRMED:
-			case Copper.Event.TYPE_REQUEST_COMPLETED:
+			case Copper.Event.TYPE_MESSAGE_TRANSMISSION_TIMED_OUT:
+			case Copper.Event.TYPE_MESSAGE_TRANSMISSION_CONFIRMED:
+			case Copper.Event.TYPE_MESSAGE_TRANSMISSION_COMPLETED:
 				this.port.sendMessage(event);
 				return true;
 
@@ -100,8 +100,8 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 /* Callback for the server port (called when the client disconnects) */
 Copper.ServerEndpoint.prototype.handleClientDisconnected = function(){
 	if (this.state === Copper.ServerEndpoint.STATE_UDP_SOCKET_READY){
-		this.transactionHandler.close();
-		this.transactionHandler = undefined;
+		this.transmissionHandler.close();
+		this.transmissionHandler = undefined;
 	}
 	if (this.state !== Copper.ServerEndpoint.STATE_DISCONNECTED){
 		this.state = Copper.ServerEndpoint.STATE_DISCONNECTED;
@@ -114,8 +114,8 @@ Copper.ServerEndpoint.prototype.handleClientDisconnected = function(){
 /* Implementation of the different events */
 Copper.ServerEndpoint.prototype.onError = function(errorType, errorMessage, endpointReady){
 	if (this.state === Copper.ServerEndpoint.STATE_UDP_SOCKET_READY && !endpointReady){
-		this.transactionHandler.close();
-		this.transactionHandler = undefined;
+		this.transmissionHandler.close();
+		this.transmissionHandler = undefined;
 		this.state = Copper.ServerEndpoint.STATE_CONNECTED;
 	}
 	this.port.sendMessage(Copper.Event.createErrorOnServerEvent(errorType, errorMessage, endpointReady, this.id));
@@ -127,8 +127,8 @@ Copper.ServerEndpoint.prototype.onRegisterClient = function(remoteAddress, remot
 		this.onError(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", this.state === Copper.ServerEndpoint.STATE_UDP_SOCKET_READY);
 	}
 	else {
-		this.transactionHandler = new Copper.TransactionHandler(Copper.ComponentFactory.createUdpClient(), remoteAddress, remotePort, settings, this.id);
-		this.transactionHandler.bind();
+		this.transmissionHandler = new Copper.TransmissionHandler(Copper.ComponentFactory.createUdpClient(), remoteAddress, remotePort, settings, this.id);
+		this.transmissionHandler.bind();
 	}
 	return true;
 };
@@ -138,8 +138,8 @@ Copper.ServerEndpoint.prototype.onUnregisterClient = function(){
 		this.onError(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false);
 	}
 	else {
-		this.transactionHandler.close();
-		this.transactionHandler = undefined;
+		this.transmissionHandler.close();
+		this.transmissionHandler = undefined;
 		this.state = Copper.ServerEndpoint.STATE_CONNECTED;
 		Copper.Log.logFine("Server Endpoint " + this.id + ": Client unregistered");
 	}
@@ -147,8 +147,8 @@ Copper.ServerEndpoint.prototype.onUnregisterClient = function(){
 };
 
 Copper.ServerEndpoint.prototype.onUpdateSettings = function(settings){
-	if (this.transactionHandler !== undefined){
-		this.transactionHandler.updateSettings(settings);
+	if (this.transmissionHandler !== undefined){
+		this.transmissionHandler.updateSettings(settings);
 	}
 	return true;
 };
@@ -158,7 +158,7 @@ Copper.ServerEndpoint.prototype.onClientSendCoapMessage = function(coapMessage){
 		this.onError(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false);
 	}
 	else {
-		new Copper.SingleRequestHandler(coapMessage, this.transactionHandler, this.transactionHandler.settings, this.id);
+		new Copper.SingleRequestHandler(coapMessage, this.transmissionHandler, this.transmissionHandler.settings, this.id);
 	}
 	return true;
 };

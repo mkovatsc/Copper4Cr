@@ -1,4 +1,4 @@
-Copper.RequestTransaction = function(coapMessage, requestHandler, doRetransmissions){
+Copper.RequestMessageTransmission = function(coapMessage, requestHandler, doRetransmissions){
 	if (!(coapMessage instanceof Copper.CoapMessage) || coapMessage.mid === undefined){
 		throw new Error("Illegal argument");
 	}
@@ -19,26 +19,26 @@ Copper.RequestTransaction = function(coapMessage, requestHandler, doRetransmissi
 	this.isCompleted = false;
 };
 
-Copper.RequestTransaction.prototype.coapMessage = undefined;
-Copper.RequestTransaction.prototype.requestHandler = undefined;
-Copper.RequestTransaction.prototype.firstTransmissionStart = undefined;
-Copper.RequestTransaction.prototype.lastTransmissionStart = undefined;
-Copper.RequestTransaction.prototype.timeout = undefined;
-Copper.RequestTransaction.prototype.retransmissionCounter = undefined;
-Copper.RequestTransaction.prototype.isConfirmed = undefined;
-Copper.RequestTransaction.prototype.isCompleted = undefined;
+Copper.RequestMessageTransmission.prototype.coapMessage = undefined;
+Copper.RequestMessageTransmission.prototype.requestHandler = undefined;
+Copper.RequestMessageTransmission.prototype.firstTransmissionStart = undefined;
+Copper.RequestMessageTransmission.prototype.lastTransmissionStart = undefined;
+Copper.RequestMessageTransmission.prototype.timeout = undefined;
+Copper.RequestMessageTransmission.prototype.retransmissionCounter = undefined;
+Copper.RequestMessageTransmission.prototype.isConfirmed = undefined;
+Copper.RequestMessageTransmission.prototype.isCompleted = undefined;
 
-Copper.RequestTransaction.prototype.isConfirmable = function(){
+Copper.RequestMessageTransmission.prototype.isConfirmable = function(){
 	// handle CONs without retransmissions as NONs
 	return Copper.CoapMessage.Type.CON.equals(this.coapMessage.type) && this.doRetransmissions;
 }
 
-Copper.RequestTransaction.prototype.isRetransmissionNecessary = function(){
+Copper.RequestMessageTransmission.prototype.isRetransmissionNecessary = function(){
 	return this.isConfirmable() && !this.isCompleted && !this.isConfirmed && this.retransmissionCounter < Copper.CoapConstants.MAX_RETRANSMIT 
 	            && Copper.TimeUtils.isOlderThan(this.lastTransmissionStart, this.timeout);
 };
 
-Copper.RequestTransaction.prototype.increaseRetransmissionCounter = function(){
+Copper.RequestMessageTransmission.prototype.increaseRetransmissionCounter = function(){
 	if (!this.isConfirmable() || this.retransmissionCounter >= Copper.CoapConstants.MAX_RETRANSMIT){
 		throw new Error("Illegal state");
 	}
@@ -47,14 +47,14 @@ Copper.RequestTransaction.prototype.increaseRetransmissionCounter = function(){
 	this.timeout = 2*this.timeout;
 };
 
-Copper.RequestTransaction.prototype.isTimeout = function(){
+Copper.RequestMessageTransmission.prototype.isTimeout = function(){
 	return !this.isCompleted && !this.isConfirmed && 
 	            ((this.isConfirmable() && this.retransmissionCounter >= Copper.CoapConstants.MAX_RETRANSMIT && 
 	         	    Copper.TimeUtils.isOlderThan(this.lastTransmissionStart, this.timeout/2)) ||
 	            (!this.isConfirmable() && Copper.TimeUtils.isOlderThan(this.lastTransmissionStart, 1000*Copper.CoapConstants.NON_TIMEOUT)));
 };
 
-Copper.RequestTransaction.prototype.isEndOfLife = function(){
+Copper.RequestMessageTransmission.prototype.isEndOfLife = function(){
 	return Copper.TimeUtils.isOlderThan(this.firstTransmissionStart, 
 		(this.isConfirmable() ? Copper.CoapConstants.EXCHANGE_LIFETIME : Copper.CoapConstants.NON_LIFETIME) * 1000); 
 };

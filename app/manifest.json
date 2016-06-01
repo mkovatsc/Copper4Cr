@@ -42,12 +42,13 @@
                      "shared/endpoint/ChromePort.js",
                      
                      //server part
+                     "endpoint/transmission/RequestMessageTransmission.js",
+                     "endpoint/transmission/ResponseMessageTransmission.js",
+                     "endpoint/transmission/MessagesInTransmissionSet.js",
+                     "endpoint/transmission/TransmissionHandler.js",
+  
                      "endpoint/ChromeUdpClient.js",
-                     "endpoint/RequestTransaction.js",
-                     "endpoint/ResponseTransaction.js",
                      "endpoint/SingleRequestHandler.js",
-                     "endpoint/TransactionSet.js",
-                     "endpoint/TransactionHandler.js",
                      "endpoint/ServerEndpoint.js",
 
                      "background.js"
