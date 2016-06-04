@@ -100,6 +100,12 @@ Copper.Event.TYPE_UNKNOWN_COAP_MESSAGE_RECEIVED = 41;
 Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED = 42;
 Copper.Event.TYPE_RECEIVED_PARSE_ERROR = 43;
 
+Copper.Event.TYPE_REQUEST_COMPLETED = 50;
+Copper.Event.TYPE_REQUEST_RECEIVE_ERROR = 51;
+Copper.Event.TYPE_REQUEST_TIMEOUT = 52;
+Copper.Event.TYPE_CANCEL_REQUESTS = 53;
+Copper.Event.TYPE_REQUEST_CANCELED = 54;
+
 
 Copper.Event.createEvent = function(type, data, endpointId){
 	if (!Number.isInteger(type) || !Number.isInteger(endpointId)){
@@ -237,6 +243,42 @@ Copper.Event.createReceivedParseErrorEvent = function(parserError, remoteAddress
 		byteLength: byteLength
 	};
 	return Copper.Event.createEvent(Copper.Event.TYPE_RECEIVED_PARSE_ERROR, data, endpointId);
+};
+
+Copper.Event.createRequestCompletedEvent = function(requestCoapMessage, responseCoapMessage, requestDuration, endpointId){
+	let data = {
+		requestCoapMessage: requestCoapMessage,
+		responseCoapMessage: responseCoapMessage,
+		requestDuration: requestDuration
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_REQUEST_COMPLETED, data, endpointId);
+};
+
+Copper.Event.createRequestReceiveErrorEvent = function(requestCoapMessage, endpointId){
+	let data = {
+		requestCoapMessage: requestCoapMessage
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_REQUEST_RECEIVE_ERROR, data, endpointId);
+};
+
+Copper.Event.createRequestTimeoutEvent = function(requestCoapMessage, endpointId){
+	let data = {
+		requestCoapMessage: requestCoapMessage
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_REQUEST_TIMEOUT, data, endpointId);
+};
+
+Copper.Event.createCancelRequestEvent = function(endpointId){
+	let data = {
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_CANCEL_REQUESTS, data, endpointId);
+};
+
+Copper.Event.createRequestCanceledEvent = function(requestCoapMessage, endpointId){
+	let data = {
+		requestCoapMessage: requestCoapMessage
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_REQUEST_CANCELED, data, endpointId);
 };
 
 Copper.Event.convertToJson = function(event){

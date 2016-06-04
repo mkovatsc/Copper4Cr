@@ -24,14 +24,21 @@ Copper.TransmissionHandlerTest.runTest = function(assert, coapMessage, expEvents
 	Copper.TimeUtils.clearTimeout(transmissionHandler.timer);
 	transmissionHandler.bind();
 
+	let requestHandler = undefined;
 	if (coapMessage !== undefined){
-		new Copper.SingleRequestHandler(coapMessage, transmissionHandler, settings, id);
+		requestHandler = Copper.TestUtils.generateRequestHandlerMock();
+		transmissionHandler.registerToken(coapMessage.token, requestHandler);
+		transmissionHandler.sendCoapMessage(coapMessage, requestHandler);
 	}
 
 	for (let i=0; i<steps.length; i++){
 		elapsedTime = steps[i][0];
 		steps[i][1](assert, transmissionHandler);	
 	}	
+
+	if (requestHandler !== undefined){
+		transmissionHandler.unregisterToken(coapMessage.token);
+	}
 
 	assert.deepEqual(transmissionHandler.messagesInTransmissionSet.getTransmissionCount(), 0);
 	assert.deepEqual(transmissionHandler.messagesInTransmissionSet.registeredTokens, new Object());
@@ -263,9 +270,7 @@ QUnit.test("TransmissionHandler: Separate CON Response (with duplicate)", functi
 	let steps = [
 		[0, function(assert, transmissionHandler){ 
 				transmissionHandler.messagesInTransmissionSet.handleTransmissions(); 
-				assert.deepEqual(Object.keys(transmissionHandler.messagesInTransmissionSet.registeredTokens).length, 1);
 				transmissionHandler.onReceiveDatagram(contentMsg, "10.0.0.1", 312);
-				assert.deepEqual(Object.keys(transmissionHandler.messagesInTransmissionSet.registeredTokens).length, 0);
 			}],
 		[1, function(assert, transmissionHandler){ transmissionHandler.onReceiveDatagram(contentMsg, "10.0.0.1", 312); }],
 		[1000*(Copper.CoapConstants.EXCHANGE_LIFETIME+1), function(assert, transmissionHandler){ transmissionHandler.messagesInTransmissionSet.handleTransmissions(); }]
@@ -303,7 +308,6 @@ QUnit.test("TransmissionHandler: Separate CON Response (lost ack)", function(ass
 	let steps = [
 		[0, function(assert, transmissionHandler){ 
 				transmissionHandler.messagesInTransmissionSet.handleTransmissions(); 
-				assert.deepEqual(Object.keys(transmissionHandler.messagesInTransmissionSet.registeredTokens).length, 0);
 			}],
 		[1000*(Copper.CoapConstants.EXCHANGE_LIFETIME+1), function(assert, transmissionHandler){ transmissionHandler.messagesInTransmissionSet.handleTransmissions(); }]
 	];
@@ -352,6 +356,7 @@ QUnit.test("TransmissionHandler: Separate NON Response (with duplicate)", functi
 				transmissionHandler.messagesInTransmissionSet.handleTransmissions(); 
 				assert.deepEqual(Object.keys(transmissionHandler.messagesInTransmissionSet.registeredTokens).length, 1);
 				transmissionHandler.onReceiveDatagram(contentMsg, "10.0.0.1", 312);
+				transmissionHandler.unregisterToken(token);
 				assert.deepEqual(Object.keys(transmissionHandler.messagesInTransmissionSet.registeredTokens).length, 0);
 			}],
 		[1, function(assert, transmissionHandler){ transmissionHandler.onReceiveDatagram(contentMsg, "10.0.0.1", 312); }],

@@ -42,13 +42,19 @@
                      "shared/endpoint/ChromePort.js",
                      
                      //server part
+                     "endpoint/request/receiver/BlockwiseReceiver.js",
+                     "endpoint/request/receiver/SingleReceiver.js",
+                     "endpoint/request/sender/BlockwiseSender.js",
+                     "endpoint/request/sender/ObserveSender.js",
+                     "endpoint/request/sender/SingleSender.js",
+                     "endpoint/request/SingleRequestHandler.js",
+
                      "endpoint/transmission/RequestMessageTransmission.js",
                      "endpoint/transmission/ResponseMessageTransmission.js",
                      "endpoint/transmission/MessagesInTransmissionSet.js",
                      "endpoint/transmission/TransmissionHandler.js",
   
                      "endpoint/ChromeUdpClient.js",
-                     "endpoint/SingleRequestHandler.js",
                      "endpoint/ServerEndpoint.js",
 
                      "background.js"

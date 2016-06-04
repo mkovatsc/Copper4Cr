@@ -46,6 +46,7 @@ Copper.ServerEndpoint.prototype.id = undefined;
 Copper.ServerEndpoint.prototype.state = undefined;
 Copper.ServerEndpoint.prototype.transmissionHandler = undefined;
 Copper.ServerEndpoint.prototype.eventCallback = undefined;
+Copper.ServerEndpoint.prototype.currentRequest = undefined;
 
 
 /* Callbacks */
@@ -158,7 +159,11 @@ Copper.ServerEndpoint.prototype.onClientSendCoapMessage = function(coapMessage){
 		this.onError(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false);
 	}
 	else {
-		new Copper.SingleRequestHandler(coapMessage, this.transmissionHandler, this.transmissionHandler.settings, this.id);
+		if (this.currentRequest !== undefined){
+			this.currentRequest.cancel();
+		}
+		this.currentRequest = new Copper.SingleRequestHandler(coapMessage, this.transmissionHandler, this.transmissionHandler.settings, this.id);
+		this.currentRequest.start();
 	}
 	return true;
 };

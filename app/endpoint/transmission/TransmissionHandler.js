@@ -280,7 +280,7 @@ Copper.TransmissionHandler.prototype.handleReceivedCoapMessage = function(coapMe
 			}
 			else if (Copper.CoapMessage.Type.RST.equals(coapMessage.type) || !Copper.CoapMessage.Code.EMPTY.equals(coapMessage.code)){
 				completeRequestTransmission(requestTransmission, coapMessage);
-				requestTransmission.requestHandler.handleResponse(coapMessage, undefined);
+				requestTransmission.requestHandler.handleResponse(requestTransmission.coapMessage, coapMessage, undefined);
 			}
 		}
 	}
@@ -301,7 +301,7 @@ Copper.TransmissionHandler.prototype.handleReceivedCoapMessage = function(coapMe
 				if (requestTransmission !== undefined){
 					Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
 					completeRequestTransmission(requestTransmission, coapMessage);
-					requestTransmission.requestHandler.handleResponse(coapMessage, responseTransmission);
+					requestTransmission.requestHandler.handleResponse(requestTransmission.coapMessage, coapMessage, responseTransmission);
 				}
 				else {
 					Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
@@ -373,16 +373,13 @@ Copper.TransmissionHandler.prototype.onTimeout = function(transmission){
 	Copper.Log.logFine("Request Transmission " + transmission.coapMessage.mid + " to " + this.remoteAddress + ":" + this.remotePort + " has timeouted");
 	Copper.Event.sendEvent(Copper.Event.createMessageTransmissionTimedOutEvent(transmission.coapMessage.mid, transmission.coapMessage.token, transmission.firstTransmissionStart, this.endpointId));
 	if (transmission.requestHandler !== undefined){
-		transmission.requestHandler.onTimeout(transmission);
+		transmission.requestHandler.onTimeout();
 	}
 };
 
 Copper.TransmissionHandler.prototype.onEndOfLife = function(transmission){
 	if (transmission instanceof Copper.RequestMessageTransmission){
 		Copper.Log.logFine("Request Transmission " + transmission.coapMessage.mid + " to " + this.remoteAddress + ":" + this.remotePort + " is end of life");
-		if (transmission.requestHandler !== undefined){
-			transmission.requestHandler.onEndOfLife(transmission);
-		}
 	}
 	else {
 		Copper.Log.logFine("Response Transmission " + transmission.coapMessage.mid + " from " + transmission.remoteAddress + ":" + transmission.remotePort + " is end of life");
