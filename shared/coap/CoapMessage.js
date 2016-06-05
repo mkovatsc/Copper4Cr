@@ -28,6 +28,32 @@ Copper.CoapMessage.reset = function(mid, token){
 };
 
 /*
+* Clones the message
+*/
+Copper.CoapMessage.prototype.clone = function(payloadOffset, payloadLength){
+	let res = new Copper.CoapMessage(this.type.clone(), this.code.clone()).
+			setMid(this.mid).
+			setToken(this.token);
+	
+	let optionNos = Object.keys(this.options);
+	for (let i=0; i<optionNos.length; i++){
+		res.options[optionNos[i]] = this.options[optionNos[i]];
+	}
+
+	if (payloadOffset === undefined && payloadLength === undefined){
+		res.setPayload(this.payload);
+	}
+	else {
+		payloadOffset = payloadOffset !== undefined ? payloadOffset : 0;
+		payloadLength = payloadLength !== undefined ? payloadLength : (this.payload.byteLength - payloadOffset);
+		if (payloadOffset < this.payload.byteLength){
+			res.setPayload(this.payload.slice(payloadOffset, Math.min(this.payload.byteLength, payloadOffset + payloadLength)));
+		}
+	}
+	return res;
+};
+
+/*
 * Sets a message identifier
 * @return: this for method chaining
 */
@@ -46,9 +72,6 @@ Copper.CoapMessage.prototype.setMid = function(mid){
 Copper.CoapMessage.prototype.setToken = function(token){
 	if (token === undefined || !(token instanceof ArrayBuffer) || token.byteLength > 8){
 		throw new Error("Illegal argument");	
-	}
-	if (Copper.CoapMessage.Code.EMPTY.equals(this.code) && token.byteLength > 0){
-		throw new Error("Empty message cannot have a token");
 	}
 	this.token = token;
 	return this;
@@ -116,8 +139,11 @@ Copper.CoapMessage.prototype.getOption = function(optionHeader){
 	if (this.options[optionHeader.number]){
 		return this.options[optionHeader.number].getValue();
 	}
+	else if (optionHeader.defaultValue !== undefined) {
+		return [optionHeader.defaultValue];
+	}
 	else {
-		return optionHeader.defaultValue;
+		return [];
 	}
 };
 

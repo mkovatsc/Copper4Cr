@@ -327,6 +327,7 @@ button
 	height: 100%;
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	padding: 4px;
+	overflow: auto;
 }
 
 .main-content .center-box-bottom .visible
@@ -337,6 +338,18 @@ button
 .main-content .center-box-bottom .hidden
 {
 	display: none;
+}
+
+#copper-payload-tab-in 
+{
+	font-family: monospace;
+	white-space: pre-wrap;
+}
+
+#copper-payload-tab-out 
+{
+	font-family: monospace;
+	white-space: pre-wrap;
 }
 
 /* Debug options */
@@ -485,6 +498,7 @@ button
 #copper-coap-message-log .coap-message-payload
 {
 	flex: 4;
+	white-space: pre-wrap;
 }
 
 #copper-coap-message-log .sent
@@ -497,6 +511,10 @@ button
 	background-color: #CFC;
 }
 
+#copper-coap-message-log .unexpected
+{
+	background-color: #FCC;
+}
 
 #copper-overlay{
 	position: fixed; 

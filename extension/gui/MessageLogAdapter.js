@@ -9,15 +9,21 @@ Copper.MessageLogAdapter.onEvent = function(event){
 		case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
 			Copper.MessageLogAdapter.addLogEntry(event.data.coapMessage, true);
 			break;
+		case Copper.Event.TYPE_UNKNOWN_COAP_MESSAGE_RECEIVED:
+			Copper.MessageLogAdapter.addLogEntry(event.data.coapMessage, true, undefined, true);
+			break;
+		case Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED:
+			Copper.MessageLogAdapter.addLogEntry(event.data.coapMessage, true, undefined, true);
+			break;	
 	}
 };
 
-Copper.MessageLogAdapter.addLogEntry = function(coapMessage, isReceived, retransmissionCount){
+Copper.MessageLogAdapter.addLogEntry = function(coapMessage, isReceived, retransmissionCount, isUnexpected){
 	let rootElement = document.getElementById("copper-coap-message-log-table");
 
 	let logElement = document.createElement("div");
 	logElement.classList.add("table-body-row");
-	logElement.classList.add(isReceived ? "received" : "sent");
+	logElement.classList.add(isReceived ? (isUnexpected ? "unexpected" : "received") : "sent");
 
 	let timeElement = document.createElement("span");
 	timeElement.classList.add("coap-message-time");

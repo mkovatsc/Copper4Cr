@@ -2,6 +2,7 @@ Copper.PayloadAdapter = function(){
 };
 
 Copper.PayloadAdapter.visiblePane = undefined;
+Copper.PayloadAdapter.currentBlockNumber = undefined;
 
 Copper.PayloadAdapter.setVisiblePane = function(element){
 	if (Copper.PayloadAdapter.visiblePane !== element){
@@ -35,13 +36,35 @@ Copper.PayloadAdapter.onEvent = function(event){
 	}
 };
 
+Copper.PayloadAdapter.beforeSendingCoapMessage = function(coapMessage){
+	if (Copper.CoapMessage.Code.POST.equals(coapMessage.code) || Copper.CoapMessage.Code.PUT.equals(coapMessage.code)){
+		coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, 0);
+		coapMessage.setPayload(Copper.ByteUtils.convertStringToBytes(document.getElementById("copper-payload-tab-out").value));
+	} 
+};
+
 Copper.PayloadAdapter.updateIncomingPayload = function(coapMessage){
+	Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-in"));
+	
+	let append = false;
+
+	let block2Option = coapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2);
+	if (block2Option.length === 1){
+		if (Copper.PayloadAdapter.currentBlockNumber === block2Option[0].num && block2Option[0].num > 0){
+			append = true;
+		}
+		Copper.PayloadAdapter.currentBlockNumber = block2Option[0].num + 1;
+	}
+
 	let incomingTextElement = document.getElementById("copper-payload-tab-in");
-	while (incomingTextElement.firstChild) {
-	    incomingTextElement.removeChild(incomingTextElement.firstChild);
+	if (!append){
+		while (incomingTextElement.firstChild) {
+		    incomingTextElement.removeChild(incomingTextElement.firstChild);
+		}
 	}
 
 	let payloadString = Copper.ByteUtils.convertBytesToString(coapMessage.payload);
+	Copper.Log.logFine(payloadString);
 	if (payloadString !== undefined && payloadString !== ""){
 		let texts = payloadString.split(/\r\n|\n/);
 		incomingTextElement.appendChild(document.createTextNode(texts[0]));

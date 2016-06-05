@@ -91,14 +91,20 @@ Copper.Event.TYPE_UPDATE_SETTINGS = 23;
 
 Copper.Event.TYPE_SEND_COAP_MESSAGE = 30;
 Copper.Event.TYPE_COAP_MESSAGE_SENT = 31;
-Copper.Event.TYPE_COAP_MESSAGE_TIMED_OUT = 32;
-Copper.Event.TYPE_MESSAGE_CONFIRMED = 33;
-Copper.Event.TYPE_REQUEST_COMPLETED = 34;
+Copper.Event.TYPE_MESSAGE_TRANSMISSION_TIMED_OUT = 32;
+Copper.Event.TYPE_MESSAGE_TRANSMISSION_CONFIRMED = 33;
+Copper.Event.TYPE_MESSAGE_TRANSMISSION_COMPLETED = 34;
 
 Copper.Event.TYPE_COAP_MESSAGE_RECEIVED = 40;
 Copper.Event.TYPE_UNKNOWN_COAP_MESSAGE_RECEIVED = 41;
 Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED = 42;
 Copper.Event.TYPE_RECEIVED_PARSE_ERROR = 43;
+
+Copper.Event.TYPE_REQUEST_COMPLETED = 50;
+Copper.Event.TYPE_REQUEST_RECEIVE_ERROR = 51;
+Copper.Event.TYPE_REQUEST_TIMEOUT = 52;
+Copper.Event.TYPE_CANCEL_REQUESTS = 53;
+Copper.Event.TYPE_REQUEST_CANCELED = 54;
 
 
 Copper.Event.createEvent = function(type, data, endpointId){
@@ -170,30 +176,30 @@ Copper.Event.createCoapMessageSentEvent = function(coapMessage, bytesSent, retra
 	return Copper.Event.createEvent(Copper.Event.TYPE_COAP_MESSAGE_SENT, data, endpointId);
 };
 
-Copper.Event.createCoapMessageTimedOutEvent = function(mid, token, firstTransmissionTime, endpointId){
+Copper.Event.createMessageTransmissionTimedOutEvent = function(mid, token, firstTransmissionTime, endpointId){
 	let data = {
 		mid: mid,
 		token: token,
 		firstTransmissionTime: firstTransmissionTime
 	};
-	return Copper.Event.createEvent(Copper.Event.TYPE_COAP_MESSAGE_TIMED_OUT, data, endpointId);
+	return Copper.Event.createEvent(Copper.Event.TYPE_MESSAGE_TRANSMISSION_TIMED_OUT, data, endpointId);
 };
 
-Copper.Event.createMessageConfirmedEvent = function(coapMessage, rtt, endpointId){
+Copper.Event.createMessageTransmissionConfirmedEvent = function(coapMessage, rtt, endpointId){
 	let data = {
 		coapMessage: coapMessage,
 		rtt: rtt
 	};
-	return Copper.Event.createEvent(Copper.Event.TYPE_MESSAGE_CONFIRMED, data, endpointId);
+	return Copper.Event.createEvent(Copper.Event.TYPE_MESSAGE_TRANSMISSION_CONFIRMED, data, endpointId);
 };
 
-Copper.Event.createRequestCompletedEvent = function(requestCoapMessage, responseCoapMessage, transactionTime, endpointId){
+Copper.Event.createMessageTransmissionCompletedEvent = function(requestCoapMessage, responseCoapMessage, transactionTime, endpointId){
 	let data = {
 		requestCoapMessage: requestCoapMessage,
 		responseCoapMessage: responseCoapMessage,
 		transactionTime: transactionTime
 	};
-	return Copper.Event.createEvent(Copper.Event.TYPE_REQUEST_COMPLETED, data, endpointId);
+	return Copper.Event.createEvent(Copper.Event.TYPE_MESSAGE_TRANSMISSION_COMPLETED, data, endpointId);
 };
 
 Copper.Event.createReceivedCoapMessageEvent = function(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, endpointId){
@@ -237,6 +243,42 @@ Copper.Event.createReceivedParseErrorEvent = function(parserError, remoteAddress
 		byteLength: byteLength
 	};
 	return Copper.Event.createEvent(Copper.Event.TYPE_RECEIVED_PARSE_ERROR, data, endpointId);
+};
+
+Copper.Event.createRequestCompletedEvent = function(requestCoapMessage, responseCoapMessage, requestDuration, endpointId){
+	let data = {
+		requestCoapMessage: requestCoapMessage,
+		responseCoapMessage: responseCoapMessage,
+		requestDuration: requestDuration
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_REQUEST_COMPLETED, data, endpointId);
+};
+
+Copper.Event.createRequestReceiveErrorEvent = function(requestCoapMessage, endpointId){
+	let data = {
+		requestCoapMessage: requestCoapMessage
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_REQUEST_RECEIVE_ERROR, data, endpointId);
+};
+
+Copper.Event.createRequestTimeoutEvent = function(requestCoapMessage, endpointId){
+	let data = {
+		requestCoapMessage: requestCoapMessage
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_REQUEST_TIMEOUT, data, endpointId);
+};
+
+Copper.Event.createCancelRequestEvent = function(endpointId){
+	let data = {
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_CANCEL_REQUESTS, data, endpointId);
+};
+
+Copper.Event.createRequestCanceledEvent = function(requestCoapMessage, endpointId){
+	let data = {
+		requestCoapMessage: requestCoapMessage
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_REQUEST_CANCELED, data, endpointId);
 };
 
 Copper.Event.convertToJson = function(event){

@@ -78,3 +78,16 @@ Copper.TestUtils.generateUdpClientMock = function(packetHandler){
 	    	  }
 	};
 };
+
+Copper.TestUtils.generateRequestHandlerMock = function(){
+	return {
+		handleResponse: function(sentCoapMessage, receivedCoapMessage, responseTransmission){
+			if (Copper.CoapMessage.Type.CON.equals(receivedCoapMessage.type)){
+				responseTransmission.addResponse(Copper.CoapMessage.ack(receivedCoapMessage.mid, receivedCoapMessage.token));
+			}
+		},
+		onTimeout: function(){
+			
+		}
+	};
+};

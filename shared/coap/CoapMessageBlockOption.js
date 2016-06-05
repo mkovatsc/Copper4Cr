@@ -16,10 +16,20 @@ Copper.CoapMessage.BlockOption = function(num, szExp, more){
 };
 
 /*
+* @return number of bytes for a given exponent
+*/
+Copper.CoapMessage.BlockOption.szExpToSize = function(szExp){
+	if (!Number.isInteger(szExp)){
+		throw new Error("Illegal Arguments");
+	}
+	return 1 << szExp; 
+};
+
+/*
 * @return: size of the block
 */
 Copper.CoapMessage.BlockOption.prototype.getSize = function(){
-	return 1 << this.szExp;
+	return Copper.CoapMessage.BlockOption.szExpToSize(this.szExp);
 };
 
 Copper.CoapMessage.BlockOption.prototype.toString = function(){
