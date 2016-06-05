@@ -23,14 +23,10 @@ Copper.SingleRequestHandler.prototype.sender = undefined;
 Copper.SingleRequestHandler.prototype.receiver = undefined;
 
 
-/* Register Send Handler */
-/* On Response --> check whether blockwise is necessary or not*/
-
 Copper.SingleRequestHandler.prototype.start = function(){
 	let thisRef = this;
 
 	// check properties of coap message
-	let blockwise = this.coapMessage.payload.byteLength >= 1024 && this.settings.blockwiseEnabled;
 	let observeOption = this.coapMessage.getOption(Copper.CoapMessage.OptionHeader.OBSERVE);
 	let observing = observeOption.length === 1 && observeOption[0] === 0;
 
@@ -47,14 +43,12 @@ Copper.SingleRequestHandler.prototype.start = function(){
 	
 	// create sender and start it
 	if (observing) {
-		this.sender = new Copper.ObserveSender(blockwise, this.coapMessage.clone(), this, function(){ thisRef.onSenderFinished(); });
-	}
-	else if (blockwise) {
-		this.sender = new Copper.BlockwiseSender(this.coapMessage.clone(), this, function(){ thisRef.onSenderFinished(); });
+		this.sender = new Copper.ObserveSender(this.coapMessage, this, function(){ thisRef.onSenderFinished(); });
 	}
 	else {
-		this.sender = new Copper.SingleSender(this.coapMessage.clone(), this, function(){ thisRef.onSenderFinished(); });
+		this.sender = new Copper.BlockwiseSender(this.coapMessage, this, function(){ thisRef.onSenderFinished(); });
 	}
+
 	this.sender.start();
 };
 

@@ -44,8 +44,8 @@ Copper.CoapMessage.prototype.clone = function(payloadOffset, payloadLength){
 		res.setPayload(this.payload);
 	}
 	else {
-		payloadOffset = payloadOffset ? payloadOffset : 0;
-		payloadLength = payloadLength ? payloadLength : (this.payload.byteLength - payloadOffset);
+		payloadOffset = payloadOffset !== undefined ? payloadOffset : 0;
+		payloadLength = payloadLength !== undefined ? payloadLength : (this.payload.byteLength - payloadOffset);
 		if (payloadOffset < this.payload.byteLength){
 			res.setPayload(this.payload.slice(payloadOffset, Math.min(this.payload.byteLength, payloadOffset + payloadLength)));
 		}

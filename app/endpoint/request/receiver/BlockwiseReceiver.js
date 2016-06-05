@@ -37,11 +37,13 @@ Copper.BlockwiseReceiver.prototype.onReceive = function(sentCoapMessage, receive
 	this.payloads.push(receivedCoapMessage.payload);
     if (block2Option.more){
 		this.currentBlockNumber++;
-		let nextMessage = this.initialSentCoapMessage.clone();
+		// do not repeat payload
+		let nextMessage = this.initialSentCoapMessage.clone(0, 0);
 		nextMessage.setMid(undefined);
 		nextMessage.addOption(Copper.CoapMessage.OptionHeader.BLOCK2, new Copper.CoapMessage.BlockOption(this.currentBlockNumber, this.blockSizeExp, false), true);
 		// do not send the observe option for blockwise requests 
 		nextMessage.removeOption(Copper.CoapMessage.OptionHeader.OBSERVE);
+		nextMessage.removeOption(Copper.CoapMessage.OptionHeader.BLOCK1);
 		this.requestHandler.sendCoapMessage(nextMessage);
 	}
 	else {

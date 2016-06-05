@@ -340,6 +340,18 @@ button
 	display: none;
 }
 
+#copper-payload-tab-in 
+{
+	font-family: monospace;
+	white-space: pre-wrap;
+}
+
+#copper-payload-tab-out 
+{
+	font-family: monospace;
+	white-space: pre-wrap;
+}
+
 /* Debug options */
 .main-content .sidebar-right 
 {
@@ -486,6 +498,7 @@ button
 #copper-coap-message-log .coap-message-payload
 {
 	flex: 4;
+	white-space: pre-wrap;
 }
 
 #copper-coap-message-log .sent

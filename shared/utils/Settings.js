@@ -25,7 +25,8 @@ Copper.Settings.prototype.sendUriHost = false;
 Copper.Settings.prototype.sendSize1 = false;
 
 // Choose block size
-Copper.Settings.prototype.blockSize = 0;
+// 0 --> late block negotiation, otherwise 4 - 10 (32 - 1024)
+Copper.Settings.prototype.blockSize = 6;
 
 // Do blockwise transfers automatically
 Copper.Settings.prototype.blockwiseEnabled = true;

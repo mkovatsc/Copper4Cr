@@ -5,7 +5,7 @@
 		* Cancellation (lazy, GET, RST)
 */
 
-Copper.ObserveSender = function(isBlockwiseSender, coapMessage, requestHandler, onComplete){
+Copper.ObserveSender = function(coapMessage, requestHandler, onComplete){
 	if (!(coapMessage instanceof Copper.CoapMessage) || !(requestHandler instanceof Copper.SingleRequestHandler) || typeof(onComplete) !== "function"){
 		throw new Error("Illegal argument");
 	}
@@ -13,9 +13,7 @@ Copper.ObserveSender = function(isBlockwiseSender, coapMessage, requestHandler, 
 	this.coapMessage = coapMessage;
 	this.requestHandler = requestHandler;
 	this.onComplete = onComplete;
-	this.sender = isBlockwiseSender ? 
-		new Copper.BlockwiseSender(this.coapMessage, requestHandler, function(){ thisRef.onComplete(); }) : 
-		new Copper.SingleSender(this.coapMessage, requestHandler, function(){ thisRef.onComplete(); });
+	this.sender = new Copper.BlockwiseSender(this.coapMessage, requestHandler, function(){ thisRef.onComplete(); });
 };
 
 Copper.ObserveSender.prototype.coapMessage = undefined;

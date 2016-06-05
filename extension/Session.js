@@ -98,7 +98,7 @@ Copper.Session.showErrorMessage = function(errorNo, errorMessage){
     Copper.OverlayAdapter.addErrorMsgOverlay("Error " + errorNo, errorMessage);
 };
 
-Copper.Session.sendCoapMessage = function(coapMessage){
+Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
     if (!(coapMessage instanceof Copper.CoapMessage)){
         throw new Error("Illegal Argument");
     }
@@ -106,27 +106,29 @@ Copper.Session.sendCoapMessage = function(coapMessage){
         throw new Error("Illegal State");
     }
     try{
-        // add URI-PATH and URI-QUERY
-        if (Copper.Session.path !== undefined){
-            let pathParts = Copper.Session.path.split("/");
-            for (let i=0; i<pathParts.length; i++){
-                coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, pathParts[i]);
+        if (!withoutModification){
+            // add URI-PATH and URI-QUERY
+            if (Copper.Session.path !== undefined){
+                let pathParts = Copper.Session.path.split("/");
+                for (let i=0; i<pathParts.length; i++){
+                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, pathParts[i]);
+                }
             }
-        }
-        if (Copper.Session.query !== undefined){
-            let queryParts = Copper.Session.query.split("&");
-            for (let i=0; i<queryParts.length; i++){
-                coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_QUERY, queryParts[i]);
+            if (Copper.Session.query !== undefined){
+                let queryParts = Copper.Session.query.split("&");
+                for (let i=0; i<queryParts.length; i++){
+                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_QUERY, queryParts[i]);
+                }
             }
-        }
-        let guiAdapters = Copper.Session.guiAdapters;
-        for (let i=0; i<guiAdapters.length; i++){
-            if (typeof(guiAdapters[i].beforeSendingCoapMessage) === "function"){
-                try {
-                    guiAdapters[i].beforeSendingCoapMessage(coapMessage);
-                } catch (exception){
-                    Copper.Log.logError(exception.stack);
-                    Copper.Session.showErrorMessage(-1, exception.message);
+            let guiAdapters = Copper.Session.guiAdapters;
+            for (let i=0; i<guiAdapters.length; i++){
+                if (typeof(guiAdapters[i].beforeSendingCoapMessage) === "function"){
+                    try {
+                        guiAdapters[i].beforeSendingCoapMessage(coapMessage);
+                    } catch (exception){
+                        Copper.Log.logError(exception.stack);
+                        Copper.Session.showErrorMessage(-1, exception.message);
+                    }
                 }
             }
         }

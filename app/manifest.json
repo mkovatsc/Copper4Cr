@@ -46,7 +46,6 @@
                      "endpoint/request/receiver/SingleReceiver.js",
                      "endpoint/request/sender/BlockwiseSender.js",
                      "endpoint/request/sender/ObserveSender.js",
-                     "endpoint/request/sender/SingleSender.js",
                      "endpoint/request/SingleRequestHandler.js",
 
                      "endpoint/transmission/RequestMessageTransmission.js",
