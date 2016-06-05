@@ -29,9 +29,14 @@ Copper.SingleRequestHandler.prototype.receiver = undefined;
 Copper.SingleRequestHandler.prototype.start = function(){
 	let thisRef = this;
 
+	// check properties of coap message
+	let blockwise = this.coapMessage.payload.byteLength >= 1024 && this.settings.blockwiseEnabled;
+	let observeOption = this.coapMessage.getOption(Copper.CoapMessage.OptionHeader.OBSERVE);
+	let observing = observeOption.length === 1 && observeOption[0] === 0;
+
 	// create token and register this handler
 	let token = this.coapMessage.token;
-	if (this.transmissionHandler.isTokenRegistered(token)){
+	if (this.transmissionHandler.isTokenRegistered(token) || (observing && this.settings.observeToken)) {
 		Copper.Log.logInfo("Token " + Copper.ByteUtils.convertBytesToHexString(token) + " is in use. Another token is used.");
 		do {
 			token = Copper.ByteUtils.convertUintToBytes(parseInt(Math.random()*0x10000000));
@@ -41,12 +46,10 @@ Copper.SingleRequestHandler.prototype.start = function(){
 	this.coapMessage.setToken(token);
 	
 	// create sender and start it
-	let isBlockwiseSender = this.coapMessage.payload.byteLength >= 1024;
-	let observeOption = this.coapMessage.getOption(Copper.CoapMessage.OptionHeader.OBSERVE);
-	if (observeOption.length === 1 && observeOption[0] === 0) {
-		this.sender = new Copper.ObserveSender(isBlockwiseSender, this.coapMessage.clone(), this, function(){ thisRef.onSenderFinished(); });
+	if (observing) {
+		this.sender = new Copper.ObserveSender(blockwise, this.coapMessage.clone(), this, function(){ thisRef.onSenderFinished(); });
 	}
-	else if (isBlockwiseSender) {
+	else if (blockwise) {
 		this.sender = new Copper.BlockwiseSender(this.coapMessage.clone(), this, function(){ thisRef.onSenderFinished(); });
 	}
 	else {
@@ -55,16 +58,16 @@ Copper.SingleRequestHandler.prototype.start = function(){
 	this.sender.start();
 };
 
-// TODO: only handle if not canceled
 Copper.SingleRequestHandler.prototype.handleResponse = function(sentCoapMessage, receivedCoapMessage, responseTransmission){
 	if (!(sentCoapMessage instanceof Copper.CoapMessage) || !(receivedCoapMessage instanceof Copper.CoapMessage) || 
 		    (responseTransmission !== undefined && !(responseTransmission instanceof Copper.ResponseMessageTransmission))) {
 		throw new Error("Illegal Argument");
 	}
 	if (this.receiver === undefined){
-		let isBlockwiseReceiver = false;
+		let block2Option = receivedCoapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2);
+		let isBlockwiseReceiver = this.settings.blockwiseEnabled && block2Option.length === 1;
 		if (isBlockwiseReceiver){
-			this.receiver = new Copper.BlockwiseReceiver(this);
+			this.receiver = new Copper.BlockwiseReceiver(this, sentCoapMessage.clone(), receivedCoapMessage.clone());
 		}
 		else {
 			this.receiver = new Copper.SingleReceiver(this);

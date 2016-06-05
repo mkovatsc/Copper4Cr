@@ -27,6 +27,9 @@ Copper.Settings.prototype.sendSize1 = false;
 // Choose block size
 Copper.Settings.prototype.blockSize = 0;
 
+// Do blockwise transfers automatically
+Copper.Settings.prototype.blockwiseEnabled = true;
+
 // Use token for observe
 Copper.Settings.prototype.observeToken = true;
 

@@ -2,6 +2,7 @@ Copper.PayloadAdapter = function(){
 };
 
 Copper.PayloadAdapter.visiblePane = undefined;
+Copper.PayloadAdapter.currentBlockNumber = undefined;
 
 Copper.PayloadAdapter.setVisiblePane = function(element){
 	if (Copper.PayloadAdapter.visiblePane !== element){
@@ -36,9 +37,21 @@ Copper.PayloadAdapter.onEvent = function(event){
 };
 
 Copper.PayloadAdapter.updateIncomingPayload = function(coapMessage){
+	let append = false;
+
+	let block2Option = coapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2);
+	if (block2Option.length === 1){
+		if (Copper.PayloadAdapter.currentBlockNumber === block2Option[0].num && block2Option[0].num > 0){
+			append = true;
+		}
+		Copper.PayloadAdapter.currentBlockNumber = block2Option[0].num + 1;
+	}
+
 	let incomingTextElement = document.getElementById("copper-payload-tab-in");
-	while (incomingTextElement.firstChild) {
-	    incomingTextElement.removeChild(incomingTextElement.firstChild);
+	if (!append){
+		while (incomingTextElement.firstChild) {
+		    incomingTextElement.removeChild(incomingTextElement.firstChild);
+		}
 	}
 
 	let payloadString = Copper.ByteUtils.convertBytesToString(coapMessage.payload);

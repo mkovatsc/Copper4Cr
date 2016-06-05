@@ -43,6 +43,9 @@ Copper.TransmissionHandler = function(udpClient, remoteAddress, remotePort, sett
 
 	this.requestCallbacks = [];
 	this.state = Copper.TransmissionHandler.STATE_CREATED;
+
+	this.isInResponseHandling = false;
+	this.sendQueue = [];
 };
 
 /* State Constants */
@@ -61,6 +64,8 @@ Copper.TransmissionHandler.prototype.midGenerator = undefined;
 Copper.TransmissionHandler.prototype.timer = undefined;
 Copper.TransmissionHandler.prototype.requestCallbacks = undefined;
 Copper.TransmissionHandler.prototype.state = undefined;
+Copper.TransmissionHandler.prototype.isInResponseHandling = undefined;
+Copper.TransmissionHandler.prototype.sendQueue = undefined;
 
 /*
 * Register a new callback that is called if a request is received
@@ -186,7 +191,7 @@ Copper.TransmissionHandler.prototype.unregisterToken = function(token, requestHa
 *
 * @arg coapMessage: message to send
 */
-Copper.TransmissionHandler.prototype.sendCoapMessage = function(coapMessage, requestHandler){
+Copper.TransmissionHandler.prototype.sendCoapMessage = function(coapMessage, requestHandler, sendFirst){
 	if (this.state !== Copper.TransmissionHandler.STATE_READY){
 		Copper.Event.sendEvent(Copper.Event.createErrorOnServerEvent(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false, this.endpointId));
 	}
@@ -203,7 +208,16 @@ Copper.TransmissionHandler.prototype.sendCoapMessage = function(coapMessage, req
 			this.setRequestMessageTransmissionForToken(coapMessage.token, transmission);
 		}
 		this.messagesInTransmissionSet.addNewTransmission(transmission);
-		this.sendCoapMessageInternal(transmission.coapMessage, this.remoteAddress, this.remotePort, 0);
+
+		if (sendFirst){
+			this.sendQueue.unshift(transmission.coapMessage);
+		}
+		else {
+			this.sendQueue.push(transmission.coapMessage);
+		}
+		if (!this.isInResponseHandling){
+			this.processSendQueue();
+		}
 	}
 };
 
@@ -220,6 +234,14 @@ Copper.TransmissionHandler.prototype.close = function(){
 };
 
 // -------- Implementation -------------
+Copper.TransmissionHandler.prototype.processSendQueue = function(){
+	let oldQueue = this.sendQueue;
+	this.sendQueue = [];
+	for (let i=0; i<oldQueue.length; i++){
+		this.sendCoapMessageInternal(oldQueue[i], this.remoteAddress, this.remotePort, 0);
+	}
+};
+
 /*
 * Sends the coap message over the udp socket
 */
@@ -253,114 +275,120 @@ Copper.TransmissionHandler.prototype.sendCoapMessageInternal = function(coapMess
 *   3. ACK if it is necessary
 */
 Copper.TransmissionHandler.prototype.handleReceivedCoapMessage = function(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength){
-	let thisRef = this;
-	let completeRequestTransmission = function(requestTransmission, coapMessage){
-		requestTransmission.isCompleted = true;
-		Copper.Event.sendEvent(Copper.Event.createMessageTransmissionCompletedEvent(requestTransmission.coapMessage, coapMessage, Copper.TimeUtils.now()-requestTransmission.firstTransmissionStart, thisRef.endpointId));
-	};
-	if (Copper.CoapMessage.Type.ACK.equals(coapMessage.type) || Copper.CoapMessage.Type.RST.equals(coapMessage.type)){
-		// Matches exactly one coap message in a request
-		let requestTransmission = this.messagesInTransmissionSet.getRequestMessageTransmission(coapMessage.mid, coapMessage.token);
-		if (requestTransmission === undefined){
-			Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-		}
-		else if (requestTransmission.isConfirmed){
-			Copper.Event.sendEvent(Copper.Event.createReceivedDuplicateCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-		}
-		else if (requestTransmission.requestHandler !== undefined && requestTransmission.requestHandler !== this.getRequestHandlerForToken(coapMessage.token)) {
-			Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-		}
-		else {
-			Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-			requestTransmission.isConfirmed = true;
-			Copper.Event.sendEvent(Copper.Event.createMessageTransmissionConfirmedEvent(requestTransmission.coapMessage, Copper.TimeUtils.now()-requestTransmission.lastTransmissionStart, this.endpointId));
-			
-			if (requestTransmission.requestHandler === undefined){
-				completeRequestTransmission(requestTransmission, coapMessage);
+	this.isInResponseHandling = true;
+	try {
+		let thisRef = this;
+		let completeRequestTransmission = function(requestTransmission, coapMessage){
+			requestTransmission.isCompleted = true;
+			Copper.Event.sendEvent(Copper.Event.createMessageTransmissionCompletedEvent(requestTransmission.coapMessage, coapMessage, Copper.TimeUtils.now()-requestTransmission.firstTransmissionStart, thisRef.endpointId));
+		};
+		if (Copper.CoapMessage.Type.ACK.equals(coapMessage.type) || Copper.CoapMessage.Type.RST.equals(coapMessage.type)){
+			// Matches exactly one coap message in a request
+			let requestTransmission = this.messagesInTransmissionSet.getRequestMessageTransmission(coapMessage.mid, coapMessage.token);
+			if (requestTransmission === undefined){
+				Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
 			}
-			else if (Copper.CoapMessage.Type.RST.equals(coapMessage.type) || !Copper.CoapMessage.Code.EMPTY.equals(coapMessage.code)){
-				completeRequestTransmission(requestTransmission, coapMessage);
-				requestTransmission.requestHandler.handleResponse(requestTransmission.coapMessage, coapMessage, undefined);
+			else if (requestTransmission.isConfirmed){
+				Copper.Event.sendEvent(Copper.Event.createReceivedDuplicateCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
 			}
-		}
-	}
-	else {
-		// Either a new request or a reponse to a previous request. If request or response is determined using the code
-		let responseCoapMessage = undefined; // CON-Message that is sent as a reply to a CON-Response
-		let responseTransmission = this.messagesInTransmissionSet.getResponseMessageTransmission(coapMessage.mid, remoteAddress, remotePort);
-		if (responseTransmission !== undefined){
-			// message is a duplicate
-			Copper.Event.sendEvent(Copper.Event.createReceivedDuplicateCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-			responseTransmission.retransmissionCounter++;
-		}
-		else {
-			responseTransmission = new Copper.ResponseMessageTransmission(coapMessage, remoteAddress, remotePort);
-			if (coapMessage.code.isResponseCode()) {
-				// reponse to a previous request. should match using the token 
-				let requestTransmission = this.getRequestMessageTransmissionForToken(coapMessage.token);
-				if (requestTransmission !== undefined){
-					Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-					completeRequestTransmission(requestTransmission, coapMessage);
-					requestTransmission.requestHandler.handleResponse(requestTransmission.coapMessage, coapMessage, responseTransmission);
-				}
-				else {
-					Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-					if (this.settings.rejectUnknown){
-						responseTransmission.addResponse(Copper.CoapMessage.reset(coapMessage.mid, coapMessage.token));
-					}
-				}
-			}
-			else if (coapMessage.code.isRequestCode()) {
-				let res = undefined;
-				let i=0;
-				while (res === undefined && i < this.requestCallbacks.length){
-					let tmpRes = this.requestCallbacks[i](coapMessage, remoteAddress, remotePort);
-					if (tmpRes !== undefined && (!(tmpRes instanceof Copper.CoapMessage)) || !tmpRes.code.isResponseCode()){
-						throw new Error("Illegal return value from callback");
-					}
-					res = tmpRes;
-					i++;
-				}
-				if (res !== undefined){
-					Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-					if (Copper.CoapMessage.Type.CON.equals(responseTransmission.coapMessage.type) && 
-						      !Copper.CoapMessage.Type.ACK.equals(res.type) && !Copper.CoapMessage.Type.RST.equals(res.type)){
-						// add ACK for the CON message
-						responseTransmission.addResponse(Copper.CoapMessage.ack(responseTransmission.coapMessage.mid, responseTransmission.coapMessage.token));
-					}
-					if (Copper.CoapMessage.Type.CON.equals(res.type)){
-						responseCoapMessage = res;
-					}
-					else {
-						responseTransmission.addResponse(res);
-					}
-				}
-				else {
-					Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-					if (this.settings.rejectUnknown){
-						responseTransmission.addResponse(Copper.CoapMessage.reset(coapMessage.mid, coapMessage.token));
-					}	
-				}
+			else if (requestTransmission.requestHandler !== undefined && requestTransmission.requestHandler !== this.getRequestHandlerForToken(coapMessage.token)) {
+				Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
 			}
 			else {
-				Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
-				if (this.settings.rejectUnknown){
-					responseTransmission.addResponse(Copper.CoapMessage.reset(coapMessage.mid, coapMessage.token));
+				Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
+				requestTransmission.isConfirmed = true;
+				Copper.Event.sendEvent(Copper.Event.createMessageTransmissionConfirmedEvent(requestTransmission.coapMessage, Copper.TimeUtils.now()-requestTransmission.lastTransmissionStart, this.endpointId));
+				
+				if (requestTransmission.requestHandler === undefined){
+					completeRequestTransmission(requestTransmission, coapMessage);
+				}
+				else if (Copper.CoapMessage.Type.RST.equals(coapMessage.type) || !Copper.CoapMessage.Code.EMPTY.equals(coapMessage.code)){
+					completeRequestTransmission(requestTransmission, coapMessage);
+					requestTransmission.requestHandler.handleResponse(requestTransmission.coapMessage, coapMessage, undefined);
 				}
 			}
-			this.messagesInTransmissionSet.addNewTransmission(responseTransmission);
 		}
-		for (let i=0; i<responseTransmission.responses.length; i++) {
-			this.sendCoapMessageInternal(responseTransmission.responses[i], responseTransmission.remoteAddress, responseTransmission.remotePort, responseTransmission.retransmissionCounter);
-		}
-		if (responseCoapMessage !== undefined){
-			if (!Copper.CoapMessage.Type.CON.equals(responseCoapMessage.type)){
-				throw new Error("Illegal response message");
+		else {
+			// Either a new request or a reponse to a previous request. If request or response is determined using the code
+			let responseCoapMessage = undefined; // CON-Message that is sent as a reply to a CON-Response
+			let responseTransmission = this.messagesInTransmissionSet.getResponseMessageTransmission(coapMessage.mid, remoteAddress, remotePort);
+			if (responseTransmission !== undefined){
+				// message is a duplicate
+				Copper.Event.sendEvent(Copper.Event.createReceivedDuplicateCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
+				responseTransmission.retransmissionCounter++;
 			}
-			// create new transmission and send reliably
-			this.sendCoapMessage(responseCoapMessage, undefined);
+			else {
+				responseTransmission = new Copper.ResponseMessageTransmission(coapMessage, remoteAddress, remotePort);
+				if (coapMessage.code.isResponseCode()) {
+					// reponse to a previous request. should match using the token 
+					let requestTransmission = this.getRequestMessageTransmissionForToken(coapMessage.token);
+					if (requestTransmission !== undefined){
+						Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
+						completeRequestTransmission(requestTransmission, coapMessage);
+						requestTransmission.requestHandler.handleResponse(requestTransmission.coapMessage, coapMessage, responseTransmission);
+					}
+					else {
+						Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
+						if (this.settings.rejectUnknown){
+							responseTransmission.addResponse(Copper.CoapMessage.reset(coapMessage.mid, coapMessage.token));
+						}
+					}
+				}
+				else if (coapMessage.code.isRequestCode()) {
+					let res = undefined;
+					let i=0;
+					while (res === undefined && i < this.requestCallbacks.length){
+						let tmpRes = this.requestCallbacks[i](coapMessage, remoteAddress, remotePort);
+						if (tmpRes !== undefined && (!(tmpRes instanceof Copper.CoapMessage)) || !tmpRes.code.isResponseCode()){
+							throw new Error("Illegal return value from callback");
+						}
+						res = tmpRes;
+						i++;
+					}
+					if (res !== undefined){
+						Copper.Event.sendEvent(Copper.Event.createReceivedCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
+						if (Copper.CoapMessage.Type.CON.equals(responseTransmission.coapMessage.type) && 
+							      !Copper.CoapMessage.Type.ACK.equals(res.type) && !Copper.CoapMessage.Type.RST.equals(res.type)){
+							// add ACK for the CON message
+							responseTransmission.addResponse(Copper.CoapMessage.ack(responseTransmission.coapMessage.mid, responseTransmission.coapMessage.token));
+						}
+						if (Copper.CoapMessage.Type.CON.equals(res.type)){
+							responseCoapMessage = res;
+						}
+						else {
+							responseTransmission.addResponse(res);
+						}
+					}
+					else {
+						Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
+						if (this.settings.rejectUnknown){
+							responseTransmission.addResponse(Copper.CoapMessage.reset(coapMessage.mid, coapMessage.token));
+						}	
+					}
+				}
+				else {
+					Copper.Event.sendEvent(Copper.Event.createReceivedUnknownCoapMessageEvent(coapMessage, parserWarnings, remoteAddress, remotePort, byteLength, this.endpointId));
+					if (this.settings.rejectUnknown){
+						responseTransmission.addResponse(Copper.CoapMessage.reset(coapMessage.mid, coapMessage.token));
+					}
+				}
+				this.messagesInTransmissionSet.addNewTransmission(responseTransmission);
+			}
+			for (let i=0; i<responseTransmission.responses.length; i++) {
+				this.sendCoapMessageInternal(responseTransmission.responses[i], responseTransmission.remoteAddress, responseTransmission.remotePort, responseTransmission.retransmissionCounter);
+			}
+			if (responseCoapMessage !== undefined){
+				if (!Copper.CoapMessage.Type.CON.equals(responseCoapMessage.type)){
+					throw new Error("Illegal response message");
+				}
+				// create new transmission and send reliably
+				this.sendCoapMessage(responseCoapMessage, undefined, true);
+			}
 		}
+	} finally {
+		this.isInResponseHandling = false;
 	}
+	this.processSendQueue();
 };
 
 // -------- Transmission Set Callbacks -----------

@@ -2,6 +2,7 @@
 	TODO:
 		* Requests in case of missing replies (max-age + 5-15s) (see RFC, 3.3.1)
 		* Reordering (out of order detection) (see RFC)
+		* Cancellation (lazy, GET, RST)
 */
 
 Copper.ObserveSender = function(isBlockwiseSender, coapMessage, requestHandler, onComplete){

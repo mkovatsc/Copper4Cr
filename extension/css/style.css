@@ -327,6 +327,7 @@ button
 	height: 100%;
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	padding: 4px;
+	overflow: auto;
 }
 
 .main-content .center-box-bottom .visible
@@ -497,6 +498,10 @@ button
 	background-color: #CFC;
 }
 
+#copper-coap-message-log .unexpected
+{
+	background-color: #FCC;
+}
 
 #copper-overlay{
 	position: fixed; 

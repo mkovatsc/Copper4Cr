@@ -73,9 +73,6 @@ Copper.CoapMessage.prototype.setToken = function(token){
 	if (token === undefined || !(token instanceof ArrayBuffer) || token.byteLength > 8){
 		throw new Error("Illegal argument");	
 	}
-	if (Copper.CoapMessage.Code.EMPTY.equals(this.code) && token.byteLength > 0){
-		throw new Error("Empty message cannot have a token");
-	}
 	this.token = token;
 	return this;
 };

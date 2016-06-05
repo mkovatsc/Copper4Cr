@@ -86,8 +86,15 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 			case Copper.Event.TYPE_RECEIVED_PARSE_ERROR:
 				this.port.sendMessage(event);
 				return true;
+			
+			case Copper.Event.TYPE_REQUEST_COMPLETED:
+			case Copper.Event.TYPE_REQUEST_RECEIVE_ERROR:
+			case Copper.Event.TYPE_REQUEST_TIMEOUT:
+			case Copper.Event.TYPE_CANCEL_REQUESTS:
+			case Copper.Event.TYPE_REQUEST_CANCELED:
+				this.port.sendMessage(event);
+				return true;
 							
-
 			default:
 				Copper.Log.logWarning("Unknown event type " + event.type);
 				return false;
