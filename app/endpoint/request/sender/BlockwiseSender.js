@@ -49,7 +49,7 @@ Copper.BlockwiseSender.prototype.onReceiveComplete = function(sentCoapMessage, r
 		}
 		this.firstRequest = false;
 	}
-	if (receivedCoapMessage.code.isSuccessCode() && this.hasMoreBlocks()){
+	if ((this.offset === 0 || receivedCoapMessage.code.isSuccessCode()) && this.hasMoreBlocks()){
 		this.sendNextMessage();
 	}
 	else {
@@ -86,8 +86,4 @@ Copper.BlockwiseSender.prototype.sendNextMessage = function(){
 
 Copper.BlockwiseSender.prototype.hasMoreBlocks = function(){
 	return this.offset <= this.coapMessage.payload.byteLength;
-};
-
-Copper.BlockwiseSender.prototype.onComplete = function(){
-	this.onComplete();
 };
