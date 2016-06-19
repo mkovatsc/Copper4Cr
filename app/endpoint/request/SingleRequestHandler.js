@@ -32,8 +32,16 @@ Copper.SingleRequestHandler.prototype.start = function(){
 
 	// create token and register this handler
 	let token = this.coapMessage.token;
-	if (this.transmissionHandler.isTokenRegistered(token) || (observing && this.settings.observeToken)) {
+	let randomToken = false;
+	if (this.transmissionHandler.isTokenRegistered(token)) {
 		Copper.Log.logInfo("Token " + Copper.ByteUtils.convertBytesToHexString(token) + " is in use. Another token is used.");
+		randomToken = true;
+	}
+	else if (observing && this.settings.observeToken) {
+		Copper.Log.logInfo("Generate token for observing request");
+		randomToken = true;
+	}
+	if (randomToken) {
 		do {
 			token = Copper.ByteUtils.convertUintToBytes(parseInt(Math.random()*0x10000000));
 		} while (this.transmissionHandler.isTokenRegistered(token));

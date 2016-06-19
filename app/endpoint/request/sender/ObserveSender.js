@@ -44,7 +44,3 @@ Copper.ObserveSender.prototype.onTimeout = function(){
 Copper.ObserveSender.prototype.cancel = function(){
 	this.sender.cancel();
 };
-
-Copper.ObserveSender.prototype.onComplete = function(){
-	this.onComplete();
-};
