@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2014, Institute for Pervasive Computing, ETH Zurich.
+ * Copyright (c) 2016, Institute for Pervasive Computing, ETH Zurich.
  * All rights reserved.
  * 
  * Redistribution and use in source and binary forms, with or without
@@ -28,16 +28,7 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
-/**
- * \file
- *         Namespace definition for the Copper CoAP Browser
- *
- * \author  Matthias Kovatsch <kovatsch@inf.ethz.ch>\author
- */
-
-/**
- * Copper namespace.
- */
+ 
 if (typeof(Copper) === "undefined") {
   var Copper = {};
 };
