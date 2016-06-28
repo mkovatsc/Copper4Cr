@@ -224,7 +224,7 @@ button
 .main-content-top-box fieldset{
 	border: 1px black solid;
 	padding: 4px;
-	background-color: silver;
+	background-color: #dddddd;
 }
 
 .main-content-top-box legend {
@@ -239,6 +239,10 @@ button
 	overflow: hidden;
 }
 
+/* Status */
+#status-label {
+    height: 35px;
+}
 /* Tree view */
 .main-content .sidebar-left 
 {
@@ -554,4 +558,123 @@ button
 
 #copper-overlay-content .error-message {
 	color: red;
+}
+
+#resource_tree {
+    display: block;
+    padding: 0 4px 0 4px;
+    overflow-y: auto;
+}
+
+.tree ul{
+    list-style-type: none;
+    padding: 0;
+    padding-bottom: 0px;
+    padding-left: 10px;
+    position: relative;
+    overflow:hidden;
+}
+
+.tree > ul {
+	list-style-type: none;
+	padding: 0;
+	padding-bottom: 0px;
+	padding-top: 2px;
+	padding-left: 10px;
+	position: relative;
+	overflow:hidden;
+}
+
+.tree li{
+    margin: 1px 0;
+    padding: 0;
+    padding-left: 12px;
+    position: relative;
+}
+
+.tree li::before, .tree li::after{
+    content: '';
+    position: absolute;
+    left: -1px;
+}
+
+
+.tree li::before{
+    border-top: 1px dotted #999;
+    top: 8px;
+    width: 10px;
+    height: 0;
+	z-index: 1;
+}
+
+.tree > ul > li::before{
+    display: none;
+}
+
+.tree > ul > li::after{
+    display: none;
+}
+
+/* vertical line on list items */
+.tree li:after{
+    border-left: 1px dotted  #999;
+    height: 100%;
+    width: 0px;
+    top: -11px;
+	z-index: 1;
+    border-collapse: collapse;
+}
+
+/* hide line from the last of the first level list items */
+.can_expand:last-child::after{
+    height: 18px;
+}
+
+.tree img {
+    width: 18px;
+    height: 18px;
+    margin-right: 5px;
+    margin-bottom: 2px;
+}
+
+.tree p {
+	display: inline;
+}
+
+.tree p:hover {
+    text-decoration: underline;
+    background: rgba(0,188,212,0.2);
+    cursor: pointer;
+}
+
+.can_expand > img:first-child {
+    position: absolute;
+    top: 2px;
+    left: -7px;
+    padding: 1px;
+    padding: 1px;
+    width: 13px;
+    height: 13px;
+    z-index: 2;
+    background-color: white;
+    cursor: pointer;
+}
+
+.tree .collapsed {
+    visibility : hidden;
+    height : 0px;
+    width : 0px;
+    margin : 0px;
+    padding : 0px;
+    overflow : hidden;
+}
+
+.selected {
+    font-weight: bold;
+    color: black;
+    background: rgba(0,188,212,0.7);
+}
+
+.tree_cached {
+    color: black;
 }

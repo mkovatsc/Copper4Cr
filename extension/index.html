@@ -41,6 +41,7 @@
 	<script src="gui/PacketOptionsAdapter.js"></script>
 	<script src="gui/PayloadAdapter.js"></script>
 	<script src="gui/ToolbarAdapter.js"></script>
+	<script src="gui/ResourceViewAdapter.js"></script>
 
 	<script src="endpoint/ClientEndpoint.js"></script>
 	<script src="endpoint/ChromeStartup.js"></script>
@@ -107,15 +108,13 @@
 				<div class="main-content-top-box">
 					<fieldset>
 						<legend>Status</legend>
-						<div class="hbox"><label class="flex-filler">some Text<label></div>
+						<div class="hbox"><label id="status-label" class="flex-filler"></label></div>
 					</fieldset>
 				</div>
 				<div class="hbox flex-filler">
 				
 					<div class="sidebar-left hbox">
-						<div class="border_solid white flex-filler">
-							<p>Tree View</p>
-						</div>
+						<div id="resource_tree" class="tree border_solid white flex-filler"></div>
 					</div>
 					
 					<div class="vbox flex-filler">
