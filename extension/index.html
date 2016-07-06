@@ -78,25 +78,221 @@
 			</button>
 		</div>
 		
-		<div class="toolbar-item">
-				<button id="copper-toolbar-payload" type="button">
-						Payload
-				</button> 
-			
-				<button id="copper-toolbar-behaviour" type="button">
-						Behaviour
-				</button>
+		<div class="toolbar-item-dropdown hbox">
+            <div id="copper-toolbar-payload">
+                <button type="button">
+                        Payload ▾
+                </button>
+
+                <div class="dropdown-content vbox hidden">
+                    <ul class="select-group vbox">
+                        <li id="copper-toolbar-payload-mode-text" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>Text</p>
+                        </li>
+                        <li id="copper-toolbar-payload-mode-file" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>File</p>
+                        </li>
+                    </ul>
+					<div class="separation-line"></div>
+                    <ul class="vbox">
+                        <li id="copper-toolbar-payload-choose-file" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8203;</span>
+                            </div>
+                            <p>Choose File...</p>
+                            <input type="file" style="display:none">
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar-item-dropdown hbox">
+            <div id="copper-toolbar-behavior">
+                <button  type="button">
+					Behavior ▾
+			    </button>
+
+                <div class="dropdown-content vbox hidden">
+                    <ul class="select-group vbox">
+                        <li id="copper-toolbar-behavior-request-con" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>CON requests</p>
+                        </li>
+                        <li id="copper-toolbar-behavior-request-non" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>NON requests</p>
+                        </li>
+                    </ul>
+
+					<div class="separation-line"></div>
+
+                    <ul class="single-element vbox">
+                        <li id="copper-toolbar-behavior-retransmissions" class="dropdown-item hbox" title="Retransmit unconfirmed messages">
+                            <div class="selection-icon hidden">
+                                <span>&#10003;</span>
+                            </div>
+                            <p>Retransmissions</p>
+                        </li>
+                    </ul>
+                    <ul class="single-element vbox">
+                        <li id="copper-toolbar-behavior-duplicates" class="dropdown-item hbox" title="Do not increase MID">
+                            <div class="selection-icon hidden">
+                                <span>&#10003;</span>
+                            </div>
+                            <p>Send Duplicates</p>
+                        </li>
+                    </ul>
+
+					<div class="separation-line"></div>
+
+					<ul class="single-element vbox">
+						<li id="copper-toolbar-behavior-display-unknown" class="dropdown-item hbox" title="Display messages with unknown tokens">
+							<div class="selection-icon hidden">
+								<span>&#10003;</span>
+							</div>
+							<p>Display unknown</p>
+						</li>
+					</ul>
+					<ul class="single-element vbox">
+						<li id="copper-toolbar-behavior-reject-unknown" class="dropdown-item hbox" title="Send a Reset for messages with unknown tokens">
+							<div class="selection-icon hidden">
+								<span>&#10003;</span>
+							</div>
+							<p>Reject unknown</p>
+						</li>
+					</ul>
+
+					<div class="separation-line"></div>
+
+					<ul class="single-element vbox">
+						<li id="copper-toolbar-behavior-send-uri-host" class="dropdown-item hbox" title="Enable virtual hosts and send Uri-Host option">
+							<div class="selection-icon hidden">
+								<span>&#10003;</span>
+							</div>
+							<p>Send Uri-Host</p>
+						</li>
+					</ul>
+					<ul class="single-element vbox">
+						<li id="copper-toolbar-behavior-send-size1" class="dropdown-item hbox" title="Automatically indicate request representation size">
+							<div class="selection-icon hidden">
+								<span>&#10003;</span>
+							</div>
+							<p>Send auto Size1</p>
+						</li>
+					</ul>
+
+                    <div class="separation-line"></div>
+
+                    <ul class="select-group vbox">
+                        <li id="copper-toolbar-behavior-block-size-0" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>Block late negotiation</p>
+                        </li>
+                        <li id="copper-toolbar-behavior-block-size-16" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>Block size 16</p>
+                        </li>
+                        <li id="copper-toolbar-behavior-block-size-32" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>Block size 32</p>
+                        </li>
+                        <li id="copper-toolbar-behavior-block-size-64" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>Block size 64</p>
+                        </li>
+                        <li id="copper-toolbar-behavior-block-size-128" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>Block size 128</p>
+                        </li>
+                        <li id="copper-toolbar-behavior-block-size-256" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>Block size 256</p>
+                        </li>
+                        <li id="copper-toolbar-behavior-block-size-512" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>Block size 512</p>
+                        </li>
+                        <li id="copper-toolbar-behavior-block-size-1024" class="dropdown-item hbox">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>Block size 1024</p>
+                        </li>
+                    </ul>
+
+                    <div class="separation-line"></div>
+
+                    <ul class="single-element vbox">
+                        <li id="copper-toolbar-behavior-token-observe" class="dropdown-item hbox" title="Enforce non-default Token option for observing">
+                            <div class="selection-icon hidden">
+                                <span>&#10003;</span>
+                            </div>
+                            <p>Observe Token</p>
+                        </li>
+                    </ul>
+
+                    <div class="separation-line"></div>
+
+                    <ul class="select-group vbox">
+                        <li id="copper-toolbar-behavior-observe-lazy" class="dropdown-item hbox" title="Only remove subscription, send lazy RST later (can be used for MID matching at server)">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>Lazy Observe cancel</p>
+                        </li>
+                        <li id="copper-toolbar-behavior-observe-get" class="dropdown-item hbox" title="Send a GET without Observe option to notify server">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>GET Observe cancel</p>
+                        </li>
+                        <li id="copper-toolbar-behavior-observe-rst" class="dropdown-item hbox" title="Send a RST right away (does not work with MID matching as new MID is used)">
+                            <div class="selection-icon hidden">
+                                <span>&#8226;</span>
+                            </div>
+                            <p>RST Observe cancel</p>
+                        </li>
+                    </ul>
+
+				</div>
+            </div>
 		</div>
+
 		<div class="flex-filler"></div>
-		<div class="toolbar-item" style="margin-top: -21px">
-				
-				<button id="copper-toolbar-log" class="no-hover" type="button">
-					<span style="font-size: 350%">&#x25A1</span>
-				</button>
-				
-				<button id="copper-toolbar-preferences" class="no-hover" type="button">				
-					<span style="font-size: 250%">≡</span>
-				</button>
+
+		<div style="display: flex; cursor: pointer;">
+			<div id="copper-toolbar-log">
+				<span style="font-size: 350%">&#x25A1</span>
+			</div>
+
+			<div id="copper-toolbar-preferences">
+				<span style="font-size: 250%">≡</span>
+			</div>
 		</div>
 	</div>
 

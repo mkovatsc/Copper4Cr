@@ -32,6 +32,19 @@
 Copper.ToolbarAdapter = function(){
 };
 
+Copper.ToolbarAdapter.payload = undefined;
+Copper.ToolbarAdapter.requests = undefined;
+Copper.ToolbarAdapter.retransmissions = false;
+Copper.ToolbarAdapter.sendDuplicates = false;
+Copper.ToolbarAdapter.showUnknown = false;
+Copper.ToolbarAdapter.rejectUnknown = false;
+Copper.ToolbarAdapter.sendUriHost = false;
+Copper.ToolbarAdapter.sendSize1 = false;
+Copper.ToolbarAdapter.blockSize = undefined;
+Copper.ToolbarAdapter.observeToken = false;
+Copper.ToolbarAdapter.observeCancellation = undefined;
+
+
 Copper.ToolbarAdapter.init = function(){
 	document.getElementById("copper-toolbar-ping").onclick = Copper.ToolbarAdapter.doPing;
 	document.getElementById("copper-toolbar-discover").onclick = Copper.ToolbarAdapter.doDiscover;
@@ -40,6 +53,55 @@ Copper.ToolbarAdapter.init = function(){
 	document.getElementById("copper-toolbar-put").onclick = Copper.ToolbarAdapter.doPut;
 	document.getElementById("copper-toolbar-delete").onclick = Copper.ToolbarAdapter.doDelete;
 	document.getElementById("copper-toolbar-observe").onclick = Copper.ToolbarAdapter.doObserve;
+	document.getElementById("copper-toolbar-payload").onclick = Copper.ToolbarAdapter.openDropdown;
+	document.getElementById("copper-toolbar-behavior").onclick = Copper.ToolbarAdapter.openDropdown;
+	document.getElementById("copper-toolbar-payload-mode-text").onclick = Copper.ToolbarAdapter.payloadModeText;
+	document.getElementById("copper-toolbar-payload-mode-file").onclick = Copper.ToolbarAdapter.payloadModeFile;
+	document.getElementById("copper-toolbar-payload-choose-file").onclick = Copper.ToolbarAdapter.chooseFile;
+    document.getElementById("copper-toolbar-behavior-request-con").onclick = Copper.ToolbarAdapter.behaviorRequestCon;
+    document.getElementById("copper-toolbar-behavior-request-non").onclick = Copper.ToolbarAdapter.behaviorRequestNon;
+    document.getElementById("copper-toolbar-behavior-retransmissions").onclick = Copper.ToolbarAdapter.behaviorRetransmissions;
+    document.getElementById("copper-toolbar-behavior-duplicates").onclick = Copper.ToolbarAdapter.behaviorDuplicates;
+    document.getElementById("copper-toolbar-behavior-display-unknown").onclick = Copper.ToolbarAdapter.behaviorDisplayUnknown;
+    document.getElementById("copper-toolbar-behavior-reject-unknown").onclick = Copper.ToolbarAdapter.behaviorRejectUnknown;
+    document.getElementById("copper-toolbar-behavior-send-uri-host").onclick = Copper.ToolbarAdapter.behaviorUriHost;
+    document.getElementById("copper-toolbar-behavior-send-size1").onclick = Copper.ToolbarAdapter.behaviorSendSize1;
+    document.getElementById("copper-toolbar-behavior-block-size-0").onclick = Copper.ToolbarAdapter.behaviorBlockSize0;
+    document.getElementById("copper-toolbar-behavior-block-size-16").onclick = Copper.ToolbarAdapter.behaviorBlockSize16;
+    document.getElementById("copper-toolbar-behavior-block-size-32").onclick = Copper.ToolbarAdapter.behaviorBlockSize32;
+    document.getElementById("copper-toolbar-behavior-block-size-64").onclick = Copper.ToolbarAdapter.behaviorBlockSize64;
+    document.getElementById("copper-toolbar-behavior-block-size-128").onclick = Copper.ToolbarAdapter.behaviorBlockSize128;
+    document.getElementById("copper-toolbar-behavior-block-size-256").onclick = Copper.ToolbarAdapter.behaviorBlockSize256;
+    document.getElementById("copper-toolbar-behavior-block-size-512").onclick = Copper.ToolbarAdapter.behaviorBlockSize512;
+    document.getElementById("copper-toolbar-behavior-block-size-1024").onclick = Copper.ToolbarAdapter.behaviorBlockSize1024;
+    document.getElementById("copper-toolbar-behavior-token-observe").onclick = Copper.ToolbarAdapter.behaviorObserveToken;
+    document.getElementById("copper-toolbar-behavior-observe-lazy").onclick = Copper.ToolbarAdapter.behaviorObserveLazy;
+    document.getElementById("copper-toolbar-behavior-observe-get").onclick = Copper.ToolbarAdapter.behaviorObserveGet;
+    document.getElementById("copper-toolbar-behavior-observe-rst").onclick = Copper.ToolbarAdapter.behaviorObserveRst;
+
+
+    // Init defaults
+    var payLoadModeText = document.getElementById("copper-toolbar-payload-mode-text");
+    payLoadModeText.onclick.apply(payLoadModeText);
+
+    var behaviorRequestCon = document.getElementById("copper-toolbar-behavior-request-con");
+    behaviorRequestCon.onclick.apply(behaviorRequestCon);
+
+    var behaviorRetransmissions = document.getElementById("copper-toolbar-behavior-retransmissions");
+    behaviorRetransmissions.onclick.apply(behaviorRetransmissions);
+
+    var behaviorRejectUnknown = document.getElementById("copper-toolbar-behavior-reject-unknown");
+    behaviorRejectUnknown.onclick.apply(behaviorRejectUnknown);
+
+    var behaviorBlockSize64 = document.getElementById("copper-toolbar-behavior-block-size-64");
+    behaviorBlockSize64.onclick.apply(behaviorBlockSize64);
+
+    var behaviorObserveToken = document.getElementById("copper-toolbar-behavior-token-observe");
+    behaviorObserveToken.onclick.apply(behaviorObserveToken);
+
+    var behaviorObserveLazy= document.getElementById("copper-toolbar-behavior-observe-lazy");
+    behaviorObserveLazy.onclick.apply(behaviorObserveLazy);
+
 };
 
 Copper.ToolbarAdapter.onEvent = function(event){
@@ -81,4 +143,201 @@ Copper.ToolbarAdapter.doObserve = function(){
 	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.GET);
 	coapMessage.addOption(Copper.CoapMessage.OptionHeader.OBSERVE, 0);
 	Copper.Session.sendCoapMessage(coapMessage);
+};
+
+Copper.ToolbarAdapter.openDropdown = function(){
+
+    var dropdowns = document.getElementsByClassName("dropdown-content");
+    for (let i = 0; i < dropdowns.length; i++) {
+        var openDropdown = dropdowns[i];
+        if (!openDropdown.classList.contains('hidden')) {
+            openDropdown.classList.add('hidden');
+        }
+    }
+
+    var id = this.id;
+    var element  = document.getElementById(id).lastElementChild;
+    if (element.classList.contains('hidden')) {
+        element.classList.remove('hidden');
+    }
+
+
+    // Close the dropdown menu if the user clicks outside of it
+    window.onclick = function(event) {
+        var dropdown = document.getElementById(id);
+        var elementClicked = event.target;
+
+        // Close dropdown if click was outside of dropdown
+        // Check if there is the dropdown container in the parent chain (stop after more than 5 levels or if parent null)
+        var j = 0;
+        while (elementClicked != null && j < 5) {
+            if (elementClicked == dropdown) {
+                return;
+            }
+            elementClicked = elementClicked.parentElement;
+            j++;
+        }
+
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        for (let i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (!openDropdown.classList.contains('hidden')) {
+                openDropdown.classList.add('hidden');
+            }
+        }
+    }
+};
+
+Copper.ToolbarAdapter.payloadModeText = function() {
+    Copper.ToolbarAdapter.payload = "text";
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.payloadModeFile = function() {
+    Copper.ToolbarAdapter.payload = "file";
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorRequestCon = function() {
+    Copper.ToolbarAdapter.requests = "con";
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorRequestNon = function() {
+    Copper.ToolbarAdapter.requests = "non";
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorRetransmissions = function() {
+    Copper.ToolbarAdapter.retransmissions = !Copper.ToolbarAdapter.retransmissions;
+    Copper.ToolbarAdapter.singleElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorDuplicates = function() {
+    Copper.ToolbarAdapter.sendDuplicates = !Copper.ToolbarAdapter.sendDuplicates;
+    Copper.ToolbarAdapter.singleElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorDisplayUnknown = function() {
+    Copper.ToolbarAdapter.showUnknown = !Copper.ToolbarAdapter.showUnknown;
+    Copper.ToolbarAdapter.singleElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorRejectUnknown = function() {
+    Copper.ToolbarAdapter.rejectUnknown = !Copper.ToolbarAdapter.rejectUnknown;
+    Copper.ToolbarAdapter.singleElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorUriHost = function() {
+    Copper.ToolbarAdapter.sendUriHost = !Copper.ToolbarAdapter.sendUriHost;
+    Copper.ToolbarAdapter.singleElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorSendSize1 = function() {
+    Copper.ToolbarAdapter.sendSize1 = !Copper.ToolbarAdapter.sendSize1;
+    Copper.ToolbarAdapter.singleElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorBlockSize0 = function() {
+    Copper.ToolbarAdapter.blockSize = 0;
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorBlockSize16 = function() {
+    Copper.ToolbarAdapter.blockSize = 16;
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorBlockSize32 = function() {
+    Copper.ToolbarAdapter.blockSize = 32;
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorBlockSize64 = function() {
+    Copper.ToolbarAdapter.blockSize = 64;
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorBlockSize128 = function() {
+    Copper.ToolbarAdapter.blockSize = 128;
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorBlockSize256 = function() {
+    Copper.ToolbarAdapter.blockSize = 256;
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorBlockSize512 = function() {
+    Copper.ToolbarAdapter.blockSize = 512;
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorBlockSize1024 = function() {
+    Copper.ToolbarAdapter.blockSize = 1024;
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorObserveToken = function() {
+    Copper.ToolbarAdapter.observeToken = !Copper.ToolbarAdapter.observeToken;
+    Copper.ToolbarAdapter.singleElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorObserveLazy = function() {
+    Copper.ToolbarAdapter.observeCancellation = "lazy";
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorObserveGet = function() {
+    Copper.ToolbarAdapter.observeCancellation = "get";
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+Copper.ToolbarAdapter.behaviorObserveRst = function() {
+    Copper.ToolbarAdapter.observeCancellation = "rest";
+    Copper.ToolbarAdapter.radioElement(this.id);
+};
+
+
+
+
+Copper.ToolbarAdapter.singleElement = function(id) {
+    var element = document.getElementById(id).firstElementChild;
+    if (!element.classList.contains('hidden')) {
+        element.classList.add('hidden');
+        element.classList.remove('selected');
+    } else {
+        element.classList.remove('hidden');
+        element.classList.add('selected');
+    }
+};
+
+Copper.ToolbarAdapter.radioElement = function(id) {
+    var selectedElement = document.getElementById(id).firstElementChild;
+    var selectionGroup = document.getElementById(id).parentNode;
+
+    if (selectedElement.classList.contains('hidden')) {
+        // Change event!
+
+        // Remove the other selected nodes;
+        var othersInGroup = selectionGroup.getElementsByClassName("selection-icon");
+        for (let i = 0; i < othersInGroup.length; i++) {
+            var icon = othersInGroup[i];
+            if (!icon.classList.contains('hidden')) {
+                icon.classList.add('hidden');
+            }
+        }
+        selectedElement.classList.remove('hidden');
+        selectedElement.classList.add('selected');
+
+    }
+};
+
+Copper.ToolbarAdapter.chooseFile = function(){
+    let chooseFile = document.getElementById("copper-toolbar-payload-choose-file").lastElementChild;
+    chooseFile.onchange = function() {
+        console.log("hoi");
+        console.log(this.value);
+    }
+    chooseFile.click();
 };
