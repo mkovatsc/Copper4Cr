@@ -201,11 +201,19 @@ button
 	background-color: #ddd;
 }
 
-.toolbar-item-dropdown .hidden {
+.toolbar-item-dropdown button > p {
+    padding-left: 5px;
+}
+
+.main-toolbar .hidden {
     visibility : hidden;
 }
 
 .toolbar-item-dropdown button:focus {
+	outline: none;
+}
+
+.toolbar-item-dropdown .focused {
     background-color: #ddd;
 }
 
@@ -217,6 +225,10 @@ button
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     border: 1px solid rgba(0,0,0,0.2);
     z-index: 5;
+}
+
+.toolbar-item-dropdown .dropdown-content p{
+	padding-right: 10px;
 }
 
 .toolbar-item-dropdown .separation-line
@@ -277,8 +289,30 @@ button
     -moz-user-select: none;
 }
 
+#copper-toolbar-log p {
+	-webkit-user-select: text;
+	-moz-user-select: text;
+}
+
 #copper-toolbar-log:hover {
     background-color: #ddd;
+}
+
+#copper-toolbar-log-event-log {
+	position: absolute;
+	width: 600px;
+	height: 69%;
+	-moz-appearance: none;
+	font-family: monospace;
+	color: lightgray;
+	background-color: black;
+	border: 1px solid white;
+	z-index: 5;
+	right: 20px;
+	padding: 4px;
+	overflow-y: auto;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	cursor: text;
 }
 
 #copper-toolbar-preferences {
@@ -291,7 +325,6 @@ button
 #copper-toolbar-preferences:hover {
     background-color: #ddd;
 }
-
 
 .main-content
 {
@@ -469,7 +502,24 @@ button
 	margin-top: 5px;
 }
 
-.main-content .sidebar-right .checkbox p {
+.main-content .sidebar-right label
+{
+	margin-top: 10px;
+}
+
+.main-content .sidebar-right .checkbox label
+{
+	margin: 0;
+	cursor: pointer;
+	font-weight: normal;
+}
+
+.main-content .sidebar-right .checkbox input
+{
+	cursor: pointer;
+}
+
+.main-content .sidebar-right .checkbox label {
 	margin: 0;
 	padding-top: 2px;
 	display: inline-block;
@@ -483,12 +533,10 @@ button
 
 #reset_button
 {
-	border-radius: 4px;
-	border-width: 1px;
-	border-color: black;
-	background-color: #fff;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	background-color: #ddd;
 	color: black;
-	margin-left: 13px;
+	margin-left: 22px;
 	height: 23px;
 	padding: 0 17px;
 	align-items: center;

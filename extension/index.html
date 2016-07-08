@@ -42,6 +42,7 @@
 	<script src="gui/PayloadAdapter.js"></script>
 	<script src="gui/ToolbarAdapter.js"></script>
 	<script src="gui/ResourceViewAdapter.js"></script>
+	<script src="gui/OptionsAdapter.js"></script>
 
 	<script src="endpoint/ClientEndpoint.js"></script>
 	<script src="endpoint/ChromeStartup.js"></script>
@@ -53,35 +54,35 @@
 	<div class="main-toolbar hbox">
 		<div class="toolbar-item border-right">
 			<button id="copper-toolbar-ping" type="button">
-					<img src="skin/tool_ping.png"></img> Ping
+					<img src="skin/tool_ping.png"> Ping
 			</button>
 			<button id="copper-toolbar-discover" type="button">				
-	            <img src="skin/tool_discover.png"></img> Discover
+	            <img src="skin/tool_discover.png"> Discover
 			</button>
 		</div>
 		
 		<div class="toolbar-item border-right">		
 	        <button id="copper-toolbar-get" type="button">				
-	            <img src="skin/tool_get.png"></img> GET
+	            <img src="skin/tool_get.png"> GET
 			</button>
 			<button id="copper-toolbar-post" type="button">
-					<img src="skin/tool_post.png"></img> POST
+					<img src="skin/tool_post.png"> POST
 			</button>
 			<button id="copper-toolbar-put" type="button">
-					<img src="skin/tool_put.png"></img> PUT
+					<img src="skin/tool_put.png"> PUT
 			</button>
 			<button id="copper-toolbar-delete" type="button">
-					<img src="skin/tool_delete.png"></img> DELETE
+					<img src="skin/tool_delete.png"> DELETE
 			</button>
 			<button id="copper-toolbar-observe" type="button">
-					<img src="skin/tool_observe.png"></img> Observe
+					<img src="skin/tool_observe.png"> Observe
 			</button>
 		</div>
 		
 		<div class="toolbar-item-dropdown hbox">
             <div id="copper-toolbar-payload">
-                <button type="button">
-                        Payload ▾
+                <button id="copper-toolbar-payload-button" type="button">
+					<p>Payload ▾</p>
                 </button>
 
                 <div class="dropdown-content vbox hidden">
@@ -115,8 +116,8 @@
 
         <div class="toolbar-item-dropdown hbox">
             <div id="copper-toolbar-behavior">
-                <button  type="button">
-					Behavior ▾
+                <button id="copper-toolbar-behavior-button" type="button">
+					<p>Behavior ▾</p>
 			    </button>
 
                 <div class="dropdown-content vbox hidden">
@@ -287,7 +288,10 @@
 
 		<div style="display: flex; cursor: pointer;">
 			<div id="copper-toolbar-log">
-				<span style="font-size: 350%">&#x25A1</span>
+				<span id="copper-toolbar-log-event-symbol" style="font-size: 350%">&#x25A1</span>
+				<div id="copper-toolbar-log-event-log" class="hidden">
+					<p>asdf</p>
+				</div>
 			</div>
 
 			<div id="copper-toolbar-preferences">
@@ -357,13 +361,13 @@
 						<div class="center-box-bottom flex-filler">
 							<h2>Payload</h2>
 							<button id="copper-payload-btn-in" type="button">
-								<img src="skin/payload_in.png"></img> Incoming
+								<img src="skin/payload_in.png"> Incoming
 							</button>
 							<button id="copper-payload-btn-rendered" type="button">
-								<img src="skin/payload_rendered.png"></img> Rendered
+								<img src="skin/payload_rendered.png"> Rendered
 							</button>
 							<button id="copper-payload-btn-out" type="button">
-								<img src="skin/payload_out.png"></img> Outgoing
+								<img src="skin/payload_out.png"> Outgoing
 							</button>
 							<div class="pane white">
 								<div id="copper-payload-tab-in" class="innerpane visible"></div>
@@ -377,10 +381,10 @@
 			
 			</div>
 			<div id="sidebar" class="sidebar-right vbox">
-				<div style="padding: 0px 10px 0px 10px; min-height: 35px; height: 35px;">
+				<div style="padding: 0px 10px 0px 10px; min-height: 30px; height: 30px;">
 					<div class="checkbox">
-						<input id="chk_debug_options" type="checkbox">
-						<p>Debug Control</p>
+						<label><input id="chk_debug_options" type="checkbox">
+						Debug Control</label>
 						<button id="reset_button">Reset</button>
 					</div>
 					
@@ -441,9 +445,9 @@
 
 							</div>
 							
-							<div class="flex vbox">
-								<p style="margin-left: auto; margin-right: auto;" >Auto</p>
-								<input id="chk_debug_option_block_auto" type="checkbox">
+							<div class="checkbox flex vbox">
+								<label style="margin-left: auto; margin-right: auto;" >Auto
+								<input style="margin-left: 7px;" id="chk_debug_option_block_auto" type="checkbox"></label>
 							</div>
 						</div>
 						
@@ -472,8 +476,8 @@
 						</div>
 						
 						<div class="checkbox">
-							<input id="debug_option_if_none_match" type="checkbox">
-							<p>If-None-Match</p>
+							<label><input id="debug_option_if_none_match" type="checkbox">
+							If-None-Match</label>
 						</div>
 						
 						<div class="hbox">
@@ -503,8 +507,8 @@
 						</div>
 						
 						<div class="checkbox">
-							<input id="debug_option_proxy_scheme" type="checkbox">
-							<p>Use Proxy-Scheme option</p>
+							<label><input id="debug_option_proxy_scheme" type="checkbox">
+							Use Proxy-Scheme option</label>
 						</div>
 						
 						<div style="text-align: center;"><label>Response Options</label></div>

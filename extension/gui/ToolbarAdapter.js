@@ -44,6 +44,7 @@ Copper.ToolbarAdapter.blockSize = undefined;
 Copper.ToolbarAdapter.observeToken = false;
 Copper.ToolbarAdapter.observeCancellation = undefined;
 
+Copper.ToolbarAdapter.optionsWindowOpened = false;
 
 Copper.ToolbarAdapter.init = function(){
 	document.getElementById("copper-toolbar-ping").onclick = Copper.ToolbarAdapter.doPing;
@@ -53,8 +54,8 @@ Copper.ToolbarAdapter.init = function(){
 	document.getElementById("copper-toolbar-put").onclick = Copper.ToolbarAdapter.doPut;
 	document.getElementById("copper-toolbar-delete").onclick = Copper.ToolbarAdapter.doDelete;
 	document.getElementById("copper-toolbar-observe").onclick = Copper.ToolbarAdapter.doObserve;
-	document.getElementById("copper-toolbar-payload").onclick = Copper.ToolbarAdapter.openDropdown;
-	document.getElementById("copper-toolbar-behavior").onclick = Copper.ToolbarAdapter.openDropdown;
+	document.getElementById("copper-toolbar-payload-button").onclick = Copper.ToolbarAdapter.openDropdown;
+	document.getElementById("copper-toolbar-behavior-button").onclick = Copper.ToolbarAdapter.openDropdown;
 	document.getElementById("copper-toolbar-payload-mode-text").onclick = Copper.ToolbarAdapter.payloadModeText;
 	document.getElementById("copper-toolbar-payload-mode-file").onclick = Copper.ToolbarAdapter.payloadModeFile;
 	document.getElementById("copper-toolbar-payload-choose-file").onclick = Copper.ToolbarAdapter.chooseFile;
@@ -78,6 +79,8 @@ Copper.ToolbarAdapter.init = function(){
     document.getElementById("copper-toolbar-behavior-observe-lazy").onclick = Copper.ToolbarAdapter.behaviorObserveLazy;
     document.getElementById("copper-toolbar-behavior-observe-get").onclick = Copper.ToolbarAdapter.behaviorObserveGet;
     document.getElementById("copper-toolbar-behavior-observe-rst").onclick = Copper.ToolbarAdapter.behaviorObserveRst;
+    document.getElementById("copper-toolbar-log-event-symbol").onclick = Copper.ToolbarAdapter.doLog;
+    document.getElementById("copper-toolbar-preferences").onclick = Copper.ToolbarAdapter.doPreferences;
 
 
     // Init defaults
@@ -101,7 +104,6 @@ Copper.ToolbarAdapter.init = function(){
 
     var behaviorObserveLazy= document.getElementById("copper-toolbar-behavior-observe-lazy");
     behaviorObserveLazy.onclick.apply(behaviorObserveLazy);
-
 };
 
 Copper.ToolbarAdapter.onEvent = function(event){
@@ -146,43 +148,51 @@ Copper.ToolbarAdapter.doObserve = function(){
 };
 
 Copper.ToolbarAdapter.openDropdown = function(){
+    var button = document.getElementById(this.id);
+    var containerId = button.parentNode.id;
 
+    // Open/Close dropdown menu on button click
+    var element  = document.getElementById(containerId).lastElementChild;
+    if (element.classList.contains('hidden')) {
+        element.classList.remove('hidden');
+        button.classList.add('focused')
+    } else {
+        element.classList.add('hidden');
+        button.classList.remove('focused');
+    }
+
+    // Close all other currently opened dropdown menus (if any)
     var dropdowns = document.getElementsByClassName("dropdown-content");
     for (let i = 0; i < dropdowns.length; i++) {
         var openDropdown = dropdowns[i];
-        if (!openDropdown.classList.contains('hidden')) {
+        if (!openDropdown.classList.contains('hidden') && openDropdown !== element) {
             openDropdown.classList.add('hidden');
+            openDropdown.parentNode.firstElementChild.classList.remove('focused')
         }
     }
 
-    var id = this.id;
-    var element  = document.getElementById(id).lastElementChild;
-    if (element.classList.contains('hidden')) {
-        element.classList.remove('hidden');
-    }
-
-
     // Close the dropdown menu if the user clicks outside of it
     window.onclick = function(event) {
-        var dropdown = document.getElementById(id);
+        var dropdown = document.getElementById(containerId);
         var elementClicked = event.target;
 
-        // Close dropdown if click was outside of dropdown
+        // Close dropdown if click was outside of it
         // Check if there is the dropdown container in the parent chain (stop after more than 5 levels or if parent null)
         var j = 0;
-        while (elementClicked != null && j < 5) {
-            if (elementClicked == dropdown) {
+        while (elementClicked !== null && j < 5) {
+
+            if (elementClicked === dropdown) {
                 return;
             }
             elementClicked = elementClicked.parentElement;
             j++;
         }
 
-        var dropdowns = document.getElementsByClassName("dropdown-content");
         for (let i = 0; i < dropdowns.length; i++) {
             var openDropdown = dropdowns[i];
             if (!openDropdown.classList.contains('hidden')) {
                 openDropdown.classList.add('hidden');
+                openDropdown.parentNode.firstElementChild.classList.remove('focused')
             }
         }
     }
@@ -298,9 +308,6 @@ Copper.ToolbarAdapter.behaviorObserveRst = function() {
     Copper.ToolbarAdapter.radioElement(this.id);
 };
 
-
-
-
 Copper.ToolbarAdapter.singleElement = function(id) {
     var element = document.getElementById(id).firstElementChild;
     if (!element.classList.contains('hidden')) {
@@ -317,7 +324,6 @@ Copper.ToolbarAdapter.radioElement = function(id) {
     var selectionGroup = document.getElementById(id).parentNode;
 
     if (selectedElement.classList.contains('hidden')) {
-        // Change event!
 
         // Remove the other selected nodes;
         var othersInGroup = selectionGroup.getElementsByClassName("selection-icon");
@@ -329,15 +335,58 @@ Copper.ToolbarAdapter.radioElement = function(id) {
         }
         selectedElement.classList.remove('hidden');
         selectedElement.classList.add('selected');
-
     }
 };
 
-Copper.ToolbarAdapter.chooseFile = function(){
-    let chooseFile = document.getElementById("copper-toolbar-payload-choose-file").lastElementChild;
-    chooseFile.onchange = function() {
-        console.log("hoi");
-        console.log(this.value);
+Copper.ToolbarAdapter.chooseFile = function() {
+    var chooseFile = document.getElementById("copper-toolbar-payload-choose-file");
+    var input = chooseFile.lastElementChild;
+
+    // Set menu entry to file name once selected
+    input.onchange = function() {
+        chooseFile.getElementsByTagName('p')[0].innerHTML = this.value.split('\\').pop().split('/').pop();
     }
-    chooseFile.click();
+    input.click();
 };
+
+Copper.ToolbarAdapter.doLog = function(event) {
+    var log = document.getElementById("copper-toolbar-log-event-log");
+    if (log.classList.contains("hidden")) {
+        log.classList.remove("hidden");
+    } else {
+        log.classList.add("hidden");
+    }
+
+    // Close the log div if click outside of div
+    window.onmousedown = function(event) {
+        var elementClicked = event.target;
+        var log_event_symbol = document.getElementById("copper-toolbar-log-event-symbol");
+
+        // Check if in hierarchy, if not hide (click outside of log div)
+        while (elementClicked !== null) {
+            if (elementClicked === log || elementClicked === log_event_symbol) {
+                return;
+            }
+            elementClicked = elementClicked.parentElement;
+        }
+
+        // Close if clicked outside
+        log.classList.add("hidden");
+    }
+};
+
+Copper.ToolbarAdapter.doPreferences = function() {
+    var windowId;
+    chrome.windows.onCreated.addListener(function(newWindow) {
+        Copper.ToolbarAdapter.optionsWindowOpened = true;
+    });
+
+    // Avoid opening more than 1 window
+    if (!Copper.ToolbarAdapter.optionsWindowOpened) {
+        windowId = Copper.OptionsAdapter.openWindow();
+    }
+    chrome.windows.onRemoved.addListener(function(id) {
+        Copper.ToolbarAdapter.optionsWindowOpened = false;
+    });
+};
+
