@@ -43,6 +43,7 @@
 	<script src="gui/ToolbarAdapter.js"></script>
 	<script src="gui/ResourceViewAdapter.js"></script>
 	<script src="gui/OptionsAdapter.js"></script>
+	<script src="gui/DebugOptionsAdapter.js"></script>
 
 	<script src="endpoint/ClientEndpoint.js"></script>
 	<script src="endpoint/ChromeStartup.js"></script>
@@ -381,7 +382,7 @@
 			
 			</div>
 			<div id="sidebar" class="sidebar-right vbox">
-				<div style="padding: 0px 10px 0px 10px; min-height: 30px; height: 30px;">
+				<div style="padding: 0px 10px 0px 10px; min-height: 35px; height: 35px;">
 					<div class="checkbox">
 						<label><input id="chk_debug_options" type="checkbox">
 						Debug Control</label>
@@ -390,7 +391,7 @@
 					
 				</div>
 				
-				<div style="display: block; padding: 0 4px 0 4px; overflow-y: auto;">
+				<div id="sidebar-debug-options" style="display: block; padding: 0 4px 0 4px; overflow-y: auto;">
 					<div style="padding: 4px;">
 						<div style="text-align: center;"><label>Token</label></div>
 						<div class="flex hbox">
@@ -403,7 +404,7 @@
 						<div style="text-align: center;"><label style="padding-top: 2px; margin-bottom: 2px;">Request Options</label></div>
 						<p>Accept</p>
 						<div class="flex hbox dropdown">
-							<select class="flex text-input-custom">
+							<select id="debug_option_accept" class="flex text-input-custom">
 								<option></option>
 								<option>Example</option>
 								<option>Example</option>
@@ -412,7 +413,7 @@
 						
 						<p>Content-Format</p>
 						<div class="flex hbox dropdown">
-							<select class="flex text-input-custom">
+							<select id="debug_option_content_format" class="flex text-input-custom">
 								<option></option>
 								<option>Example</option>
 								<option>Example</option>

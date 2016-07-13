@@ -266,3 +266,28 @@ Copper.ByteUtils.convertBytesToHexString = function(buf, offset, length){
 	}
 	return res.join("");
 };
+
+
+/**
+ * @arg val: hex number in string format
+ * @return: byte representation of val, truncate tail if more than 16 digits
+ */
+Copper.ByteUtils.convertHexStringToBytes = function(hexString) {
+	if (hexString.length < 2 || !(/^[0-9A-Fa-f]{1,64}$/.test(hexString.substring(2)))) {
+		throw new Error("Illegal Argument for HexString");
+	}
+
+	hexString = hexString.substring(0,18);
+
+	if (hexString.substring(10,17) === "") {
+		return Copper.ByteUtils.convertUintToBytes(parseInt(hexString));
+	}
+
+	let lower = hexString.substring(hexString.length-8);
+	let upper = hexString.substring(2, hexString.length-8);
+
+	let res = [];
+	res.push(Copper.ByteUtils.convertUintToBytes(parseInt('0x' + upper)));
+	res.push(Copper.ByteUtils.convertUintToBytes(parseInt('0x' + lower)));
+	return Copper.ByteUtils.mergeByteArrays(res);
+}

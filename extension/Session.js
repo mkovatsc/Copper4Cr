@@ -58,7 +58,8 @@ Copper.Session.guiAdapters = [
         Copper.PacketOptionsAdapter,
         Copper.PayloadAdapter,
         Copper.ToolbarAdapter,
-        Copper.ResourceViewAdapter
+        Copper.ResourceViewAdapter,
+        Copper.DebugOptionsAdapter
     ];
 
 // setup session

@@ -51,7 +51,7 @@ window.onload = function()
 Copper.OptionsAdapter.openWindow = function(){
 
     var w = 260;
-    var h = 300;
+    var h = 280;
     var dualScreenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
     var dualScreenTop = window.screenTop != undefined ? window.screenTop : screen.top;
 
