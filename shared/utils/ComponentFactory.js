@@ -42,7 +42,13 @@ Copper.ComponentFactory = {
     // calls the callback afterwards (function())
     resolvePortAndCoapEndpoint: function(clientId, finalDisconnectHandler, callback){
     				throw new Error("not implemented");
-    			}
+    			},
+	storeLocally: function(id, value) {
+					throw new Error("not implemented");
+				},
+	retrieveLocally: function(element, callback) {
+					throw new Error("not implemented");
+				},
 };
 
 Copper.ChromeComponentFactory = {
@@ -54,5 +60,15 @@ Copper.ChromeComponentFactory = {
     			},
     resolvePortAndCoapEndpoint: function(clientId, finalDisconnectHandler, callback){
     				return Copper.ChromeStartup.resolvePortAndCoapEndpoint(clientId, finalDisconnectHandler, callback);
-    			}
+    			},
+	storeLocally: function(id, value) {
+					var storeObject = {};
+					storeObject[id] = value;
+					chrome.storage.local.set(storeObject);
+				},
+	retrieveLocally: function(id, callback) {
+					chrome.storage.local.get(id, function(items) {
+						callback(id, items);
+					});
+				},
 };

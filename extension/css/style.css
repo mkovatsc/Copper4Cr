@@ -197,9 +197,133 @@ button
 	padding-left: 5px;
 }
 
-.main-toolbar button:not(.no-hover):hover
-{
+.main-toolbar button:not(.no-hover):hover {
 	background-color: #ddd;
+}
+
+.toolbar-item-dropdown button > p {
+    padding-left: 5px;
+}
+
+.main-toolbar .hidden {
+    visibility : hidden;
+}
+
+.toolbar-item-dropdown button:focus {
+	outline: none;
+}
+
+.toolbar-item-dropdown .focused {
+    background-color: #ddd;
+}
+
+.toolbar-item-dropdown .dropdown-content {
+	position: absolute;
+    padding: 2px;
+	background-color: #f9f9f9;
+	min-width: 160px;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    border: 1px solid rgba(0,0,0,0.2);
+    z-index: 5;
+}
+
+.toolbar-item-dropdown .dropdown-content p{
+	padding-right: 10px;
+}
+
+.toolbar-item-dropdown .separation-line
+{
+	border-bottom: 1px solid rgba(0,0,0,0.2);
+	margin: 2px 0px;
+}
+
+
+.toolbar-item-dropdown .dropdown-item {
+    cursor: pointer;
+    position: relative;
+}
+
+.toolbar-item-dropdown .dropdown-item:hover {
+    background: rgba(0, 188, 212, 0.7);
+}
+
+.toolbar-item-dropdown .dropdown-item p {
+    height: 20px;
+    padding-left: 5px;
+    padding-top: 2px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+.toolbar-item-dropdown .dropdown-item span {
+	position: absolute;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+.toolbar-item-dropdown .select-group span {
+    font-size: 170%;
+    top: -4px;
+    left: 6px;
+}
+
+.toolbar-item-dropdown .selection-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.toolbar-item-dropdown .selection-icon .selected {
+      background: rgba(0, 188, 212, 0.7);
+}
+
+.toolbar-item-dropdown .single-element span {
+	font-size: 130%;
+	top: 0px;
+	left: 3px;
+}
+
+#copper-toolbar-log {
+    margin-top: -17px;
+    margin-right: 3px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+#copper-toolbar-log p {
+	-webkit-user-select: text;
+	-moz-user-select: text;
+}
+
+#copper-toolbar-log:hover {
+    background-color: #ddd;
+}
+
+#copper-toolbar-log-event-log {
+	position: absolute;
+	width: 600px;
+	height: 69%;
+	-moz-appearance: none;
+	font-family: monospace;
+	color: lightgray;
+	background-color: black;
+	border: 1px solid white;
+	z-index: 5;
+	right: 20px;
+	padding: 4px;
+	overflow-y: auto;
+	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+	cursor: text;
+}
+
+#copper-toolbar-preferences {
+    margin-top: -3px;
+    margin-right: 3px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+#copper-toolbar-preferences:hover {
+    background-color: #ddd;
 }
 
 .main-content
@@ -378,7 +502,24 @@ button
 	margin-top: 5px;
 }
 
-.main-content .sidebar-right .checkbox p {
+.main-content .sidebar-right label
+{
+	margin-top: 10px;
+}
+
+.main-content .sidebar-right .checkbox label
+{
+	margin: 0;
+	cursor: pointer;
+	font-weight: normal;
+}
+
+.main-content .sidebar-right .checkbox input
+{
+	cursor: pointer;
+}
+
+.main-content .sidebar-right .checkbox label {
 	margin: 0;
 	padding-top: 2px;
 	display: inline-block;
@@ -392,12 +533,10 @@ button
 
 #reset_button
 {
-	border-radius: 4px;
-	border-width: 1px;
-	border-color: black;
-	background-color: #fff;
+	border: 1px solid rgba(0, 0, 0, 0.3);
+	background-color: #ddd;
 	color: black;
-	margin-left: 13px;
+	margin-left: 22px;
 	height: 23px;
 	padding: 0 17px;
 	align-items: center;
@@ -563,6 +702,7 @@ button
 #resource_tree {
     display: block;
     padding: 0 4px 0 4px;
+    overflow-x: hidden;
     overflow-y: auto;
 }
 
