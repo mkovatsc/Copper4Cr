@@ -38,6 +38,7 @@
                      "shared/coap/CoapMessageBlockOption.js",
                      "shared/coap/CoapMessageOption.js",
                      "shared/coap/CoapMessageSerializer.js",
+                     "shared/coap/CoapMessageContentFormat.js",
 
                      "shared/endpoint/ChromePort.js",
                      

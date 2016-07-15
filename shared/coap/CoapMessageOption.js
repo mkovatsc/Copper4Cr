@@ -111,7 +111,7 @@ Copper.CoapMessage.Option.prototype.addValue = function(val, opts) {
 				this.addByteValue(new ArrayBuffer(0));
 				break;
 			}
-			throw new Error("Illegal Argument");
+			throw new Error("Illegal Argument for " + this.header.name + " - Expected Empty Type");
 		case Types.TYPE_OPAQUE:
 			this.addByteValue(Copper.ByteUtils.convertToByteArray(val));
 			break;
@@ -120,21 +120,21 @@ Copper.CoapMessage.Option.prototype.addValue = function(val, opts) {
 				this.addByteValue(Copper.ByteUtils.convertUintToBytes(val));
 				break;
 			}
-			throw new Error("Illegal Argument");
+			throw new Error("Illegal Argument for " + this.header.name + " - Expected Positive Integer");
 		case Types.TYPE_STRING:
 			if (typeof(val) === "string"){
 				this.addByteValue(Copper.ByteUtils.convertStringToBytes(val, ascii, strict));
 				break;
 			}
-			throw new Error("Illegal Argument");
+			throw new Error("Illegal Argument for " + this.header.name + " - Expected String");
 		case Types.TYPE_BLOCK:
 			if (val instanceof Copper.CoapMessage.BlockOption) {
 				this.addByteValue(Copper.ByteUtils.convertUintToBytes(Copper.CoapMessage.BlockOption.convertBlockOptionToUint(val)));
 				break;
 			}
-			throw new Error("Illegal Argument");
+			throw new Error("Illegal Argument for " + this.header.name + " - Expected Block Type");
 		default:
-			throw new Error("Illegal Argument");
+			throw new Error("Illegal Argument for " + this.header.name);
 	}
 	return this;
 };
