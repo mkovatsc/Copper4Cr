@@ -48,7 +48,7 @@ Copper.ToolbarAdapter.payloadFile = undefined;
 
 Copper.ToolbarAdapter.optionsWindowOpened = false;
 
-
+Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
 
 Copper.ToolbarAdapter.onEvent = function(event){
 };
@@ -220,6 +220,7 @@ Copper.ToolbarAdapter.doDiscover = function(){
 	let coapMessage = new Copper.CoapMessage(Copper.ToolbarAdapter.requests, Copper.CoapMessage.Code.GET);
 	coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, ".well-known");
 	coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, "core");
+    Copper.ToolbarAdapter.ongoingDiscoverRequest = true;
 	Copper.Session.sendCoapMessage(coapMessage, true);
 };
 
