@@ -80,7 +80,6 @@ Copper.DebugOptionsAdapter.init = function() {
     Copper.DebugOptionsAdapter.allDebugOptionValues = {};
     Copper.DebugOptionsAdapter.initMappinghtmlIdToOptionHeader();
 
-
     Copper.DebugOptionsAdapter.addDebugControlListener();
     Copper.DebugOptionsAdapter.addClearInputListener();
     Copper.DebugOptionsAdapter.addChangeListeners();
@@ -140,7 +139,7 @@ Copper.DebugOptionsAdapter.addDebugControlListener = function() {
         Copper.DebugOptionsAdapter.storeOptionState(this.id, this.checked);
         Copper.DebugOptionsAdapter.optionsEnabled = this.checked;
     }
-}
+};
 
 // Clear text input boxes
 Copper.DebugOptionsAdapter.addClearInputListener = function() {
@@ -149,6 +148,8 @@ Copper.DebugOptionsAdapter.addClearInputListener = function() {
         let clearSign = nextInput.parentNode.lastElementChild;
         clearSign.onclick = function () {
             nextInput.value = "";
+            Copper.DebugOptionsAdapter.storeOptionState(nextInput.id, nextInput.value);
+            Copper.DebugOptionsAdapter.allDebugOptionValues[nextInput.id] = nextInput.value;
         }
     }
 };
@@ -159,6 +160,14 @@ Copper.DebugOptionsAdapter.addChangeListeners = function() {
         let nextInput = inputs[i];
         if (nextInput.type == "text") {
             nextInput.onchange = function () {
+                if (nextInput.classList.contains("str2Hex")) {
+                    if (this.value !== "") {
+                        nextInput.title = Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertStringToBytes(this.value));
+                    }
+                    else {
+                        nextInput.removeAttribute("title");
+                    }
+                }
                 Copper.DebugOptionsAdapter.storeOptionState(this.id, this.value);
                 Copper.DebugOptionsAdapter.allDebugOptionValues[this.id] = this.value;
             }
@@ -189,7 +198,14 @@ Copper.DebugOptionsAdapter.storeOptionState = function(id, value) {
 Copper.DebugOptionsAdapter.retrieveInputTextOptionState = function(id, items) {
     let stored = items[id];
     let textInput = document.getElementById(id);
-    textInput.value = (stored === undefined ? "" : stored);
+    if (stored !== undefined) {
+        textInput.value = stored;
+        if (textInput.classList.contains("hex2Str")) {
+            textInput.title = Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertStringToBytes(stored));
+        }
+    } else {
+        textInput.value = "";
+    }
     Copper.DebugOptionsAdapter.allDebugOptionValues[id] = textInput.value;
 };
 
@@ -231,7 +247,6 @@ Copper.DebugOptionsAdapter.setDefaultValues = function() {
         let nextInput = inputs[i];
         if (nextInput.type == "text") {
             nextInput.value = "";
-            console.log(nextInput.id);
             Copper.DebugOptionsAdapter.storeOptionState(nextInput.id, nextInput.value);
             Copper.DebugOptionsAdapter.allDebugOptionValues[nextInput.id] = nextInput.value;
         } else if (nextInput.type == "checkbox") {

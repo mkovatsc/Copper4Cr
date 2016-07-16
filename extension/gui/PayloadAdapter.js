@@ -69,7 +69,7 @@ Copper.PayloadAdapter.onEvent = function(event){
 
 Copper.PayloadAdapter.beforeSendingCoapMessage = function(coapMessage){
 	if (Copper.CoapMessage.Code.POST.equals(coapMessage.code) || Copper.CoapMessage.Code.PUT.equals(coapMessage.code)){
-		coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, 0);
+		//coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, 0);
 		coapMessage.setPayload(Copper.ByteUtils.convertStringToBytes(document.getElementById("copper-payload-tab-out").value));
 	} 
 };

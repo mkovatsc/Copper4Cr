@@ -64,7 +64,7 @@ Copper.CoapMessage.BlockOption.prototype.getSize = function(){
 };
 
 Copper.CoapMessage.BlockOption.prototype.toString = function(){
-	return this.num + "/" + this.getSize() + "/" + (this.more ? "1" : "0"); 
+	return this.num + "/" + (this.more ? "1" : "0") + "/" + this.getSize();
 };
 
 Copper.CoapMessage.BlockOption.prototype.equals = function(other){
