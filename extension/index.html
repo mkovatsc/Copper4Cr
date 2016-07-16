@@ -31,7 +31,8 @@
 	<script src="shared/coap/CoapMessageBlockOption.js"></script>
 	<script src="shared/coap/CoapMessageOption.js"></script>
 	<script src="shared/coap/CoapMessageSerializer.js"></script>
-	
+	<script src="shared/coap/CoapMessageContentFormat.js"></script>
+
 	<script src="shared/endpoint/ChromePort.js"></script>
 
 	<script src="gui/OverlayAdapter.js"></script>
@@ -54,10 +55,10 @@
 <div class="main-container">
 	<div class="main-toolbar hbox">
 		<div class="toolbar-item border-right">
-			<button id="copper-toolbar-ping" type="button">
+			<button id="copper-toolbar-ping" type="button" title="Ping with empty message">
 					<img src="skin/tool_ping.png"> Ping
 			</button>
-			<button id="copper-toolbar-discover" type="button">				
+			<button id="copper-toolbar-discover" type="button" title="GET link-formats from the well-known URI (cached resources are displayed in red)">
 	            <img src="skin/tool_discover.png"> Discover
 			</button>
 		</div>
@@ -75,7 +76,7 @@
 			<button id="copper-toolbar-delete" type="button">
 					<img src="skin/tool_delete.png"> DELETE
 			</button>
-			<button id="copper-toolbar-observe" type="button">
+			<button id="copper-toolbar-observe" type="button" title="Subscribe to the resource">
 					<img src="skin/tool_observe.png"> Observe
 			</button>
 		</div>
@@ -396,7 +397,7 @@
 						<div style="text-align: center;"><label>Token</label></div>
 						<div class="flex hbox">
 							<span class="flex hbox text-input-custom">
-								<input class="flex" type="text" id="debug_option_token" placeholder="use hex (0x..) or string">
+								<input class="flex str2Hex" type="text" id="debug_option_token" placeholder="use hex (0x..) or string">
 								<span class="clear_text" title="Clear">&times;</span>
 							</span>		
 						</div>
@@ -406,8 +407,6 @@
 						<div class="flex hbox dropdown">
 							<select id="debug_option_accept" class="flex text-input-custom">
 								<option></option>
-								<option>Example</option>
-								<option>Example</option>
 							</select>
 						</div>
 						
@@ -415,15 +414,13 @@
 						<div class="flex hbox dropdown">
 							<select id="debug_option_content_format" class="flex text-input-custom">
 								<option></option>
-								<option>Example</option>
-								<option>Example</option>
 							</select>
 						</div>
 						
 						<div id="sidebar_block_size" class="hbox">
 							<div class="vbox" style="flex: 3; margin-left: 0;">
 								<p>Block1 (Req.)</p>
-								<span class="hbox text-input-custom">
+								<span class="hbox text-input-custom" title="Choose block size in Behavior menu">
 									<input class="flex" type="text" id="debug_option_block1" placeholder="block no.">
 									<span class="clear_text" title="Clear">&times;</span>
 								</span>		
@@ -434,7 +431,7 @@
 							
 							<div class="vbox" style="flex: 3;">
 								<p>Block2 (Res.)</p>
-								<span class="hbox text-input-custom">
+								<span class="hbox text-input-custom" title="Choose block size in Behavior menu">
 									<input class="flex" type="text" id="debug_option_block2" placeholder="block no.">
 									<span class="clear_text" title="Clear">&times;</span>
 								</span>		
@@ -448,7 +445,7 @@
 							
 							<div class="checkbox flex vbox">
 								<label style="margin-left: auto; margin-right: auto;" >Auto
-								<input style="margin-left: 7px;" id="chk_debug_option_block_auto" type="checkbox"></label>
+								<input style="margin-left: 7px;" id="chk_debug_option_block_auto" type="checkbox" title="Automatically transmit all blocks"></label>
 							</div>
 						</div>
 						
@@ -463,7 +460,7 @@
 						<p>ETag</p>
 						<div class="flex hbox">
 							<span class="flex hbox text-input-custom">
-								<input class="flex" type="text" id="debug_option_etag" placeholder="use hex (0x..) or string">
+								<input class="flex str2Hex" type="text" id="debug_option_etag" placeholder="use hex (0x..) or string">
 								<span class="clear_text" title="Clear">&times;</span>
 							</span>		
 						</div>
@@ -471,7 +468,7 @@
 						<p>If-Match</p>
 						<div class="flex hbox">
 							<span class="flex hbox text-input-custom">
-								<input class="flex" type="text" id="debug_option_if_match" placeholder="use an Etag">
+								<input class="flex str2Hex" type="text" id="debug_option_if_match" placeholder="use an Etag">
 								<span class="clear_text" title="Clear">&times;</span>
 							</span>		
 						</div>
@@ -554,7 +551,7 @@
 							<div style="margin-left: 6px; flex: 2;">
 								<p>Value</p>
 								<span class="hbox text-input-custom">
-									<input class="flex" type="text" id="debug_option_custom_value" placeholder="use hex (0x..) or string">
+									<input class="flex str2Hex" type="text" id="debug_option_custom_value" placeholder="use hex (0x..) or string">
 									<span class="clear_text" title="Clear">&times;</span>
 								</span>		
 							</div>

@@ -1,41 +1,66 @@
 Copper.DebugOptionsAdapter = function(){
 };
 
-Copper.DebugOptionsAdapter.beforeSendingCoapMessage = function(coapMessage){
-   for (var optionId in Copper.DebugOptionsAdapter.allDebugOptionValues) {
-       if (optionId !== undefined)
-       {
-           let value = Copper.DebugOptionsAdapter.allDebugOptionValues[optionId];
-           if (value === "" || value === false) {
-               continue;
-           }
-           if (optionId === "debug_option_token") {
-               // Add token to message
-               var token;
-               if (value === 'empty' || value === '0x') {
-                   token = new ArrayBuffer(0);
-               } else if (value.substr(0, 2) === '0x') {
-                   token = Copper.ByteUtils.convertHexStringToBytes(value);
-               } else {
-                   token = Copper.ByteUtils.convertStringToBytes(value);
-               }
-               
-               coapMessage.setToken(token);
-           } else if (optionId !== "") {
-               // Add option to message
-               let optionHeader = Copper.DebugOptionsAdapter.htmlIdToOptionHeader[optionId];
-               if (optionHeader !== undefined) {
-
-                   if (value === true) {
-                       // Convert to 0 for If-None-Match
-                       value = 0;
-                   } //TODO: Elseif for accept and content format
-                   coapMessage.addOption(optionHeader, value, false); // TODO: Last elem?
-               }
-           }
-           // TODO: add one option more than once
-       }
-   } 
+Copper.DebugOptionsAdapter.beforeSendingCoapMessage = function(coapMessage) {
+    if (Copper.DebugOptionsAdapter.optionsEnabled) {
+        for (var optionId in Copper.DebugOptionsAdapter.allDebugOptionValues) {
+            if (optionId !== undefined)
+            {
+                let value = Copper.DebugOptionsAdapter.allDebugOptionValues[optionId];
+                if (value === "" || value === false) {
+                    continue;
+                }
+                switch (optionId) {
+                    case "debug_option_token":
+                        var token;
+                        if (value === 'empty' || value === '0x') {
+                            token = new ArrayBuffer(0);
+                        } else if (value.substr(0, 2) === '0x') {
+                            token = Copper.ByteUtils.convertHexStringToBytes(value);
+                        } else {
+                            token = Copper.ByteUtils.convertStringToBytes(value);
+                        }
+                        if (token.byteLength > 8) {
+                            token = token.slice(0,7);
+                        }
+                        coapMessage.setToken(token);
+                        break;
+                    case "debug_option_accept":
+                    case "debug_option_content_format":
+                        if (value === 0) {
+                            continue; // Nothing selected (empty place holder selected)
+                        }
+                        let selectionMenu = document.getElementById(optionId);
+                        let selectedContentFormatNumber = selectionMenu.options[value].dataset.number;
+                        coapMessage.addOption(Copper.DebugOptionsAdapter.htmlIdToOptionHeader[optionId], parseInt(selectedContentFormatNumber), true);
+                        break;
+                    case "debug_option_block1":
+                    case "debug_option_block2":
+                        let payload = Math.log2(Copper.ToolbarAdapter.blockSize);
+                        coapMessage.addOption(Copper.DebugOptionsAdapter.htmlIdToOptionHeader[optionId], new Copper.CoapMessage.BlockOption(parseInt(value), payload, false), true);
+                        break;
+                    case "debug_option_if_none_match":
+                        coapMessage.addOption(Copper.DebugOptionsAdapter.htmlIdToOptionHeader[optionId], 0, true);
+                        break;
+                    //TODO:
+                    case "chk_debug_option_block_auto":
+                    case "debug_option_proxy_scheme":
+                        break;
+                    // All options that require an integer as argument
+                    case "debug_option_observe":
+                    case "debug_option_uri_port":
+                    case "debug_option_max_age":
+                    case "debug_option_size1":
+                    case "debug_option_size2":
+                        coapMessage.addOption(Copper.DebugOptionsAdapter.htmlIdToOptionHeader[optionId], parseInt(value), true);
+                        break;
+                    default:
+                        coapMessage.addOption(Copper.DebugOptionsAdapter.htmlIdToOptionHeader[optionId], value, true);
+                        break;
+                }
+            }
+        }
+    }
 };
 
 var inputs;
@@ -43,21 +68,48 @@ var selectMenus;
 
 Copper.DebugOptionsAdapter.allDebugOptionValues = undefined;
 Copper.DebugOptionsAdapter.htmlIdToOptionHeader = undefined;
+Copper.DebugOptionsAdapter.optionsEnabled = false;
 
 Copper.DebugOptionsAdapter.init = function() {
     let sidebar = document.getElementById("sidebar-debug-options");
     inputs = sidebar.getElementsByTagName("INPUT");
     selectMenus = sidebar.getElementsByTagName("SELECT");
 
+    Copper.DebugOptionsAdapter.initContentFormat();
+
     Copper.DebugOptionsAdapter.allDebugOptionValues = {};
     Copper.DebugOptionsAdapter.initMappinghtmlIdToOptionHeader();
 
+    Copper.DebugOptionsAdapter.addDebugControlListener();
     Copper.DebugOptionsAdapter.addClearInputListener();
     Copper.DebugOptionsAdapter.addChangeListeners();
 
     Copper.DebugOptionsAdapter.addResetListener();
     Copper.DebugOptionsAdapter.loadOldOptionSettingsOrDefault();
 };
+
+Copper.DebugOptionsAdapter.initContentFormat = function() {
+    let acceptMenu = document.getElementById("debug_option_accept");
+    let contentFormatMenu = document.getElementById("debug_option_content_format");
+
+    for (let i = 0; i < Copper.CoapMessage.ContentFormat.Registry.length; i++) {
+        let format = Copper.CoapMessage.ContentFormat.Registry[i];
+        if (format.number > 100) {
+            break;
+        }
+        let option = document.createElement("option");
+        option.text = format.name;
+        option.dataset.number = format.number;
+        acceptMenu.add(option);
+
+        option = document.createElement("option");
+        option.text = format.name;
+        option.dataset.number = format.number;
+
+        contentFormatMenu.add(option);
+
+    }
+}
 
 Copper.DebugOptionsAdapter.initMappinghtmlIdToOptionHeader = function() {
     var options = {};
@@ -81,6 +133,14 @@ Copper.DebugOptionsAdapter.initMappinghtmlIdToOptionHeader = function() {
     Copper.DebugOptionsAdapter.htmlIdToOptionHeader = options;
 };
 
+Copper.DebugOptionsAdapter.addDebugControlListener = function() {
+    let debugControl = document.getElementById('chk_debug_options');
+    debugControl.onchange = function () {
+        Copper.DebugOptionsAdapter.storeOptionState(this.id, this.checked);
+        Copper.DebugOptionsAdapter.optionsEnabled = this.checked;
+    }
+};
+
 // Clear text input boxes
 Copper.DebugOptionsAdapter.addClearInputListener = function() {
     for (let i = 0; i < inputs.length; i++) {
@@ -88,6 +148,8 @@ Copper.DebugOptionsAdapter.addClearInputListener = function() {
         let clearSign = nextInput.parentNode.lastElementChild;
         clearSign.onclick = function () {
             nextInput.value = "";
+            Copper.DebugOptionsAdapter.storeOptionState(nextInput.id, nextInput.value);
+            Copper.DebugOptionsAdapter.allDebugOptionValues[nextInput.id] = nextInput.value;
         }
     }
 };
@@ -98,6 +160,14 @@ Copper.DebugOptionsAdapter.addChangeListeners = function() {
         let nextInput = inputs[i];
         if (nextInput.type == "text") {
             nextInput.onchange = function () {
+                if (nextInput.classList.contains("str2Hex")) {
+                    if (this.value !== "") {
+                        nextInput.title = Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertStringToBytes(this.value));
+                    }
+                    else {
+                        nextInput.removeAttribute("title");
+                    }
+                }
                 Copper.DebugOptionsAdapter.storeOptionState(this.id, this.value);
                 Copper.DebugOptionsAdapter.allDebugOptionValues[this.id] = this.value;
             }
@@ -128,9 +198,16 @@ Copper.DebugOptionsAdapter.storeOptionState = function(id, value) {
 Copper.DebugOptionsAdapter.retrieveInputTextOptionState = function(id, items) {
     let stored = items[id];
     let textInput = document.getElementById(id);
-    textInput.value = (stored === undefined ? "" : stored);
+    if (stored !== undefined) {
+        textInput.value = stored;
+        if (textInput.classList.contains("hex2Str")) {
+            textInput.title = Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertStringToBytes(stored));
+        }
+    } else {
+        textInput.value = "";
+    }
     Copper.DebugOptionsAdapter.allDebugOptionValues[id] = textInput.value;
-}
+};
 
 
 Copper.DebugOptionsAdapter.retrieveInputCheckboxOptionState = function(id, items) {
@@ -142,20 +219,26 @@ Copper.DebugOptionsAdapter.retrieveInputCheckboxOptionState = function(id, items
         checkboxInput.checked = (stored === undefined ? false : stored);
     }
     Copper.DebugOptionsAdapter.allDebugOptionValues[id] = checkboxInput.checked;
-}
+};
 
 Copper.DebugOptionsAdapter.retrieveSelectionMenuOptionState = function(id, items) {
     let stored = items[id];
     let selectionMenu = document.getElementById(id);
     selectionMenu.selectedIndex = (stored === undefined ? 0 : stored);
     Copper.DebugOptionsAdapter.allDebugOptionValues[id] = selectionMenu.selectedIndex;
+};
+
+Copper.DebugOptionsAdapter.retrieveDebugOptionsState = function(id, items) {
+    let stored = items[id];
+    let debugOptions = document.getElementById(id);
+    debugOptions.checked = (stored === undefined ? false : stored);
+    Copper.DebugOptionsAdapter.optionsEnabled = debugOptions.checked;
 }
 
 
 Copper.DebugOptionsAdapter.addResetListener = function() {
     let resetButton = document.getElementById("reset_button");
     resetButton.onclick = Copper.DebugOptionsAdapter.setDefaultValues;
-
 };
 
 
@@ -165,6 +248,7 @@ Copper.DebugOptionsAdapter.setDefaultValues = function() {
         if (nextInput.type == "text") {
             nextInput.value = "";
             Copper.DebugOptionsAdapter.storeOptionState(nextInput.id, nextInput.value);
+            Copper.DebugOptionsAdapter.allDebugOptionValues[nextInput.id] = nextInput.value;
         } else if (nextInput.type == "checkbox") {
             if (nextInput.id == "chk_debug_option_block_auto") {
                 nextInput.checked = true;
@@ -172,6 +256,7 @@ Copper.DebugOptionsAdapter.setDefaultValues = function() {
                 nextInput.checked = false;
             }
             Copper.DebugOptionsAdapter.storeOptionState(nextInput.id, nextInput.checked);
+            Copper.DebugOptionsAdapter.allDebugOptionValues[nextInput.id] = nextInput.checked;
         }
     }
 
@@ -179,10 +264,15 @@ Copper.DebugOptionsAdapter.setDefaultValues = function() {
         let nextSelectMenu = selectMenus[i];
         nextSelectMenu.selectedIndex = 0;
         Copper.DebugOptionsAdapter.storeOptionState(nextSelectMenu.id, nextSelectMenu.selectedIndex);
+        Copper.DebugOptionsAdapter.allDebugOptionValues[nextSelectMenu.id] = nextSelectMenu.selectedIndex;
     }
 };
 
 Copper.DebugOptionsAdapter.loadOldOptionSettingsOrDefault = function() {
+
+    let debugControl = document.getElementById('chk_debug_options');
+    Copper.ComponentFactory.retrieveLocally(debugControl.id, Copper.DebugOptionsAdapter.retrieveDebugOptionsState);
+
     for (let i = 0; i < inputs.length; i++) {
         let nextInput = inputs[i];
         if (nextInput.type == "text") {

@@ -53,7 +53,7 @@ Copper.ToolbarAdapter.optionsWindowOpened = false;
 Copper.ToolbarAdapter.onEvent = function(event){
 };
 
-Copper.ToolbarAdapter.beforeSendingCoapMessage = function(coapMessage){
+Copper.ToolbarAdapter.beforeSendingCoapMessage = function(coapMessage) {
 };
 
 Copper.ToolbarAdapter.init = function(){
@@ -212,39 +212,39 @@ Copper.ToolbarAdapter.loadDefault = function(id) {
 };
 
 Copper.ToolbarAdapter.doPing = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.EMPTY);
+	let coapMessage = new Copper.CoapMessage(Copper.ToolbarAdapter.requests, Copper.CoapMessage.Code.EMPTY);
 	Copper.Session.sendCoapMessage(coapMessage, true);
 };
 
 Copper.ToolbarAdapter.doDiscover = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.GET);
+	let coapMessage = new Copper.CoapMessage(Copper.ToolbarAdapter.requests, Copper.CoapMessage.Code.GET);
 	coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, ".well-known");
 	coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, "core");
 	Copper.Session.sendCoapMessage(coapMessage, true);
 };
 
 Copper.ToolbarAdapter.doGet = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.GET);
+	let coapMessage = new Copper.CoapMessage(Copper.ToolbarAdapter.requests, Copper.CoapMessage.Code.GET);
 	Copper.Session.sendCoapMessage(coapMessage);
 };
 
 Copper.ToolbarAdapter.doPost = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.POST);
+	let coapMessage = new Copper.CoapMessage(Copper.ToolbarAdapter.requests, Copper.CoapMessage.Code.POST);
 	Copper.Session.sendCoapMessage(coapMessage);
 };
 
 Copper.ToolbarAdapter.doPut = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.PUT);
+	let coapMessage = new Copper.CoapMessage(Copper.ToolbarAdapter.requests, Copper.CoapMessage.Code.PUT);
 	Copper.Session.sendCoapMessage(coapMessage);
 };
 
 Copper.ToolbarAdapter.doDelete = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.DELETE);
+	let coapMessage = new Copper.CoapMessage(Copper.ToolbarAdapter.requests, Copper.CoapMessage.Code.DELETE);
 	Copper.Session.sendCoapMessage(coapMessage);
 };
 
 Copper.ToolbarAdapter.doObserve = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.GET);
+	let coapMessage = new Copper.CoapMessage(Copper.ToolbarAdapter.requests, Copper.CoapMessage.Code.GET);
 	coapMessage.addOption(Copper.CoapMessage.OptionHeader.OBSERVE, 0);
 	Copper.Session.sendCoapMessage(coapMessage);
 };
@@ -315,13 +315,13 @@ Copper.ToolbarAdapter.payloadModeFile = function() {
 };
 
 Copper.ToolbarAdapter.behaviorRequestCon = function() {
-    Copper.ToolbarAdapter.requests = "con";
+    Copper.ToolbarAdapter.requests = Copper.CoapMessage.Type.CON;
     Copper.ToolbarAdapter.radioElement(this.id);
     Copper.ComponentFactory.storeLocally("radio-request", this.id);
 };
 
 Copper.ToolbarAdapter.behaviorRequestNon = function() {
-    Copper.ToolbarAdapter.requests = "non";
+    Copper.ToolbarAdapter.requests = Copper.CoapMessage.Type.NON;
     Copper.ToolbarAdapter.radioElement(this.id);
     Copper.ComponentFactory.storeLocally("radio-request", this.id);
 };
