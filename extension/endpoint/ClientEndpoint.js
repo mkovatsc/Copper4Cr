@@ -49,3 +49,11 @@ Copper.ClientEndpoint.prototype.sendCoapMessage = function(coapMessage){
 	this.port.sendMessage(Copper.Event.createClientSendCoapMessageEvent(coapMessage, this.id));
 	return true;
 };
+
+Copper.ClientEndpoint.prototype.updateSettings = function(newSettings) {
+	if (!(newSettings instanceof Copper.Settings)){
+		throw new Error("Illegal Argument");
+	}
+	this.port.sendMessage(Copper.Event.createUpdateSettingsEvent(newSettings, this.id));
+	return true;
+};
