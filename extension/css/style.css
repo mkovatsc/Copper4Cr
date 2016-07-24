@@ -55,6 +55,11 @@ button
 	background-color: white;
 }
 
+.red
+{
+	background-color: red;
+}
+
 .border_solid
 {
 	border: 1px black solid;

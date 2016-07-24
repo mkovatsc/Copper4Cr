@@ -118,14 +118,19 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 				this.port.sendMessage(event);
 				return true;
 			
+
+			case Copper.Event.TYPE_CANCEL_REQUESTS:
+				return this.onCancelRequests();
+   			
 			case Copper.Event.TYPE_REQUEST_COMPLETED:
+			case Copper.Event.TYPE_OBSERVE_REQUEST_FRESH:
+            case Copper.Event.TYPE_OBSERVE_REQUEST_OUT_OF_ORDER:
 			case Copper.Event.TYPE_REQUEST_RECEIVE_ERROR:
 			case Copper.Event.TYPE_REQUEST_TIMEOUT:
-			case Copper.Event.TYPE_CANCEL_REQUESTS:
 			case Copper.Event.TYPE_REQUEST_CANCELED:
 				this.port.sendMessage(event);
 				return true;
-							
+
 			default:
 				Copper.Log.logWarning("Unknown event type " + event.type);
 				return false;
@@ -192,14 +197,20 @@ Copper.ServerEndpoint.prototype.onUpdateSettings = function(settings){
 	return true;
 };
 
+Copper.ServerEndpoint.prototype.onCancelRequests = function(){
+	if (this.currentRequest !== undefined){
+		this.currentRequest.cancel();
+		this.currentRequest = undefined;
+	}
+	return true;
+};
+
 Copper.ServerEndpoint.prototype.onClientSendCoapMessage = function(coapMessage){
 	if (this.state !== Copper.ServerEndpoint.STATE_UDP_SOCKET_READY){
 		this.onError(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false);
 	}
 	else {
-		if (this.currentRequest !== undefined){
-			this.currentRequest.cancel();
-		}
+		this.onCancelRequests();
 		this.currentRequest = new Copper.SingleRequestHandler(coapMessage, this.transmissionHandler, this.transmissionHandler.settings, this.id);
 		this.currentRequest.start();
 	}

@@ -51,6 +51,25 @@ Copper.ToolbarAdapter.optionsWindowOpened = false;
 
 
 Copper.ToolbarAdapter.onEvent = function(event){
+    switch(event.type){
+        case Copper.Event.TYPE_COAP_MESSAGE_SENT:
+            let observeOption = event.data.coapMessage.getOption(Copper.CoapMessage.OptionHeader.OBSERVE);
+            if (observeOption.length > 0 && observeOption[0] === 0){
+                let rootElement = document.getElementById("copper-toolbar-observe");
+                if (rootElement.firstChild.src.endsWith("skin/tool_observe.png")) {
+                    rootElement.firstChild.src = "skin/tool_unobserve.png";
+                    rootElement.lastChild.textContent = "Cancel";
+                }
+            }
+            break;
+        case Copper.Event.TYPE_REQUEST_CANCELED:
+            let rootElement = document.getElementById("copper-toolbar-observe");
+            if (rootElement.firstChild.src.endsWith("skin/tool_unobserve.png")) {
+                rootElement.firstChild.src = "skin/tool_observe.png";
+                rootElement.lastChild.textContent = "Observe";
+            }
+            break;
+    }
 };
 
 Copper.ToolbarAdapter.beforeSendingCoapMessage = function(coapMessage) {
@@ -244,9 +263,17 @@ Copper.ToolbarAdapter.doDelete = function(){
 };
 
 Copper.ToolbarAdapter.doObserve = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.ToolbarAdapter.requests, Copper.CoapMessage.Code.GET);
-	coapMessage.addOption(Copper.CoapMessage.OptionHeader.OBSERVE, 0);
-	Copper.Session.sendCoapMessage(coapMessage);
+    let rootElement = document.getElementById("copper-toolbar-observe");
+    if (rootElement.firstChild.src.endsWith("skin/tool_unobserve.png")) {
+        // stop observing
+        Copper.Session.clientEndpoint.cancelRequests();
+    }
+    else {
+        // start observing
+        let coapMessage = new Copper.CoapMessage(Copper.ToolbarAdapter.requests, Copper.CoapMessage.Code.GET);
+        coapMessage.addOption(Copper.CoapMessage.OptionHeader.OBSERVE, 0);
+        Copper.Session.sendCoapMessage(coapMessage);
+    }
 };
 
 Copper.ToolbarAdapter.openDropdown = function(){

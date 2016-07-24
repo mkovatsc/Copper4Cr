@@ -49,3 +49,8 @@ Copper.ClientEndpoint.prototype.sendCoapMessage = function(coapMessage){
 	this.port.sendMessage(Copper.Event.createClientSendCoapMessageEvent(coapMessage, this.id));
 	return true;
 };
+
+Copper.ClientEndpoint.prototype.cancelRequests = function() {
+	this.port.sendMessage(Copper.Event.createCancelRequestEvent(this.id));
+	return true;
+};
