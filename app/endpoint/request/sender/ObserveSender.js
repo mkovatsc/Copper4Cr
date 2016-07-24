@@ -28,13 +28,6 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
-/*
-	TODO:
-		* Requests in case of missing replies (max-age + 5-15s) (see RFC, 3.3.1)
-		* Reordering (out of order detection) (see RFC)
-		* Cancellation (lazy, GET, RST)
-*/
 
 Copper.ObserveSender = function(coapMessage, requestHandler, onComplete){
 	if (!(coapMessage instanceof Copper.CoapMessage) || !(requestHandler instanceof Copper.SingleRequestHandler) || typeof(onComplete) !== "function"){
@@ -44,34 +37,69 @@ Copper.ObserveSender = function(coapMessage, requestHandler, onComplete){
 	this.coapMessage = coapMessage;
 	this.requestHandler = requestHandler;
 	this.onComplete = onComplete;
-	this.sender = new Copper.BlockwiseSender(this.coapMessage, requestHandler, function(){ thisRef.onComplete(); });
 };
 
 Copper.ObserveSender.prototype.coapMessage = undefined;
 Copper.ObserveSender.prototype.requestHandler = undefined;
 Copper.ObserveSender.prototype.requestStart = undefined;
+Copper.ObserveSender.prototype.lastTimestamp = undefined;
+Copper.ObserveSender.prototype.lastSeqNumber = undefined;
+Copper.ObserveSender.prototype.onComplete = undefined;
 
 Copper.ObserveSender.prototype.start = function(){
-	this.sender.start();
+	this.requestHandler.sendCoapMessage(this.coapMessage.clone());
 };
 
 Copper.ObserveSender.prototype.onReceiveComplete = function(sentCoapMessage, receivedCoapMessage){
 	let observeOption = receivedCoapMessage.getOption(Copper.CoapMessage.OptionHeader.OBSERVE);
 	if (observeOption.length === 0){
 		// no more observing --> stop it
+		Copper.Event.sendEvent(Copper.Event.createObserveRequestFreshEvent(sentCoapMessage, receivedCoapMessage, this.lastTimestamp, this.lastSeqNumber, this.requestHandler.endpointId));
+		Copper.Event.sendEvent(Copper.Event.createRequestCompletedEvent(sentCoapMessage, receivedCoapMessage, Copper.TimeUtils.now() - this.requestStart, this.requestHandler.endpointId));
 		this.onComplete();
 	}
-	Copper.Event.sendEvent(Copper.Event.createRequestCompletedEvent(sentCoapMessage, receivedCoapMessage, Copper.TimeUtils.now() - this.requestStart, this.requestHandler.endpointId));
+	else if (this.lastTimestamp !== undefined && this.lastSeqNumber !== undefined && this.lastTimestamp + 128000 < Copper.TimeUtils.now()
+	        && ((this.lastSeqNumber < observeOption[0] && observeOption[0] - this.lastSeqNumber > 1<<23)
+	        || (observeOption[0] < this.lastSeqNumber && this.lastSeqNumber - observeOption[0] < 1<<23))){
+		Copper.Event.sendEvent(Copper.Event.createObserveRequestOutOfOrderEvent(sentCoapMessage, receivedCoapMessage, this.lastTimestamp, this.lastSeqNumber, this.requestHandler.endpointId));
+	}
+	else {
+		Copper.Event.sendEvent(Copper.Event.createObserveRequestFreshEvent(sentCoapMessage, receivedCoapMessage, this.lastTimestamp, this.lastSeqNumber, this.requestHandler.endpointId));
+		this.lastTimestamp = Copper.TimeUtils.now();
+		this.lastSeqNumber = observeOption[0];
+	}
 };
 
 Copper.ObserveSender.prototype.onReceiveError = function(errorMessage){
-	this.sender.onReceiveError();
+	Copper.Event.sendEvent(Copper.Event.createRequestReceiveErrorEvent(this.coapMessage, this.requestHandler.endpointId));
+	this.onComplete();
 };
 
 Copper.ObserveSender.prototype.onTimeout = function(){
-	this.sender.onTimeout();
+	this.requestHandler.cancelReceiver();
+	Copper.Event.sendEvent(Copper.Event.createRequestTimeoutEvent(this.coapMessage, this.requestHandler.endpointId));
+	this.onComplete();
 };
 
 Copper.ObserveSender.prototype.cancel = function(){
-	this.sender.cancel();
+	Copper.Event.sendEvent(Copper.Event.createRequestCanceledEvent(this.coapMessage, this.requestHandler.endpointId));
+	if (this.requestHandler.settings.observeCancellation === 'get'){
+		let cancelCoapMessage = this.coapMessage.clone();
+		cancelCoapMessage.removeOption(Copper.CoapMessage.OptionHeader.ETAG);
+		cancelCoapMessage.addOption(Copper.CoapMessage.OptionHeader.OBSERVE, 1, true);
+		this.requestHandler.sendCoapMessage(cancelCoapMessage);
+	}
+	else if (this.requestHandler.settings.observeCancellation === 'rst'){
+		let thisRef = this;
+		this.requestHandler.registerReceiveCallback(function(sentCoapMessage, receivedCoapMessage, responseTransmission){
+			thisRef.requestHandler.unregisterReceiveCallback();
+			responseTransmission.addResponse(Copper.CoapMessage.reset(receivedCoapMessage.mid, receivedCoapMessage.token));
+			thisRef.onComplete();
+		});
+	}
+	else {
+		// lazy --> handle next message as unknown
+		this.requestHandler.cancelReceiver();
+		this.onComplete();
+	}
 };

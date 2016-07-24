@@ -32,6 +32,8 @@
 Copper.PacketOptionsAdapter = function(){
 };
 
+Copper.PacketOptionsAdapter.maxAgeTimer = undefined;
+
 Copper.PacketOptionsAdapter.onEvent = function(event){
 	switch(event.type){
 		case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
@@ -40,16 +42,21 @@ Copper.PacketOptionsAdapter.onEvent = function(event){
 };
 
 Copper.PacketOptionsAdapter.updatePacketOptions = function(coapMessage){
+	Copper.TimeUtils.clearTimeout(Copper.PacketOptionsAdapter.maxAgeTimer);
+	Copper.PacketOptionsAdapter.maxAgeTimer = undefined;
+
 	let rootElement = document.getElementById("copper-packet-options-table");
 
 	while (rootElement.firstChild) {
 	    rootElement.removeChild(rootElement.firstChild);
 	}
+
 	let options = coapMessage.getOptions();
 	for (let i=0; i<options.length; i++){
 		let optionHeader = options[i].header;
 		let value = options[i].getValue();
 		let rawValue = options[i].val;
+
 		for (let j=0; j<value.length; j++){
 			let optionRowElement = document.createElement("div");
 			optionRowElement.classList.add("table-body-row");
@@ -70,6 +77,12 @@ Copper.PacketOptionsAdapter.updatePacketOptions = function(coapMessage){
 			optionRowElement.appendChild(rawElement);
 			
 			rootElement.appendChild(optionRowElement);
+		}
+		if (Copper.CoapMessage.OptionHeader.MAX_AGE.equals(optionHeader)){
+			let maxAgeRow = rootElement.lastChild;
+			Copper.PacketOptionsAdapter.maxAgeTimer = Copper.TimeUtils.setTimeout(function(){
+				maxAgeRow.classList.add("red");
+			}, value[value.length - 1]*1000);
 		}
 	}
 };

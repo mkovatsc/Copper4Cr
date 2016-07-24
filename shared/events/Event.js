@@ -81,24 +81,26 @@ Copper.Event.sendEvent = function(event) {
 };
 
 Copper.Event.dispatchEvents = function(){
-	if (!Copper.Event.isDispatching){
+	if (!Copper.Event.isDispatching) {
 		Copper.Event.isDispatching = true;
 		try{
-			let oldQueue = Copper.Event.queue;
-			Copper.Event.queue = [];
-			for (let i = 0; i < oldQueue.length; i++){
-				let processed = false;
-				for (let j = 0; j < this.callbacks.length; j++){
-					if (this.callbacks[j].endpointId === oldQueue[i].endpointId){
-						try {
-							processed = this.callbacks[j].callback(oldQueue[i]) || processed;
-						} catch (exception){
-							Copper.Log.logError("Error when dispatching event " + oldQueue[i].type + ":" + exception.stack);
+			while (Copper.Event.queue.length > 0) {
+				let oldQueue = Copper.Event.queue;
+				Copper.Event.queue = [];
+				for (let i = 0; i < oldQueue.length; i++){
+					let processed = false;
+					for (let j = 0; j < this.callbacks.length; j++){
+						if (this.callbacks[j].endpointId === oldQueue[i].endpointId){
+							try {
+								processed = this.callbacks[j].callback(oldQueue[i]) || processed;
+							} catch (exception){
+								Copper.Log.logError("Error when dispatching event " + oldQueue[i].type + ":" + exception.stack);
+							}
 						}
 					}
-				}
-				if (!processed){
-					Copper.Log.logWarning("Unprocessed event for endpointId " + oldQueue[i].endpointId + ": " + oldQueue[i].type);
+					if (!processed){
+						Copper.Log.logWarning("Unprocessed event for endpointId " + oldQueue[i].endpointId + ": " + oldQueue[i].type);
+					}
 				}
 			}
 		} finally {
@@ -132,10 +134,12 @@ Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED = 42;
 Copper.Event.TYPE_RECEIVED_PARSE_ERROR = 43;
 
 Copper.Event.TYPE_REQUEST_COMPLETED = 50;
-Copper.Event.TYPE_REQUEST_RECEIVE_ERROR = 51;
-Copper.Event.TYPE_REQUEST_TIMEOUT = 52;
-Copper.Event.TYPE_CANCEL_REQUESTS = 53;
-Copper.Event.TYPE_REQUEST_CANCELED = 54;
+Copper.Event.TYPE_OBSERVE_REQUEST_FRESH = 51;
+Copper.Event.TYPE_OBSERVE_REQUEST_OUT_OF_ORDER = 52;
+Copper.Event.TYPE_REQUEST_RECEIVE_ERROR = 53;
+Copper.Event.TYPE_REQUEST_TIMEOUT = 54;
+Copper.Event.TYPE_CANCEL_REQUESTS = 55;
+Copper.Event.TYPE_REQUEST_CANCELED = 56;
 
 
 Copper.Event.createEvent = function(type, data, endpointId){
@@ -283,6 +287,26 @@ Copper.Event.createRequestCompletedEvent = function(requestCoapMessage, response
 		requestDuration: requestDuration
 	};
 	return Copper.Event.createEvent(Copper.Event.TYPE_REQUEST_COMPLETED, data, endpointId);
+};
+
+Copper.Event.createObserveRequestFreshEvent = function(requestCoapMessage, freshCoapMessage, lastMessageTimestamp, lastMessageSeqNumber, endpointId){
+	let data = {
+		requestCoapMessage: requestCoapMessage,
+		freshCoapMessage: freshCoapMessage,
+		lastMessageTimestamp: lastMessageTimestamp,
+		lastMessageSeqNumber: lastMessageSeqNumber
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_OBSERVE_REQUEST_FRESH, data, endpointId);
+};
+
+Copper.Event.createObserveRequestOutOfOrderEvent = function(requestCoapMessage, outOfOrderCoapMessage, lastMessageTimestamp, lastMessageSeqNumber, endpointId){
+	let data = {
+		requestCoapMessage: requestCoapMessage,
+		outOfOrderCoapMessage: outOfOrderCoapMessage,
+		lastMessageTimestamp: lastMessageTimestamp,
+		lastMessageSeqNumber: lastMessageSeqNumber
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_OBSERVE_REQUEST_OUT_OF_ORDER, data, endpointId);
 };
 
 Copper.Event.createRequestReceiveErrorEvent = function(requestCoapMessage, endpointId){
