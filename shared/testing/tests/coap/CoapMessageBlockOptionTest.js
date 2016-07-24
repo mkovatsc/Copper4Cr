@@ -31,7 +31,7 @@
  
 QUnit.test("CoapMessageBlockOption: Object", function(assert) {
 	let blockOption1 = new Copper.CoapMessage.BlockOption(10, 4, 1);
-	assert.deepEqual(blockOption1.toString(), "10/16/1");
+	assert.deepEqual(blockOption1.toString(), "10/1/16");
 
 	assert.throws(function(){
 		new Copper.CoapMessage.BlockOption(10, 3, 1);

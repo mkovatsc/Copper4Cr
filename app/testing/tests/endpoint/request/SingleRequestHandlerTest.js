@@ -159,7 +159,7 @@ QUnit.test("SingleRequestHandler: Get Using Observe Accepted", function(assert) 
 	let settings = new Copper.Settings();
 	let beforeClose = [
 		function(requestHandler, lastEvent){
-			assert.deepEqual(lastEvent.type, Copper.Event.TYPE_REQUEST_COMPLETED);
+			assert.deepEqual(lastEvent.type, Copper.Event.TYPE_OBSERVE_REQUEST_FRESH);
 			requestHandler.handleResponse(firstRequest, new Copper.CoapMessage(Copper.CoapMessage.Type.ACK, Copper.CoapMessage.Code.CONTENT).setPayload(new ArrayBuffer(3)));
 		}];
 	let lastEvent = Copper.SingleRequestHandlerTest.runTest(assert, firstRequest, responses, settings, beforeClose);
@@ -173,7 +173,7 @@ QUnit.test("SingleRequestHandler: Get Using Observe Canceled", function(assert) 
 	let settings = new Copper.Settings();
 	let beforeClose = [
 		function(requestHandler, lastEvent){
-			assert.deepEqual(lastEvent.type, Copper.Event.TYPE_REQUEST_COMPLETED);
+			assert.deepEqual(lastEvent.type, Copper.Event.TYPE_OBSERVE_REQUEST_FRESH);
 			requestHandler.cancel();
 		}];
 	let lastEvent = Copper.SingleRequestHandlerTest.runTest(assert, firstRequest, responses, settings, beforeClose);
