@@ -44,7 +44,6 @@ Copper.DebugOptionsAdapter.beforeSendingCoapMessage = function(coapMessage) {
                         break;
                     //TODO:
                     case "chk_debug_option_block_auto":
-                    case "debug_option_proxy_scheme":
                         break;
                     // All options that require an integer as argument
                     case "debug_option_observe":
@@ -54,10 +53,51 @@ Copper.DebugOptionsAdapter.beforeSendingCoapMessage = function(coapMessage) {
                     case "debug_option_size2":
                         coapMessage.addOption(Copper.DebugOptionsAdapter.htmlIdToOptionHeader[optionId], parseInt(value), true);
                         break;
+                    // Proxy-Options are handeled below
+                    case "debug_option_proxy_scheme":
+                    case "debug_option_proxy_uri":
+                        break;
+
                     default:
                         coapMessage.addOption(Copper.DebugOptionsAdapter.htmlIdToOptionHeader[optionId], value, true);
                         break;
                 }
+            }
+        }
+        // special handling for proxy options
+        let proxyUri = Copper.DebugOptionsAdapter.allDebugOptionValues["debug_option_proxy_uri"];
+        if (proxyUri !== ""){
+            // Proxy takes precedence over URI-Options (which MUST NOT be present)
+            coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_HOST);
+            coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_PORT);
+            coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_PATH);
+            coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_QUERY);
+            let useProxyScheme = Copper.DebugOptionsAdapter.allDebugOptionValues["debug_option_proxy_scheme"];
+            if (useProxyScheme) {
+                let uri = Copper.StringUtils.parseUri(proxyUri);
+                if (uri === undefined){
+                    throw new Error("Proxy URI is not a valid URI");
+                }
+                else {
+                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_SCHEME, uri.protocol ? uri.protocol : "coap", true);
+                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_HOST, uri.address);
+                    if (uri.port !== undefined) coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PORT, uri.port);
+                    if (uri.path !== undefined){
+                        let pathParts = uri.path.split("/");
+                        for (let i=0; i<pathParts.length; i++){
+                            coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, pathParts[i]);
+                        }
+                    }
+                    if (uri.query !== undefined){
+                        let queryParts = uri.query.split("&");
+                        for (let i=0; i<queryParts.length; i++){
+                            coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_QUERY, queryParts[i]);
+                        }
+                    }
+                }
+            }
+            else {
+                coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_URI, proxyUri, true);
             }
         }
     }

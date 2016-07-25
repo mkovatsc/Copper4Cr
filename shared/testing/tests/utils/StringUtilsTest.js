@@ -61,8 +61,8 @@ QUnit.test("StringUtils: getDateTimeTest", function(assert) {
 QUnit.test("StringUtils: parseUri", function(assert){
 	assert.deepEqual(Copper.StringUtils.parseUri("vs0.inf.ethz.ch"), {address: "vs0.inf.ethz.ch"});
 	assert.deepEqual(Copper.StringUtils.parseUri("www.vs0.inf.ethz.ch.ch:230/hello"), {address: "www.vs0.inf.ethz.ch.ch", path: "hello", port: 230});
-	assert.deepEqual(Copper.StringUtils.parseUri("coap://vs0.inf.ethz.ch:230/hello"), {address: "vs0.inf.ethz.ch", path: "hello", port: 230});
+	assert.deepEqual(Copper.StringUtils.parseUri("coap://vs0.inf.ethz.ch:230/hello"), {protocol: "coap", address: "vs0.inf.ethz.ch", path: "hello", port: 230});
 	assert.deepEqual(Copper.StringUtils.parseUri("vs0.inf.ethz.ch?param=test&p2=1"), {address: "vs0.inf.ethz.ch", query: "param=test&p2=1"});
 	assert.deepEqual(Copper.StringUtils.parseUri("coap://vs0.inf.ethz.ch:230/hello?param=test&p2=1"), 
-		{address: "vs0.inf.ethz.ch", port: 230, path: "hello", query: "param=test&p2=1"});
+		{protocol: "coap", address: "vs0.inf.ethz.ch", port: 230, path: "hello", query: "param=test&p2=1"});
 });

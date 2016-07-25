@@ -51,6 +51,7 @@ Copper.SingleRequestHandler.prototype.settings = undefined;
 Copper.SingleRequestHandler.prototype.endpointId = undefined;
 
 Copper.SingleRequestHandler.prototype.sender = undefined;
+Copper.SingleRequestHandler.prototype.receiveCallback = undefined;
 Copper.SingleRequestHandler.prototype.receiver = undefined;
 
 
@@ -96,21 +97,37 @@ Copper.SingleRequestHandler.prototype.handleResponse = function(sentCoapMessage,
 		    (responseTransmission !== undefined && !(responseTransmission instanceof Copper.ResponseMessageTransmission))) {
 		throw new Error("Illegal Argument");
 	}
-	if (this.receiver === undefined){
-		let block2Option = receivedCoapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2);
-		let isBlockwiseReceiver = this.settings.blockwiseEnabled && block2Option.length === 1;
-		if (isBlockwiseReceiver){
-			this.receiver = new Copper.BlockwiseReceiver(this, sentCoapMessage.clone(), receivedCoapMessage.clone());
-		}
-		else {
-			this.receiver = new Copper.SingleReceiver(this);
-		}
+	if (this.receiveCallback !== undefined){
+		this.receiveCallback(sentCoapMessage, receivedCoapMessage, responseTransmission);
 	}
-	this.receiver.onReceive(sentCoapMessage, receivedCoapMessage, responseTransmission);
+	else {
+		if (this.receiver === undefined){
+			let block2Option = receivedCoapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2);
+			let isBlockwiseReceiver = this.settings.blockwiseEnabled && block2Option.length === 1;
+			if (isBlockwiseReceiver){
+				this.receiver = new Copper.BlockwiseReceiver(this, sentCoapMessage.clone(), receivedCoapMessage.clone());
+			}
+			else {
+				this.receiver = new Copper.SingleReceiver(this);
+			}
+		}
+		this.receiver.onReceive(sentCoapMessage, receivedCoapMessage, responseTransmission);
+	}
 };
 
 Copper.SingleRequestHandler.prototype.onTimeout = function(){
 	this.sender.onTimeout();
+};
+
+Copper.SingleRequestHandler.prototype.registerReceiveCallback = function(receiveCallback){
+	if (typeof(receiveCallback) !== "function"){
+		throw new Error("Illegal Argument");
+	}
+	this.receiveCallback = receiveCallback;
+};
+
+Copper.SingleRequestHandler.prototype.unregisterReceiveCallback = function(){
+	this.receiveCallback = undefined;
 };
 
 Copper.SingleRequestHandler.prototype.cancel = function(){
@@ -132,7 +149,7 @@ Copper.SingleRequestHandler.prototype.cancelReceiver = function(){
 };
 
 Copper.SingleRequestHandler.prototype.onSenderFinished = function(){
-	this.transmissionHandler.unregisterToken(this.coapMessage.token);
+	this.transmissionHandler.unregisterToken(this.coapMessage.token, this);
 };
 
 // receiver callbacks

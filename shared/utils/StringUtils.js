@@ -88,23 +88,25 @@ Copper.StringUtils.parseUri = function(rawUri){
 	if (!rawUri){
 		return undefined;
 	}
+	let result = {};
+
 	// use HTML <a> tag as a parser
 	let parser = document.createElement("a");
+
 	// we have to set a valid protocol
-	if (rawUri.startsWith("coap://")){
-		parser.href = rawUri.replace(/^coap/, "http");
-	}
-	else if (!rawUri.startsWith("http://") && !rawUri.startsWith("https://")){
+	let protocolMatcher = /^([a-zA-Z]+):\/\/(.+?)$/;
+	let match = protocolMatcher.exec(rawUri);
+	if (match === null){
 		parser.href = "http://" + rawUri;
 	}
 	else {
-		parser.href = rawUri;	
+		result.protocol = match[1];
+		parser.href = "http://" + match[2];	
 	}
+	
 	if (parser.host && parser.host !== window.location.host){
 		// if an invalid href is entered, host points in some browser versions to current location
-		let result = {
-			address: parser.hostname
-		};
+		result["address"] = parser.hostname;
 		if (!Number.isNaN(parseInt(parser.port))){
 			result["port"] = parseInt(parser.port);
 		}

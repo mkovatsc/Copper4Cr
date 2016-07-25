@@ -36,15 +36,16 @@ QUnit.test("Event: sendEvent", function(assert) {
 	let called2 = 0;
 	Copper.Event.registerCallback(function(event){
 		called1++;
-		Copper.Event.sendEvent(event);
 	}, 1);
 	Copper.Event.registerCallback(function(event){
 		called2++;
-		Copper.Event.sendEvent(event);
+		if (called2 < 2){
+			Copper.Event.sendEvent(event);
+		}
 	}, 2);
 	Copper.Event.sendEvent(e1);
 	Copper.Event.sendEvent(e2);
-	assert.deepEqual(called1, 2);
-	assert.deepEqual(called2, 1);
-	assert.deepEqual(Copper.Event.queue.length, 2);
+	assert.deepEqual(called1, 1);
+	assert.deepEqual(called2, 2);
+	assert.deepEqual(Copper.Event.queue.length, 0);
 });
