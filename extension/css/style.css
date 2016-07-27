@@ -572,7 +572,7 @@ button
   font-weight:bold;
 }
 
-#sidebar_block_size > div
+#sidebar_block_options > div
 {
 	margin-left: 5px;
 }
@@ -581,6 +581,24 @@ button
 	margin-left: auto;
 	margin-right: auto;
 }
+
+.main-content .multiple-options span {
+	margin-bottom: 5px;
+}
+
+.main-content .add-option-button {
+	position: absolute;
+	left: -15px;
+	width: 13px;
+	height: 13px;
+	top: 6px;
+	cursor: pointer;
+}
+
+.main-content .last-option-with-add {
+	position: relative;
+}
+
 
 /* Coap Message Log Box */
 .main-content-bottom-box 

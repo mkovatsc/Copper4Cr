@@ -47,7 +47,9 @@ Copper.Session.remotePort = undefined;
 Copper.Session.path = undefined;
 Copper.Session.query = undefined;
 
+Copper.Session.profileName = undefined;
 Copper.Session.settings = undefined;
+Copper.Session.options = undefined;
 
 Copper.Session.clientEndpoint = undefined;
 Copper.Session.localPort = undefined;
@@ -73,16 +75,18 @@ Copper.Session.registerClient = function(clientId, port, remoteAddress, remotePo
     Copper.Session.query = query;
 
     Copper.Session.settings = new Copper.Settings();
+    Copper.Session.options = new Copper.Options();
 
     let registeredCallback = function(event){
         switch (event.type){
-            case Copper.Event.TYPE_CLIENT_REGISTERED: 
+            case Copper.Event.TYPE_CLIENT_REGISTERED:
                 Copper.Event.unregisterCallback(registeredCallback, clientId);
                 Copper.OverlayAdapter.removeOverlay();
 
                 Copper.Session.clientEndpoint = new Copper.ClientEndpoint(port, clientId);
                 Copper.Session.localPort = event.port;
 
+                Copper.Session.loadProfile("default");
                 Copper.Session.startExtension();
                 break;
             case Copper.Event.TYPE_ERROR_ON_SERVER: 
@@ -153,6 +157,9 @@ Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
                     coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_QUERY, queryParts[i]);
                 }
             }
+
+            Copper.Session.options.addOptions(coapMessage);
+
             let guiAdapters = Copper.Session.guiAdapters;
             for (let i=0; i<guiAdapters.length; i++){
                 if (typeof(guiAdapters[i].beforeSendingCoapMessage) === "function"){
@@ -176,4 +183,42 @@ Copper.Session.onPortDisconnect = function(){
     Copper.Session.clientEndpoint = undefined;
     Copper.Session.localPort = undefined;
     Copper.OverlayAdapter.addTitleTextOverlay("Connection lost...", "Connection to Copper app lost. Please restart the extension.");
+};
+
+
+Copper.Session.loadProfile = function(name) {
+    Copper.Session.profileName = name;
+    Copper.ChromeComponentFactory.retrieveLocally(name, function(id, items) {
+        let profile = items[id];
+
+        if (profile !== undefined) {
+            Copper.Session.settings = Copper.JsonUtils.parse(profile.settings);
+            Copper.Session.options = Copper.JsonUtils.parse(profile.options);
+            if (profile.settings.requests !== undefined) {
+                Copper.Session.settings.requests = (profile.settings.requests.number === 0 ? Copper.CoapMessage.Type.CON : Copper.CoapMessage.Type.NON);
+            } else {
+                Copper.Session.settings.requests = Copper.CoapMessage.Type.CON;
+            }
+            Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+
+            let guiAdapters = Copper.Session.guiAdapters;
+
+            // init
+            for (let i=0; i<guiAdapters.length; i++){
+                if (typeof(guiAdapters[i].onProfileLoaded) === "function"){
+                    guiAdapters[i].onProfileLoaded();
+                }
+            }
+
+        } else {
+            // No profile stored yet -> create a new one
+            let newStorageObj = {settings: Copper.JsonUtils.stringify(Copper.Session.settings), options: Copper.JsonUtils.stringify(Copper.Session.options)};
+            Copper.ChromeComponentFactory.storeLocally(name, newStorageObj);
+        }
+    });
+};
+
+Copper.Session.storeChange = function() {
+    let newStorageObj = {settings: Copper.JsonUtils.stringify(Copper.Session.settings), options: Copper.JsonUtils.stringify(Copper.Session.options)};
+    Copper.ChromeComponentFactory.storeLocally(Copper.Session.profileName, newStorageObj);
 };

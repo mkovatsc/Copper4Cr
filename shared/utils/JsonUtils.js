@@ -98,6 +98,15 @@ Copper.JsonUtils.jsonToCopperSettings = function(data){
 	return res;
 };
 
+Copper.JsonUtils.jsonToCopperOptions = function(data){
+	let res = new Copper.Options();
+	let options = Object.keys(data);
+	for (let i=0; i<options.length; i++){
+		res[options[i]] = data[options[i]];
+	}
+	return res;
+};
+
 Copper.JsonUtils.coapMessageOptionToJson = function(option){
 	if (!(option instanceof Copper.CoapMessage.Option)){
 		throw new Error("Illegal Arguments");
@@ -158,6 +167,7 @@ Copper.JsonUtils.jsonToCoapMessage = function(data){
 Copper.JsonUtils.transformers = [
 	[function(value){return value instanceof ArrayBuffer}, "ArrayBuffer", Copper.JsonUtils.arrayBufferToJson, Copper.JsonUtils.jsonToArrayBuffer],
 	[function(value){return value instanceof Copper.Settings}, "Copper.Settings", undefined, Copper.JsonUtils.jsonToCopperSettings],
+	[function(value){return value instanceof Copper.Options}, "Copper.Options", undefined, Copper.JsonUtils.jsonToCopperOptions],
 	[function(value){return value instanceof Copper.CoapMessage.Option}, "Copper.CoapMessage.Option", Copper.JsonUtils.coapMessageOptionToJson, Copper.JsonUtils.jsonToCoapMessageOption],
 	[function(value){return value instanceof Copper.CoapMessage}, "Copper.CoapMessage", Copper.JsonUtils.coapMessageToJson, Copper.JsonUtils.jsonToCoapMessage]
 ];

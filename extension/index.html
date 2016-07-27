@@ -14,6 +14,7 @@
 	<script src="shared/utils/TimeUtils.js"></script>
 	<script src="shared/utils/StringUtils.js"></script>
 	<script src="shared/utils/ByteUtils.js"></script>
+	<script src="shared/utils/Options.js"></script>
 	<script src="shared/utils/Settings.js"></script>
 	<script src="shared/utils/JsonUtils.js"></script>
 	<script src="shared/utils/ComponentFactory.js"></script>
@@ -77,13 +78,13 @@
 					<img src="skin/tool_delete.png"> DELETE
 			</button>
 			<button id="copper-toolbar-observe" type="button" title="Subscribe to the resource"
-			    ><img src="skin/tool_observe.png"> Observe
+				><img src="skin/tool_observe.png"> Observe
 			</button>
 		</div>
 		
 		<div class="toolbar-item-dropdown hbox">
             <div id="copper-toolbar-payload">
-                <button id="copper-toolbar-payload-button" type="button">
+                <button class="copper-toolbar-dropdown-button" type="button">
 					<p>Payload ▾</p>
                 </button>
 
@@ -118,7 +119,7 @@
 
         <div class="toolbar-item-dropdown hbox">
             <div id="copper-toolbar-behavior">
-                <button id="copper-toolbar-behavior-button" type="button">
+                <button class="copper-toolbar-dropdown-button" type="button">
 					<p>Behavior ▾</p>
 			    </button>
 
@@ -286,6 +287,37 @@
             </div>
 		</div>
 
+		<div class="toolbar-item-dropdown hbox">
+			<div id="copper-toolbar-profiles">
+				<button class="copper-toolbar-dropdown-button" type="button">
+					<p>Profiles ▾</p>
+				</button>
+
+				<div class="dropdown-content hbox hidden">
+					<div class="vbox flex-filler" style="width: 160px;">
+						<ul class="select-group vbox">
+							<li id="copper-toolbar-profiles-mode-te2xt" class="dropdown-item hbox">
+								<div class="selection-icon hidden">
+									<span>&#8226;</span>
+								</div>
+								<p>Standard Profile</p>
+							</li>
+						</ul>
+						<div class="separation-line"></div>
+						<ul class="vbox">
+							<li id="copper-toolbar-manage-profiles" class="dropdown-item hbox">
+								<div class="selection-icon hidden">
+									<span>&#8203;</span>
+								</div>
+								<p>Manage Profiles...</p>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
 		<div class="flex-filler"></div>
 
 		<div style="display: flex; cursor: pointer;">
@@ -392,7 +424,7 @@
 					
 				</div>
 				
-				<div id="sidebar-debug-options" style="display: block; padding: 0 4px 0 4px; overflow-y: auto;">
+				<div id="sidebar-debug-options" style="display: block; padding: 0 4px 0 10px; overflow-y: auto;">
 					<div style="padding: 4px;">
 						<div style="text-align: center;"><label>Token</label></div>
 						<div class="flex hbox">
@@ -417,7 +449,7 @@
 							</select>
 						</div>
 						
-						<div id="sidebar_block_size" class="hbox">
+						<div id="sidebar_block_options" class="hbox">
 							<div class="vbox" style="flex: 3; margin-left: 0;">
 								<p>Block1 (Req.)</p>
 								<span class="hbox text-input-custom" title="Choose block size in Behavior menu">
@@ -457,20 +489,26 @@
 							</span>		
 						</div>
 						
-						<p>ETag</p>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom">
-								<input class="flex str2Hex" type="text" id="debug_option_etag" placeholder="use hex (0x..) or string">
-								<span class="clear_text" title="Clear">&times;</span>
-							</span>		
+						<p>ETag(s)</p>
+						<div class="flex vbox multiple-options" id="debug_option_etags">
+							<div class="flex hbox last-option-with-add">
+								<img class="add-option-button" src="skin/collapsed.png">
+								<span class="flex hbox text-input-custom">
+									<input class="flex str2Hex" type="text"  placeholder="use hex (0x..) or string">
+									<span class="clear_text" title="Clear">&times;</span>
+								</span>
+							</div>
 						</div>
 						
-						<p>If-Match</p>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom">
-								<input class="flex str2Hex" type="text" id="debug_option_if_match" placeholder="use an Etag">
-								<span class="clear_text" title="Clear">&times;</span>
-							</span>		
+						<p>If-Match(s)</p>
+						<div class="flex vbox multiple-options" id="debug_option_if_matchs">
+							<div class="flex hbox last-option-with-add">
+								<img class="add-option-button" src="skin/collapsed.png">
+								<span class="flex hbox text-input-custom">
+									<input class="flex str2Hex" type="text"  placeholder="use hex (0x..) or string">
+									<span class="clear_text" title="Clear">&times;</span>
+								</span>
+							</div>
 						</div>
 						
 						<div class="checkbox">
@@ -499,7 +537,7 @@
 						<p>Proxy-Uri</p>
 						<div class="flex hbox">
 							<span class="flex hbox text-input-custom">
-								<input class="flex" type="text" id="debug_option_proxy_uri" placeholder="use an Etag">
+								<input class="flex" type="text" id="debug_option_proxy_uri" placeholder="use absolute URI">
 								<span class="clear_text" title="Clear">&times;</span>
 							</span>		
 						</div>
@@ -518,28 +556,32 @@
 								<span class="clear_text" title="Clear">&times;</span>
 							</span>		
 						</div>
-						
-						<div class="hbox">
-							<div class="flex">
-								<p>Location-Path</p>
-								<span class="hbox text-input-custom">
-									<input class="flex" type="text" id="debug_option_location_path" placeholder="not set">
+
+						<p>Location-Path</p>
+						<div class="flex vbox multiple-options" id="debug_option_location_paths">
+							<div class="flex hbox last-option-with-add">
+								<img class="add-option-button" src="skin/collapsed.png">
+								<span class="flex hbox text-input-custom">
+									<input class="flex str2Hex" type="text"  placeholder="not set">
 									<span class="clear_text" title="Clear">&times;</span>
-								</span>		
+								</span>
 							</div>
-							
-							<div class="flex" style="margin-left: 6px;">
-								<p>Location-Query</p>
-								<span class="hbox text-input-custom">
-									<input class="flex" type="text" id="debug_option_location_query" placeholder="not set">
+						</div>
+
+						<p>Location-Query</p>
+						<div class="flex vbox multiple-options" id="debug_option_location_queries">
+							<div class="flex hbox last-option-with-add">
+								<img class="add-option-button" src="skin/collapsed.png">
+								<span class="flex hbox text-input-custom">
+									<input class="flex str2Hex" type="text"  placeholder="not set">
 									<span class="clear_text" title="Clear">&times;</span>
-								</span>		
+								</span>
 							</div>
 						</div>
 						
 						<div style="text-align: center;"><label>Custom Options</label></div>
 
-						<div class="hbox">
+						<div class="hbox" id="debug_option_custom_option">
 							<div style="flex: 1;">
 								<p>Number</p>
 								<span class="hbox text-input-custom">
@@ -551,7 +593,7 @@
 							<div style="margin-left: 6px; flex: 2;">
 								<p>Value</p>
 								<span class="hbox text-input-custom">
-									<input class="flex str2Hex" type="text" id="debug_option_custom_value" placeholder="use hex (0x..) or string">
+									<input class="flex str2Hex" type="text" id="debug_option_custom_value" placeholder="hex (0x..) or string">
 									<span class="clear_text" title="Clear">&times;</span>
 								</span>		
 							</div>

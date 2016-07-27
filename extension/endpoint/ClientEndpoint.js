@@ -55,6 +55,7 @@ Copper.ClientEndpoint.prototype.updateSettings = function(newSettings) {
 		throw new Error("Illegal Argument");
 	}
 	this.port.sendMessage(Copper.Event.createUpdateSettingsEvent(newSettings, this.id));
+	Copper.Session.storeChange();
 	return true;
 };
 
