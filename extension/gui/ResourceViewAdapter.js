@@ -1,15 +1,19 @@
 Copper.ResourceViewAdapter = function(){
 };
 
+Copper.ResourceViewAdapter.currentBlockNumber = undefined;
+Copper.ResourceViewAdapter.payloadStr = undefined;
+Copper.ResourceViewAdapter.resources = new Object();
+Copper.ResourceViewAdapter.allResourcesHTML = undefined;
+
+Copper.ResourceViewAdapter.uriPath = undefined;
+
 Copper.ResourceViewAdapter.init = function(){
 
-    /* BUILD TEST TREE */
-    Copper.ResourceViewAdapter.testTree();
-    Copper.ResourceViewAdapter.clearTree();
-    Copper.ResourceViewAdapter.testTree();
+    Copper.ResourceViewAdapter.uriPath = '.well-known/core';
 };
 
-/* BUILD TEST TREE */
+/* BUILD TEST TREE FOR DEBUG*/
 Copper.ResourceViewAdapter.testTree = function(){
     var tree = document.getElementById('resource_tree');
     Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/.well-known/core", []);
@@ -27,7 +31,91 @@ Copper.ResourceViewAdapter.testTree = function(){
     Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/test", {title: "test title"});
 };
 
+Copper.ResourceViewAdapter.beforeSendingCoapMessage = function(coapMessage) {
+    let uriPathComponents = Copper.ResourceViewAdapter.uriPath.split('/');
+
+    for (let i = 0; i < uriPathComponents.length; i++) {
+        coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, uriPathComponents[i]);
+    }
+};
+
 Copper.ResourceViewAdapter.onEvent = function(event){
+    if (event.type === Copper.Event.TYPE_COAP_MESSAGE_RECEIVED) {
+
+        let coapMessage = event.data.coapMessage;
+        if (coapMessage.code.number !== Copper.CoapMessage.Code.CONTENT.number || !Copper.ToolbarAdapter.ongoingDiscoverRequest) {
+            return;
+        }
+
+        let contentFormat = coapMessage.getOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT);
+        if (contentFormat[0] !== Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_LINK_FORMAT.number) {
+            throw new Error("Discovery requires 'application/link-format");
+        }
+
+        // On Discover Request
+        let block2Option = coapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2);
+        if (block2Option.length === 1) {
+            block2Option = block2Option[0];
+            if (block2Option.num === 0) {
+                Copper.ResourceViewAdapter.payloadStr = new String();
+            }
+            Copper.ResourceViewAdapter.currentBlockNumber === block2Option.num + 1;
+
+            Copper.ResourceViewAdapter.payloadStr += Copper.ByteUtils.convertBytesToString(coapMessage.payload);
+
+            if (!block2Option.more) {
+
+                Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
+                Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ResourceViewAdapter.payloadStr));
+            }
+
+            return;
+        } else {
+            // Not blockwise
+            Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
+            Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ByteUtils.convertBytesToString(coapMessage.payload)));
+        }
+    }
+};
+
+Copper.ResourceViewAdapter.updateResourceLinks = function(add) {
+    // merge links
+    if (add) {
+        for (var uri in add) {
+            if (!Copper.ResourceViewAdapter.resources[uri]) {
+                Copper.ResourceViewAdapter.resources[uri] = add[uri];
+            }
+        }
+    }
+
+    // add well-known resource to resource cache
+    if (!Copper.ResourceViewAdapter.resources['/.well-known/core']) {
+        Copper.ResourceViewAdapter.resources['/.well-known/core'] = new Object();
+        Copper.ResourceViewAdapter.resources['/.well-known/core']['ct'] = 40;
+        Copper.ResourceViewAdapter.resources['/.well-known/core']['title'] = 'Resource discovery';
+    }
+
+    Copper.ResourceViewAdapter.clearTree();
+
+    // sort by path
+    let sorted = new Array();
+    for (var uri in Copper.ResourceViewAdapter.resources) {
+        sorted.push(uri);
+    }
+    sorted.sort();
+
+    for (var entry in sorted) {
+
+        let uri = sorted[entry];
+        // add to tree view
+        Copper.ResourceViewAdapter.addTreeResource( decodeURI(uri), Copper.ResourceViewAdapter.resources[uri] );
+    }
+
+    let allResourcesHTML = document.getElementsByTagName("P");
+    for (let i = 0; i < allResourcesHTML.length; i++) {
+        let resource = allResourcesHTML[i];
+        resource.onclick = Copper.ResourceViewAdapter.onClickResource;
+    }
 };
 
 Copper.ResourceViewAdapter.clearTree = function() {
@@ -39,7 +127,6 @@ Copper.ResourceViewAdapter.clearTree = function() {
 };
 
 Copper.ResourceViewAdapter.addTreeResource = function(uri, attributes) {
-
     var tree = document.getElementById('resource_tree');
     var segments;
 
@@ -151,13 +238,17 @@ Copper.ResourceViewAdapter.addTreeResource = function(uri, attributes) {
 
                 // Update status label
                 let status = document.getElementById('status-label');
-                status.innerHTML = "Opened coap://" + p.getAttribute("data-uri");
+
+                let search = window.location.search;
+                let uriObject = Copper.StringUtils.parseUri(decodeURIComponent(search.substr(1)));
+
+                status.innerHTML = "Opened coap://" + address + ':' + port + '/' + p.getAttribute("data-uri");
             });
             let textNode = document.createTextNode(segments[i]);
             p.appendChild(textNode);
 
             // Add uri as data attribute
-            p.dataset.uri = path;
+            p.dataset.uri = segments.slice(1,i+1).join('/');
 
             // special icon
             let icon = document.createElement("img");
@@ -199,4 +290,8 @@ Copper.ResourceViewAdapter.addTreeResource = function(uri, attributes) {
             node = li;
         }
     }
+};
+
+Copper.ResourceViewAdapter.onClickResource = function() {
+    Copper.ResourceViewAdapter.uriPath = this.getAttribute("data-uri");
 };

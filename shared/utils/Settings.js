@@ -34,7 +34,7 @@ Copper.Settings = function() {
 };
 
 // Message type to use (0 -> CON). See Copper.CoapMessage.Type object for different values
-Copper.Settings.prototype.requests = 0; 
+Copper.Settings.prototype.requests = 0;
 
 // Retransmit messages after timeout (up to MAX_RETRANSMIT)
 Copper.Settings.prototype.retransmission = true;
@@ -67,3 +67,6 @@ Copper.Settings.prototype.observeToken = true;
 
 // Observe cancellation (get, rst, lazy)
 Copper.Settings.prototype.observeCancellation = "lazy";
+
+
+Copper.Settings.prototype.payloadMode = "text";

@@ -96,6 +96,14 @@ Copper.OverlayAdapter.addInputOverlay = function(title, text, errorMsg, inputVal
 			}); 
 		};
 		container.appendChild(buttonElement);
+
+		// On press enter click button
+		inputElement.addEventListener("keyup", function(event) {
+			event.preventDefault();
+			if (event.keyCode == 13) {
+				buttonElement.click();
+			}
+		});
 	}
 
 	Copper.OverlayAdapter.addOverlay(container);

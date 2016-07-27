@@ -122,3 +122,57 @@ Copper.StringUtils.parseUri = function(rawUri){
 		return undefined;
 	}
 };
+
+Copper.StringUtils.parseLinkFormat = function(data) {
+
+	var links = new Object();
+
+	// totally complicated but supports ',' and '\n' to separate links and ',' as well as '\"' within quoted strings
+	var format = data.match(/(<[^>]+>\s*(;\s*\w+\s*(=\s*(\w+|"([^"\\]*(\\.[^"\\]*)*)")\s*)?)*)/g);
+	for (var i in format) {
+		//Copper.logEvent(links[i]+'\n');
+		var elems = format[i].match(/^<([^>\?]+)[^>]*>\s*(;.+)?\s*$/);
+
+		var uri = elems[1];
+
+		if (uri.match(/([a-zA-Z]+:\/\/)([^\/]+)(.*)/)) {
+			// absolute URI
+		} else {
+			// fix for old Contiki implementation and others which omit the leading '/' in the link format
+			if (uri.charAt(0)!='/') uri = '/'+uri;
+		}
+
+		links[uri] = new Object();
+
+		if (elems[2]) {
+
+			var tokens = elems[2].match(/(;\s*\w+\s*(=\s*(\w+|"([^\\"]*(\\.[^"\\]*)*)"))?)/g);
+
+			for (var j in tokens) {
+				//Copper.logEvent('  '+tokens[j]+'\n');
+				var keyVal = tokens[j].match(/;\s*([^<"\s;,=]+)\s*(=\s*(([^<"\s;,]+)|"([^"\\]*(\\.[^"\\]*)*)"))?/);
+				if (keyVal) {
+					//Copper.logEvent(keyVal[0]+'\n');
+					//Copper.logEvent('   '+keyVal[1] + (keyVal[2] ? (': '+ (keyVal[4] ? keyVal[4] : keyVal[5].replace(/\\/g,''))) : ''));
+
+					if (links[uri][keyVal[1]]!=null) {
+
+						if (!Array.isArray(links[uri][keyVal[1]])) {
+							let temp = links[uri][keyVal[1]];
+							links[uri][keyVal[1]] = new Array(0);
+							links[uri][keyVal[1]].push(temp);
+						}
+
+						links[uri][keyVal[1]].push(keyVal[2] ? (keyVal[4] ? parseInt(keyVal[4]) : keyVal[5].replace(/\\/g,'')) : true);
+
+					} else {
+
+						links[uri][keyVal[1]] = keyVal[2] ? (keyVal[4] ? parseInt(keyVal[4]) : keyVal[5].replace(/\\/g,'')) : true;
+					}
+				}
+			}
+		}
+	}
+
+	return links;
+};
