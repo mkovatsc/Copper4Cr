@@ -43,6 +43,10 @@ Copper.ComponentFactory = {
     resolvePortAndCoapEndpoint: function(clientId, finalDisconnectHandler, callback){
     				throw new Error("not implemented");
     			},
+    // change resource --> state is preserved in a browser dependent way
+    changeCoapResource: function(protocol, remoteAddress, remotePort, path, query){
+    				 new Error("not implemented");
+    			},
 	storeLocally: function(id, value) {
 					throw new Error("not implemented");
 				},
@@ -60,6 +64,10 @@ Copper.ChromeComponentFactory = {
     			},
     resolvePortAndCoapEndpoint: function(clientId, finalDisconnectHandler, callback){
     				return Copper.ChromeStartup.resolvePortAndCoapEndpoint(clientId, finalDisconnectHandler, callback);
+    			},
+    changeCoapResource: function(protocol, remoteAddress, remotePort, path, query){
+    				window.location.search = "?" + encodeURIComponent((protocol ? protocol + "://" : "") + remoteAddress + ":" + remotePort + 
+                        (path ? ("/" + path) : "") + (query ? ("?" + query) : ""));
     			},
 	storeLocally: function(id, value) {
 					var storeObject = {};

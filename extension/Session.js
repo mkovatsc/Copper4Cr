@@ -35,13 +35,14 @@ window.onload = function(){
 
     let clientId = 1;
     // resolve port, remoteAddress:port in a browser dependent way
-    Copper.ChromeComponentFactory.resolvePortAndCoapEndpoint(clientId, Copper.Session.onPortDisconnect, Copper.Session.registerClient);
+    Copper.ComponentFactory.resolvePortAndCoapEndpoint(clientId, Copper.Session.onPortDisconnect, Copper.Session.registerClient);
 };
 
 Copper.Session = function(){
 };
 
 Copper.Session.clientId = undefined;
+Copper.Session.protocol = undefined;
 Copper.Session.remoteAddress = undefined;
 Copper.Session.remotePort = undefined;
 Copper.Session.path = undefined;
@@ -67,8 +68,9 @@ Copper.Session.guiAdapters = [
 // setup session
 // register client
 // bind HTML to javascript
-Copper.Session.registerClient = function(clientId, port, remoteAddress, remotePort, path, query){
+Copper.Session.registerClient = function(clientId, port, protocol, remoteAddress, remotePort, path, query){
     Copper.Session.clientId = clientId;
+    Copper.Session.protocol = protocol;
     Copper.Session.remoteAddress = remoteAddress;
     Copper.Session.remotePort = remotePort;
     Copper.Session.path = path;

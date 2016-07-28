@@ -260,7 +260,7 @@ Copper.ToolbarAdapter.doObserve = function(){
     }
     else {
         // start observing
-        let coapMessage = new Copper.CoapMessage(Copper.ToolbarAdapter.requests, Copper.CoapMessage.Code.GET);
+        let coapMessage = new Copper.CoapMessage(Copper.Session.settings.requests, Copper.CoapMessage.Code.GET);
         coapMessage.addOption(Copper.CoapMessage.OptionHeader.OBSERVE, 0);
         Copper.Session.sendCoapMessage(coapMessage);
     }

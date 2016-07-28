@@ -1,17 +1,9 @@
 Copper.ResourceViewAdapter = function(){
 };
 
-Copper.ResourceViewAdapter.currentBlockNumber = undefined;
 Copper.ResourceViewAdapter.payloadStr = undefined;
 Copper.ResourceViewAdapter.resources = new Object();
 Copper.ResourceViewAdapter.allResourcesHTML = undefined;
-
-Copper.ResourceViewAdapter.uriPath = undefined;
-
-Copper.ResourceViewAdapter.init = function(){
-
-    Copper.ResourceViewAdapter.uriPath = '.well-known/core';
-};
 
 /* BUILD TEST TREE FOR DEBUG*/
 Copper.ResourceViewAdapter.testTree = function(){
@@ -29,14 +21,6 @@ Copper.ResourceViewAdapter.testTree = function(){
     Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/path/sub2", {title: "sub2 title"});
     Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/path/sub3", {title: "sub3 title"});
     Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/test", {title: "test title"});
-};
-
-Copper.ResourceViewAdapter.beforeSendingCoapMessage = function(coapMessage) {
-    let uriPathComponents = Copper.ResourceViewAdapter.uriPath.split('/');
-
-    for (let i = 0; i < uriPathComponents.length; i++) {
-        coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, uriPathComponents[i]);
-    }
 };
 
 Copper.ResourceViewAdapter.onEvent = function(event){
@@ -59,8 +43,6 @@ Copper.ResourceViewAdapter.onEvent = function(event){
             if (block2Option.num === 0) {
                 Copper.ResourceViewAdapter.payloadStr = new String();
             }
-            Copper.ResourceViewAdapter.currentBlockNumber === block2Option.num + 1;
-
             Copper.ResourceViewAdapter.payloadStr += Copper.ByteUtils.convertBytesToString(coapMessage.payload);
 
             if (!block2Option.more) {
@@ -76,6 +58,11 @@ Copper.ResourceViewAdapter.onEvent = function(event){
             Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ByteUtils.convertBytesToString(coapMessage.payload)));
         }
     }
+};
+
+
+Copper.ResourceViewAdapter.onClickResource = function() {
+    Copper.ComponentFactory.changeCoapResource(Copper.Session.protocol, Copper.Session.remoteAddress, Copper.Session.remotePort, this.getAttribute("data-uri"));
 };
 
 Copper.ResourceViewAdapter.updateResourceLinks = function(add) {
@@ -290,8 +277,4 @@ Copper.ResourceViewAdapter.addTreeResource = function(uri, attributes) {
             node = li;
         }
     }
-};
-
-Copper.ResourceViewAdapter.onClickResource = function() {
-    Copper.ResourceViewAdapter.uriPath = this.getAttribute("data-uri");
 };

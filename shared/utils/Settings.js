@@ -33,8 +33,8 @@
 Copper.Settings = function() {
 };
 
-// Message type to use (0 -> CON). See Copper.CoapMessage.Type object for different values
-Copper.Settings.prototype.requests = 0;
+// Message type to use. See Copper.CoapMessage.Type object for different values
+Copper.Settings.prototype.requests = Copper.CoapMessage.Type.CON;
 
 // Retransmit messages after timeout (up to MAX_RETRANSMIT)
 Copper.Settings.prototype.retransmission = true;
