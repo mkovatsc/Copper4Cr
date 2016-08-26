@@ -112,6 +112,7 @@ Copper.ToolbarAdapter.onProfileLoaded = function() {
     let settings = Copper.Session.settings;
 
     for (let profileKey in profiles.allProfiles) {
+
         if (profileKey !== Copper.Profiles.defaultProfile) {
             let element = document.getElementById("copper-toolbar-profiles-profile-" + profileKey.split(' ').join('-'));
             if (element === null) {
@@ -496,6 +497,7 @@ Copper.ToolbarAdapter.behaviorObserveRst = function() {
 
 Copper.ToolbarAdapter.profilesStandardProfile = function() {
     Copper.ToolbarAdapter.radioElement(this.id);
+    Copper.Session.profiles.loadProfile(Copper.Profiles.defaultProfile);
 };
 
 Copper.ToolbarAdapter.profilesAutoStore = function() {

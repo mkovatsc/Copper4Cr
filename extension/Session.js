@@ -215,4 +215,5 @@ Copper.Session.loadAllProfilesAndSelect = function() {
 
 Copper.Session.storeChange = function() {
     Copper.Session.profiles.updateCurrentProfile();
+    debugger;
 };

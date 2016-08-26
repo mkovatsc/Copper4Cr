@@ -72,7 +72,7 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
 
 
             let managerProfileName = managerProfiles[i].firstElementChild.firstElementChild;
-            let dropdownProfileName = dropDownProfiles[i].lastElementChild;
+            let dropdownProfileName = dropDownProfiles[i].lastElementChild.innerHTML;
 
             if (managerProfileName.disabled) {
                 // Profile deleted
@@ -158,13 +158,11 @@ Copper.ProfilesAdapter.addNewHTMLProfileInManager = function(name) {
         crossOut.style.borderBottom = "3px solid red";
         crossOut.style.position = "absolute"
         crossOut.style.top = "10px";
-        crossOut.classList.add("to-be-deleted")
         div.appendChild(crossOut);
         let cover = document.createElement("div");
         cover.style.width = "100%";
         cover.style.height = "100%";
         cover.style.position = "absolute"
-        cover.classList.add("to-be-deleted")
         input.disabled = true;
         input.classList.add("disabled-profile-input")
         div.appendChild(cover);
