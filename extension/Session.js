@@ -51,9 +51,11 @@ Copper.Session.query = undefined;
 Copper.Session.profileName = undefined;
 Copper.Session.settings = undefined;
 Copper.Session.options = undefined;
+Copper.Session.profiles = undefined;
 
 Copper.Session.clientEndpoint = undefined;
 Copper.Session.localPort = undefined;
+
 
 Copper.Session.guiAdapters = [
         Copper.MessageLogAdapter,
@@ -62,7 +64,9 @@ Copper.Session.guiAdapters = [
         Copper.PayloadAdapter,
         Copper.ToolbarAdapter,
         Copper.ResourceViewAdapter,
-        Copper.DebugOptionsAdapter
+        Copper.DebugOptionsAdapter,
+        Copper.PopupWindowAdapter,
+        Copper.ProfilesAdapter
     ];
 
 // setup session
@@ -78,6 +82,8 @@ Copper.Session.registerClient = function(clientId, port, protocol, remoteAddress
 
     Copper.Session.settings = new Copper.Settings();
     Copper.Session.options = new Copper.Options();
+    Copper.Session.profiles = new Copper.Profiles();
+
 
     let registeredCallback = function(event){
         switch (event.type){
@@ -88,7 +94,7 @@ Copper.Session.registerClient = function(clientId, port, protocol, remoteAddress
                 Copper.Session.clientEndpoint = new Copper.ClientEndpoint(port, clientId);
                 Copper.Session.localPort = event.port;
 
-                Copper.Session.loadProfile("default");
+                Copper.Session.loadAllProfilesAndSelect();
                 Copper.Session.startExtension();
                 break;
             case Copper.Event.TYPE_ERROR_ON_SERVER: 
@@ -187,40 +193,26 @@ Copper.Session.onPortDisconnect = function(){
     Copper.OverlayAdapter.addTitleTextOverlay("Connection lost...", "Connection to Copper app lost. Please restart the extension.");
 };
 
+Copper.Session.loadAllProfilesAndSelect = function() {
 
-Copper.Session.loadProfile = function(name) {
-    Copper.Session.profileName = name;
-    Copper.ChromeComponentFactory.retrieveLocally(name, function(id, items) {
-        let profile = items[id];
+    Copper.ChromeComponentFactory.retrieveLocally(Copper.Profiles.profilesKey, function(id, items) {
+        let profiles = items[id];
 
-        if (profile !== undefined) {
-            Copper.Session.settings = Copper.JsonUtils.parse(profile.settings);
-            Copper.Session.options = Copper.JsonUtils.parse(profile.options);
-            if (profile.settings.requests !== undefined) {
-                Copper.Session.settings.requests = (profile.settings.requests.number === 0 ? Copper.CoapMessage.Type.CON : Copper.CoapMessage.Type.NON);
-            } else {
-                Copper.Session.settings.requests = Copper.CoapMessage.Type.CON;
-            }
-            Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
-
-            let guiAdapters = Copper.Session.guiAdapters;
-
-            // init
-            for (let i=0; i<guiAdapters.length; i++){
-                if (typeof(guiAdapters[i].onProfileLoaded) === "function"){
-                    guiAdapters[i].onProfileLoaded();
-                }
-            }
+        if (profiles === undefined) {
+            // No profiles stored yet -> Create default profile and load it
+            Copper.Session.profiles.createAndSelectDefaultProfile();
 
         } else {
-            // No profile stored yet -> create a new one
-            let newStorageObj = {settings: Copper.JsonUtils.stringify(Copper.Session.settings), options: Copper.JsonUtils.stringify(Copper.Session.options)};
-            Copper.ChromeComponentFactory.storeLocally(name, newStorageObj);
+            Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
+
+            let allProfiles = Copper.Session.profiles.allProfiles;
+
+            Copper.Session.profiles.loadProfile(Copper.Session.profiles.selectedProfile)
         }
     });
+
 };
 
 Copper.Session.storeChange = function() {
-    let newStorageObj = {settings: Copper.JsonUtils.stringify(Copper.Session.settings), options: Copper.JsonUtils.stringify(Copper.Session.options)};
-    Copper.ChromeComponentFactory.storeLocally(Copper.Session.profileName, newStorageObj);
+    Copper.Session.profiles.updateCurrentProfile();
 };

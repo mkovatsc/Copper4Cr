@@ -33,7 +33,7 @@ Copper.ChromeStartup = function(){
 };
 
 Copper.ChromeStartup.resolvePortAndCoapEndpoint = function(clientId, finalDisconnectHandler, callback){
-	let appId = "mbighlecbopknoggoappifafoffcnocc";
+	let appId = "kdgfcijijlbhfondicahdjhchebnnmei";
 	let port = Copper.ComponentFactory.createPort(chrome.runtime.connect(appId), clientId);
 
 	let resolveEndpointFunction = function(){
@@ -76,7 +76,7 @@ Copper.ChromeStartup.resolveCoapEndpoint = function(clientId, port, finalDisconn
                     errorCallback("Please enter a valid URL");
                 }
                 else {
-                    Copper.ComponentFactory.changeCoapResource(uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query);
+                    Copper.ComponentFactory.changeCoapResource(uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query, true);
                 }
             });
         }

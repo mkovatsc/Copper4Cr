@@ -23,6 +23,7 @@
                      "shared/utils/ByteUtils.js",
                      "shared/utils/Settings.js",
                      "shared/utils/Options.js",
+                     "shared/utils/Profiles.js",
                      "shared/utils/JsonUtils.js",
                      "shared/utils/ComponentFactory.js",
 

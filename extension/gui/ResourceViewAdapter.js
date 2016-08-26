@@ -5,6 +5,14 @@ Copper.ResourceViewAdapter.payloadStr = undefined;
 Copper.ResourceViewAdapter.resources = new Object();
 Copper.ResourceViewAdapter.allResourcesHTML = undefined;
 
+
+Copper.ResourceViewAdapter.onProfileLoaded = function() {
+    let settings = Copper.Session.settings;
+    Copper.ResourceViewAdapter.resources = Copper.Session.settings.resources;
+    Copper.ResourceViewAdapter.updateResourceLinks();
+};
+
+
 /* BUILD TEST TREE FOR DEBUG*/
 Copper.ResourceViewAdapter.testTree = function(){
     var tree = document.getElementById('resource_tree');
@@ -62,10 +70,12 @@ Copper.ResourceViewAdapter.onEvent = function(event){
 
 
 Copper.ResourceViewAdapter.onClickResource = function() {
-    Copper.ComponentFactory.changeCoapResource(Copper.Session.protocol, Copper.Session.remoteAddress, Copper.Session.remotePort, this.getAttribute("data-uri"));
+    Copper.Session.path = this.getAttribute("data-uri");
+    Copper.ComponentFactory.changeCoapResource(Copper.Session.protocol, Copper.Session.remoteAddress, Copper.Session.remotePort, this.getAttribute("data-uri"), false);
 };
 
 Copper.ResourceViewAdapter.updateResourceLinks = function(add) {
+
     // merge links
     if (add) {
         for (var uri in add) {
@@ -74,7 +84,6 @@ Copper.ResourceViewAdapter.updateResourceLinks = function(add) {
             }
         }
     }
-
     // add well-known resource to resource cache
     if (!Copper.ResourceViewAdapter.resources['/.well-known/core']) {
         Copper.ResourceViewAdapter.resources['/.well-known/core'] = new Object();
@@ -82,7 +91,7 @@ Copper.ResourceViewAdapter.updateResourceLinks = function(add) {
         Copper.ResourceViewAdapter.resources['/.well-known/core']['title'] = 'Resource discovery';
     }
 
-    Copper.ResourceViewAdapter.clearTree();
+    //Copper.ResourceViewAdapter.clearTree();
 
     // sort by path
     let sorted = new Array();
@@ -277,4 +286,7 @@ Copper.ResourceViewAdapter.addTreeResource = function(uri, attributes) {
             node = li;
         }
     }
+
+    Copper.Session.settings.resources = Copper.ResourceViewAdapter.resources;
+    Copper.Session.storeChange();
 };

@@ -16,6 +16,7 @@
 	<script src="shared/utils/ByteUtils.js"></script>
 	<script src="shared/utils/Options.js"></script>
 	<script src="shared/utils/Settings.js"></script>
+	<script src="shared/utils/Profiles.js"></script>
 	<script src="shared/utils/JsonUtils.js"></script>
 	<script src="shared/utils/ComponentFactory.js"></script>
 
@@ -44,8 +45,9 @@
 	<script src="gui/PayloadAdapter.js"></script>
 	<script src="gui/ToolbarAdapter.js"></script>
 	<script src="gui/ResourceViewAdapter.js"></script>
-	<script src="gui/OptionsAdapter.js"></script>
+	<script src="gui/PopupWindowAdapter.js"></script>
 	<script src="gui/DebugOptionsAdapter.js"></script>
+	<script src="gui/ProfilesAdapter.js"></script>
 
 	<script src="endpoint/ClientEndpoint.js"></script>
 	<script src="endpoint/ChromeStartup.js"></script>
@@ -110,7 +112,6 @@
                                 <span>&#8203;</span>
                             </div>
                             <p>Choose File...</p>
-                            <input type="file" style="display:none">
                         </li>
                     </ul>
                 </div>
@@ -295,8 +296,8 @@
 
 				<div class="dropdown-content hbox hidden">
 					<div class="vbox flex-filler" style="width: 160px;">
-						<ul class="select-group vbox">
-							<li id="copper-toolbar-profiles-mode-te2xt" class="dropdown-item hbox">
+						<ul id="copper-toolbar-profiles-container" class="select-group vbox">
+							<li id="copper-toolbar-profiles-standard" class="dropdown-item hbox" title="Default profile - All changes are automatically stored to this profile if selected">
 								<div class="selection-icon hidden">
 									<span>&#8226;</span>
 								</div>
@@ -304,8 +305,25 @@
 							</li>
 						</ul>
 						<div class="separation-line"></div>
+						<ul class="single-element vbox">
+							<li id="copper-toolbar-profiles-auto-store" class="dropdown-item hbox" title="Automatically store changes made to the currently selected profile">
+								<div class="selection-icon hidden">
+									<span>&#10003;</span>
+								</div>
+								<p>Auto store to Profile</p>
+							</li>
+						</ul>
 						<ul class="vbox">
-							<li id="copper-toolbar-manage-profiles" class="dropdown-item hbox">
+							<li id="copper-toolbar-profiles-store-current" class="dropdown-item hbox" title="Store changes made to the currently selected profile">
+								<div class="selection-icon hidden">
+									<span>&#8203;</span>
+								</div>
+								<p>Store to current Profile</p>
+							</li>
+						</ul>
+						<div class="separation-line"></div>
+						<ul class="vbox">
+							<li id="copper-toolbar-profiles-manage" class="dropdown-item hbox">
 								<div class="selection-icon hidden">
 									<span>&#8203;</span>
 								</div>
@@ -621,6 +639,60 @@
 				<div class="table-head-scrollbar"></div>
 				<div id="copper-coap-message-log-table" class="table-body">
 				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="popup-windows">
+
+	<!-- Option window -->
+	<div class="block_screen hidden">
+		<div id="preferences-window" class="popup-container vbox">
+			<label class="title">Copper (Cu) Preferences</label>
+
+			<div class="vbox content">
+				<fieldset>
+					<legend>Appearance</legend>
+				</fieldset>
+
+				<fieldset>
+					<legend>Debug</legend>
+					<div class="checkbox">
+						<label><input id="preferences-window-encode-utf-8" type="checkbox">
+							Use UTF-8 encoding</label>
+					</div>
+					<div class="checkbox">
+						<label><input id="preferences-window-plugtest" type="checkbox">
+							Enable ETSI Plugtest menu</label>
+					</div>
+					<button id="preferences-window-clear-resource-cache">Clear resource cache</button>
+					<button id="preferences-window-clear-payload-cache">Clear payload cache</button>
+				</fieldset>
+			<button class="close-button">OK</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Profiles window -->
+	<div class="block_screen hidden">
+		<div id="manage-profile-window" class="popup-container vbox">
+			<label class="title">Manage Profiles</label>
+
+			<div class="vbox content">
+				<fieldset id="copper-profile-manager-container">
+					<legend>Profiles</legend>
+
+
+					<button id="profile-add">Add Profile with current Settings</button>
+
+				</fieldset>
+
+				<div class="hbox">
+					<button id="profile-save-and-exit">Save and Exit</button>
+					<button id="profile-cancel">Cancel</button>
+				</div>
+
 			</div>
 		</div>
 	</div>
