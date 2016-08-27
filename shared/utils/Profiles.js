@@ -32,24 +32,32 @@
 /* Settings object. Set a pref to override the default behavior */
 Copper.Profiles = function() {
     this.allProfiles = {};
-    this.selectedProfile = "";
 };
 
 Copper.Profiles.prototype.allProfiles = undefined;
 
-Copper.Profiles.prototype.selectedProfile = "";
+Copper.Profiles.prototype.autoStore = false;
 
 Copper.Profiles.defaultProfile = "default_profile";
 
 Copper.Profiles.profilesKey = "profiles";
 
-Copper.Profiles.prototype.addNewProfile = function(name, settings, options) {
-    console.log("new");
-    if (!(name in this.allProfiles)) {
+Copper.Profiles.selectedProfileKey = "selected_profile";
 
+
+
+Copper.Profiles.prototype.addNewProfile = function(name, settings, options) {
+    if (!(name in this.allProfiles)) {
         this.allProfiles[name] = {settings: settings, options: options};
         let newStorageObj = Copper.JsonUtils.stringify(Copper.Session.profiles);
-        Copper.ChromeComponentFactory.storeLocally(Copper.Profiles.profilesKey, newStorageObj);
+        Copper.ChromeComponentFactory.storeLocally(Copper.Profiles.profilesKey, newStorageObj, function () {
+            Copper.ChromeComponentFactory.retrieveLocally(Copper.Profiles.profilesKey, function (id, items) {
+                let profiles = items[id];
+
+                Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
+                console.log("hi");
+            });
+        });
     }
 };
 
@@ -61,12 +69,13 @@ Copper.Profiles.prototype.deleteProfile = function(name) {
     }
 };
 
-Copper.Profiles.prototype.createAndSelectDefaultProfile = function(name) {
+Copper.Profiles.prototype.createAndSelectDefaultProfile = function() {
     if (!(Copper.Profiles.defaultProfile in this.allProfiles)) {
 
         this.allProfiles = {};
         this.addNewProfile(Copper.Profiles.defaultProfile, Copper.Session.settings, Copper.Session.options);
         this.loadProfile(Copper.Profiles.defaultProfile);
+        Copper.ChromeComponentFactory.storeLocally(Copper.Profiles.selectedProfileKey, Copper.Profiles.defaultProfile);
     }
 };
 
@@ -80,38 +89,54 @@ Copper.Profiles.prototype.loadProfile = function(name) {
     Copper.ChromeComponentFactory.retrieveLocally(Copper.Profiles.profilesKey, function(id, items) {
         let profiles = items[id];
 
-        Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
+            Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
 
-        Copper.Session.profiles.selectedProfile = name;
-        let profile = Copper.Session.profiles.allProfiles[name];
-        Copper.Session.settings = profile.settings;
-        Copper.Session.options = profile.options;
-        if (Copper.Session.settings.requests === 0) {
-            Copper.Session.settings.requests = Copper.CoapMessage.Type.CON;
-        } else {
-            Copper.Session.settings.requests = (Copper.Session.settings.requests.number === 0 ? Copper.CoapMessage.Type.CON : Copper.CoapMessage.Type.NON);
-        }
-
-        let guiAdapters = Copper.Session.guiAdapters;
-
-        // init
-        for (let i=0; i<guiAdapters.length; i++){
-            if (typeof(guiAdapters[i].onProfileLoaded) === "function"){
-                guiAdapters[i].onProfileLoaded();
+            Copper.Profiles.selectedProfile = name;
+            let profile = Copper.Session.profiles.allProfiles[name];
+            Copper.Session.settings = profile.settings;
+            Copper.Session.options = profile.options;
+            if (Copper.Session.settings.requests === 0) {
+                Copper.Session.settings.requests = Copper.CoapMessage.Type.CON;
+            } else {
+                Copper.Session.settings.requests = (Copper.Session.settings.requests.number === 0 ? Copper.CoapMessage.Type.CON : Copper.CoapMessage.Type.NON);
             }
-        }
 
-        Copper.Session.profiles.updateCurrentProfile();
+            let guiAdapters = Copper.Session.guiAdapters;
+
+            // init
+            for (let i=0; i<guiAdapters.length; i++){
+                if (typeof(guiAdapters[i].onProfileLoaded) === "function"){
+                    guiAdapters[i].onProfileLoaded();
+                }
+            }
+
+            Copper.Session.profiles.updateCurrentProfile();
     });
 
 };
 
-Copper.Profiles.prototype.updateCurrentProfile = function() {
-    let profileSettings = {settings: Copper.Session.settings, options:  Copper.Session.options};
-    this.allProfiles[this.selectedProfile] = profileSettings;
-    let newStorageObj = Copper.JsonUtils.stringify(this);
+Copper.Profiles.prototype.changeProfile = function(name) {
 
-    Copper.ChromeComponentFactory.storeLocally(Copper.Profiles.profilesKey, newStorageObj);
+    Copper.ChromeComponentFactory.storeLocally(Copper.Profiles.selectedProfileKey, name, function() {
+        window.location.reload();
+    });
+
+}
+
+Copper.Profiles.prototype.updateCurrentProfile = function(forceUpdate) {
+
+    //let profileSettings = {settings: Copper.Session.settings, options: Copper.Session.options};
+
+    //this.allProfiles[Copper.Profiles.defaultProfile] = profileSettings;
+    //let newStorageObj = Copper.JsonUtils.stringify(this);
+    //Copper.ChromeComponentFactory.storeLocally(Copper.Profiles.profilesKey, newStorageObj);
+
+    if (forceUpdate || this.autoStore || Copper.Profiles.selectedProfile === Copper.Profiles.defaultProfile) {
+
+        let profileSettings = {settings: Copper.Session.settings, options: Copper.Session.options};
+
+        this.allProfiles[Copper.Profiles.selectedProfile] = profileSettings;
+        let newStorageObj = Copper.JsonUtils.stringify(this);
+        Copper.ChromeComponentFactory.storeLocally(Copper.Profiles.profilesKey, newStorageObj);
+    }
 };
-
-

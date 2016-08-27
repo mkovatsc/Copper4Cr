@@ -76,10 +76,14 @@ Copper.ChromeComponentFactory = {
 
 
 	},
-	storeLocally: function(id, value) {
+	storeLocally: function(id, value, callback) {
 					var storeObject = {};
 					storeObject[id] = value;
-					chrome.storage.local.set(storeObject);
+					chrome.storage.local.set(storeObject, function(items) {
+						if (callback !== undefined) {
+							callback();
+						}
+					});
 				},
 	retrieveLocally: function(id, callback) {
 					chrome.storage.local.get(id, function(items) {

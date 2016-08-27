@@ -82,6 +82,10 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
                 if (profileToDeleteInDropdown.firstElementChild.classList.contains("selected")) {
                     // Select standard profile if profile to delete was previously selected
                     Copper.ToolbarAdapter.radioElement("copper-toolbar-profiles-standard");
+                    Copper.Profiles.selectedProfile = Copper.Profiles.defaultProfile;
+                    Copper.ChromeComponentFactory.storeLocally(Copper.Profiles.selectedProfileKey, Copper.Profiles.selectedProfile);
+
+                    Copper.Session.profiles.updateCurrentProfile(true);
                 }
                 profileToDeleteInDropdown.parentNode.removeChild(profileToDeleteInDropdown);
 
@@ -97,7 +101,7 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
                 // Profile renamed
                 Copper.Session.profiles.allProfiles[managerProfileName.value] = Copper.Session.profiles.allProfiles[dropdownProfileName];
                 delete Copper.Session.profiles.allProfiles[dropdownProfileName];
-                dropdownProfileName.innerHTML = managerProfileName.value;
+                dropDownProfiles[i].lastElementChild.innerHTML = managerProfileName.value;
             }
         }
 
@@ -200,6 +204,6 @@ Copper.ProfilesAdapter.addNewHTMLDropdownProfile = function(name, profiles, sele
 
     li.onclick = function() {
         Copper.ToolbarAdapter.radioElement(li.id);
-        profiles.loadProfile(name);
+        profiles.changeProfile(name);
     }
 };

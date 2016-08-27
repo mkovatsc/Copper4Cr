@@ -116,12 +116,16 @@ Copper.ToolbarAdapter.onProfileLoaded = function() {
         if (profileKey !== Copper.Profiles.defaultProfile) {
             let element = document.getElementById("copper-toolbar-profiles-profile-" + profileKey.split(' ').join('-'));
             if (element === null) {
-                Copper.ProfilesAdapter.addNewHTMLDropdownProfile(profileKey, profiles, profileKey === profiles.selectedProfile);
+                Copper.ProfilesAdapter.addNewHTMLDropdownProfile(profileKey, profiles, profileKey === Copper.Profiles.selectedProfile);
             }
         }
     }
 
-    if (profiles.selectedProfile === Copper.Profiles.defaultProfile) {
+    if (profiles.autoStore) {
+        Copper.ToolbarAdapter.checkboxElement("copper-toolbar-profiles-auto-store");
+    }
+
+    if (Copper.Profiles.selectedProfile === Copper.Profiles.defaultProfile) {
         let standardProfile = document.getElementById("copper-toolbar-profiles-standard");
         standardProfile.firstElementChild.classList.remove("hidden");
         standardProfile.firstElementChild.classList.add("selected");
@@ -256,8 +260,6 @@ Copper.ToolbarAdapter.onProfileLoaded = function() {
 };
 
 Copper.ToolbarAdapter.doPing = function(){
-    chrome.storage.local.clear(function () { });
-
     let coapMessage = new Copper.CoapMessage(Copper.Session.settings.requests, Copper.CoapMessage.Code.EMPTY);
 	Copper.Session.sendCoapMessage(coapMessage, true);
 };
@@ -497,15 +499,17 @@ Copper.ToolbarAdapter.behaviorObserveRst = function() {
 
 Copper.ToolbarAdapter.profilesStandardProfile = function() {
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.profiles.loadProfile(Copper.Profiles.defaultProfile);
+    Copper.Session.profiles.changeProfile(Copper.Profiles.defaultProfile);
 };
 
 Copper.ToolbarAdapter.profilesAutoStore = function() {
     Copper.ToolbarAdapter.checkboxElement(this.id);
+    Copper.Session.profiles.autoStore = !Copper.Session.profiles.autoStore;
+    Copper.Session.storeChange();
 };
 
 Copper.ToolbarAdapter.profilesStoreCurrent = function() {
-    Copper.ToolbarAdapter.checkboxElement(this.id);
+    Copper.Session.profiles.updateCurrentProfile(true);
 };
 
 Copper.ToolbarAdapter.checkboxElement = function(id) {

@@ -197,17 +197,17 @@ Copper.Session.loadAllProfilesAndSelect = function() {
 
     Copper.ChromeComponentFactory.retrieveLocally(Copper.Profiles.profilesKey, function(id, items) {
         let profiles = items[id];
-
         if (profiles === undefined) {
             // No profiles stored yet -> Create default profile and load it
             Copper.Session.profiles.createAndSelectDefaultProfile();
 
         } else {
             Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
+            Copper.ChromeComponentFactory.retrieveLocally(Copper.Profiles.selectedProfileKey, function(id2, items2) {
+                let name = items2[id2];
+                Copper.Session.profiles.loadProfile(name);
 
-            let allProfiles = Copper.Session.profiles.allProfiles;
-
-            Copper.Session.profiles.loadProfile(Copper.Session.profiles.selectedProfile)
+            });
         }
     });
 
@@ -215,5 +215,4 @@ Copper.Session.loadAllProfilesAndSelect = function() {
 
 Copper.Session.storeChange = function() {
     Copper.Session.profiles.updateCurrentProfile();
-    debugger;
 };
