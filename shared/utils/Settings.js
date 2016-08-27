@@ -34,7 +34,7 @@ Copper.Settings = function() {
 };
 
 // Message type to use. See Copper.CoapMessage.Type object for different values
-Copper.Settings.prototype.requests = Copper.CoapMessage.Type.CON;
+Copper.Settings.prototype.requests = 0;
 
 // Retransmit messages after timeout (up to MAX_RETRANSMIT)
 Copper.Settings.prototype.retransmission = true;
@@ -70,3 +70,18 @@ Copper.Settings.prototype.observeCancellation = "lazy";
 
 
 Copper.Settings.prototype.payloadMode = "text";
+
+
+Copper.Settings.prototype.payloadText = "";
+
+
+Copper.Settings.prototype.payloadFileData = new ArrayBuffer();
+
+
+Copper.Settings.prototype.payloadFileName = "";
+
+
+Copper.Settings.prototype.resources = new Object();
+
+
+Copper.Settings.prototype.encode_utf_8 = true;
