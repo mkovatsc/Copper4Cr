@@ -49,12 +49,15 @@ Copper.PayloadAdapter.init = function(){
 	Copper.PayloadAdapter.visiblePane = document.getElementById("copper-payload-tab-in");
 
 	document.getElementById("copper-payload-btn-in").onclick = function(){
+		Copper.PayloadAdapter.toggleHighlight(this);
 		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-in"));
 	};
 	document.getElementById("copper-payload-btn-rendered").onclick = function(){
+		Copper.PayloadAdapter.toggleHighlight(this);
 		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-rendered"));
 	};
 	document.getElementById("copper-payload-btn-out").onclick = function(){
+		Copper.PayloadAdapter.toggleHighlight(this);
 		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-out"));
 		document.getElementById("copper-payload-tab-out").focus();
 		document.getElementById("copper-payload-tab-out").onchange = function() {
@@ -69,6 +72,16 @@ Copper.PayloadAdapter.onProfileLoaded = function() {
 	if (payload.payloadText !== undefined) {
 		document.getElementById("copper-payload-tab-out").value = payload.payloadText;
 	}
+};
+
+Copper.PayloadAdapter.toggleHighlight = function(element) {
+	console.log(element)
+	if (element.classList.contains("selected")) {
+		return;
+	}
+
+	element.parentNode.getElementsByClassName("selected")[0].classList.remove("selected");
+	element.classList.add("selected");
 };
 
 Copper.PayloadAdapter.resetPayload = function() {

@@ -944,6 +944,10 @@ button
 	cursor: pointer;
 }
 
-#manage-profile-window #profile-add {
+#manage-profile-window #copper-profile-manager-add-profile {
 	margin-bottom: 0px;
+}
+
+#manage-profile-window .text-input-custom {
+	padding: 1px;
 }

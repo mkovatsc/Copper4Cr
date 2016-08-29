@@ -336,16 +336,18 @@ Copper.ToolbarAdapter.openDropdown = function(){
         var dropdown = document.getElementById(containerId);
         var elementClicked = event.target;
 
-        // Close dropdown if click was outside of it
+        // Close dropdown if click was outside of it or on an element which requires the dropdown menu to be closed (class: close-dropdown-on-click)
         // Check if there is the dropdown container in the parent chain (stop after more than 5 levels or if parent null)
-        var j = 0;
-        while (elementClicked !== null) {
+        if (!elementClicked.classList.contains("close-dropdown-on-click")) {
+            var j = 0;
+            while (elementClicked !== null) {
 
-            if (elementClicked === dropdown) {
-                return;
+                if (elementClicked === dropdown) {
+                    return;
+                }
+                elementClicked = elementClicked.parentElement;
+                j++;
             }
-            elementClicked = elementClicked.parentElement;
-            j++;
         }
 
         for (let i = 0; i < dropdowns.length; i++) {
@@ -507,6 +509,7 @@ Copper.ToolbarAdapter.profilesAutoStore = function() {
 };
 
 Copper.ToolbarAdapter.profilesStoreCurrent = function() {
+    alert("Stored current changes to the selected profile");
     Copper.Session.profiles.updateCurrentProfile(true);
 };
 
