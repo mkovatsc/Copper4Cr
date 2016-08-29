@@ -92,11 +92,6 @@ Copper.Profiles.prototype.loadProfile = function(name) {
             let profile = Copper.Session.profiles.allProfiles[name];
             Copper.Session.settings = profile.settings;
             Copper.Session.options = profile.options;
-            if (Copper.Session.settings.requests === 0) {
-                Copper.Session.settings.requests = Copper.CoapMessage.Type.CON;
-            } else {
-                Copper.Session.settings.requests = (Copper.Session.settings.requests.number === 0 ? Copper.CoapMessage.Type.CON : Copper.CoapMessage.Type.NON);
-            }
 
             let guiAdapters = Copper.Session.guiAdapters;
 

@@ -172,8 +172,10 @@ Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
                 }
             }
 
-
-            Copper.Session.options.addOptions(coapMessage);
+            if (Copper.Session.options.optionsEnabled){
+                blockwiseEnabled = Copper.Session.options.blockwiseEnabled;
+                Copper.Session.options.addOptions(coapMessage);
+            }
 
             let guiAdapters = Copper.Session.guiAdapters;
             for (let i=0; i<guiAdapters.length; i++){
