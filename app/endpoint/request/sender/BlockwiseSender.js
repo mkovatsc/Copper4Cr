@@ -29,18 +29,19 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-Copper.BlockwiseSender = function(coapMessage, requestHandler, onComplete){
+Copper.BlockwiseSender = function(coapMessage, blockwiseEnabled, requestHandler, onComplete){
 	if (!(coapMessage instanceof Copper.CoapMessage) || !(requestHandler instanceof Copper.SingleRequestHandler) || typeof(onComplete) !== "function"){
 		throw new Error("Illegal argument");
 	}
 	this.coapMessage = coapMessage;
+	this.blockwiseEnabled = blockwiseEnabled;
 	this.requestHandler = requestHandler;
 	this.onComplete = onComplete;
 
 	if (this.requestHandler.settings.sendSize1){
 		this.coapMessage.addOption(Copper.CoapMessage.OptionHeader.SIZE1, this.coapMessage.payload.byteLength, true);
 	}
-	this.blockSizeExp = this.requestHandler.settings.blockwiseEnabled ? (this.requestHandler.settings.blockSize === 0 ? 10 : this.requestHandler.settings.blockSize) : undefined;
+	this.blockSizeExp = this.requestHandler.blockwiseEnabled ? (this.requestHandler.settings.blockSize === 0 ? 10 : this.requestHandler.settings.blockSize) : undefined;
 	this.offset = 0;
 	this.firstRequest = true;
 };
@@ -65,7 +66,7 @@ Copper.BlockwiseSender.prototype.start = function(){
 
 Copper.BlockwiseSender.prototype.onReceiveComplete = function(sentCoapMessage, receivedCoapMessage){
 	let block1 = receivedCoapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK1);
-	if (block1.length === 0 || !this.requestHandler.settings.blockwiseEnabled){
+	if (block1.length === 0 || !this.requestHandler.blockwiseEnabled){
 		Copper.Event.sendEvent(Copper.Event.createRequestCompletedEvent(sentCoapMessage, receivedCoapMessage, Copper.TimeUtils.now() - this.requestStart, this.requestHandler.endpointId));
 		this.onComplete();
 		return;

@@ -40,6 +40,9 @@ Copper.JsonUtils = function(){
 *  - Copper.CoapMessage
 */ 
 Copper.JsonUtils.stringify = function(object){
+	if (object === undefined){
+		return undefined;
+	}
 	return JSON.stringify(object, Copper.JsonUtils.replacer);
 };
 
@@ -47,6 +50,9 @@ Copper.JsonUtils.stringify = function(object){
 * Transform a json representation to an object
 */
 Copper.JsonUtils.parse = function(json){
+	if (json === undefined){
+		return undefined;
+	}
 	return JSON.parse(json, Copper.JsonUtils.reviver);
 };
 
@@ -94,48 +100,6 @@ Copper.JsonUtils.jsonToCopperSettings = function(data){
 	let settings = Object.keys(data);
 	for (let i=0; i<settings.length; i++){
 		res[settings[i]] = data[settings[i]];
-	}
-	return res;
-};
-
-Copper.JsonUtils.jsonToCopperOptions = function(data){
-	let res = new Copper.Options();
-	let options = Object.keys(data);
-	for (let i=0; i<options.length; i++){
-		res[options[i]] = data[options[i]];
-	}
-	return res;
-};
-
-Copper.JsonUtils.jsonToCopperProfiles = function(data){
-	let res = new Copper.Profiles();
-	let profiles = Object.keys(data);
-
-	for (let i=0; i<profiles.length; i++){
-		if (profiles[i] === "allProfiles") {
-			let profileNames = Object.keys(data[profiles[i]]);
-			for (let j=0; j<profileNames.length; j++){
-				let settings = new Copper.Settings();
-				let options = new Copper.Options();
-				let profileKeysSettings = Object.keys(data[profiles[i]][profileNames[j]]["settings"]);
-				let profileKeysOptions = Object.keys(data[profiles[i]][profileNames[j]]["options"]);
-				
-				for (let k=0; k<profileKeysSettings.length; k++){
-					settings[profileKeysSettings[k]] = data[profiles[i]][profileNames[j]]["settings"][profileKeysSettings[k]];
-				}
-				for (let k=0; k<profileKeysOptions.length; k++){
-					options[profileKeysOptions[k]] = data[profiles[i]][profileNames[j]]["options"][profileKeysOptions[k]];
-				}
-
-				res[profiles[i]][profileNames[j]] = {settings: settings, options: options};
-
-
-			}
-		}
-		else {
-			res[profiles[i]] = data[profiles[i]];
-		}
-
 	}
 	return res;
 };
@@ -200,8 +164,6 @@ Copper.JsonUtils.jsonToCoapMessage = function(data){
 Copper.JsonUtils.transformers = [
 	[function(value){return value instanceof ArrayBuffer}, "ArrayBuffer", Copper.JsonUtils.arrayBufferToJson, Copper.JsonUtils.jsonToArrayBuffer],
 	[function(value){return value instanceof Copper.Settings}, "Copper.Settings", undefined, Copper.JsonUtils.jsonToCopperSettings],
-	[function(value){return value instanceof Copper.Options}, "Copper.Options", undefined, Copper.JsonUtils.jsonToCopperOptions],
-	[function(value){return value instanceof Copper.Profiles}, "Copper.Profiles", undefined, Copper.JsonUtils.jsonToCopperProfiles],
 	[function(value){return value instanceof Copper.CoapMessage.Option}, "Copper.CoapMessage.Option", Copper.JsonUtils.coapMessageOptionToJson, Copper.JsonUtils.jsonToCoapMessageOption],
 	[function(value){return value instanceof Copper.CoapMessage}, "Copper.CoapMessage", Copper.JsonUtils.coapMessageToJson, Copper.JsonUtils.jsonToCoapMessage]
 ];

@@ -85,12 +85,11 @@ Copper.PopupWindowAdapter.clearResourceCache = function(){
 
 Copper.PopupWindowAdapter.clearPayloadCache = function(){
     if (confirm('This will delete the PAYLOAD cache. Continue?')) {
-        Copper.Session.settings.payloadFileData = new ArrayBuffer();
-        Copper.Session.settings.payloadFileName = "";
-        Copper.Session.settings.payloadMode = "text";
-        Copper.Session.settings.payloadText = "";
+        Copper.Session.payload.payloadFileData = new ArrayBuffer();
+        Copper.Session.payload.payloadFileName = "";
+        Copper.Session.payload.payloadMode = "text";
+        Copper.Session.payload.payloadText = "";
         Copper.ToolbarAdapter.resetPayload();
         Copper.PayloadAdapter.resetPayload();
-        Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
     }
 };

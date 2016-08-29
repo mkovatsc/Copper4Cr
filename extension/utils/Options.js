@@ -29,7 +29,6 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-/* Settings object. Set a pref to override the default behavior */
 Copper.Options = function() {
     this.etags = [];
     this.ifMatchs = [];
@@ -39,45 +38,26 @@ Copper.Options = function() {
 };
 
 Copper.Options.prototype.optionsEnabled = false;
-
-Copper.Options.prototype.token = "";
-
+Copper.Options.prototype.token = undefined;
 Copper.Options.prototype.accept = undefined;
-
 Copper.Options.prototype.contentFormat = undefined;
-
+Copper.Options.prototype.blockwiseEnabled = true;
 Copper.Options.prototype.block1 = undefined;
-
 Copper.Options.prototype.block2 = undefined;
-
 Copper.Options.prototype.size1 = undefined;
-
 Copper.Options.prototype.size2 = undefined;
-
 Copper.Options.prototype.observe = undefined;
-
 Copper.Options.prototype.etags = undefined;
-
 Copper.Options.prototype.ifMatchs = undefined;
-
 Copper.Options.prototype.ifNoneMatch = false;
-
-Copper.Options.prototype.uriHost = "";
-
+Copper.Options.prototype.uriHost = undefined;
 Copper.Options.prototype.uriPort = undefined;
-
-Copper.Options.prototype.proxyUri = "";
-
+Copper.Options.prototype.proxyUri = undefined;
 Copper.Options.prototype.proxyScheme = false;
-
 Copper.Options.prototype.maxAge = undefined;
-
 Copper.Options.prototype.locationPaths = undefined;
-
 Copper.Options.prototype.locationQueries = undefined;
-
 Copper.Options.prototype.customOptions = undefined;
-
 
 
 Copper.Options.prototype.addOptions = function(coapMessage) {
@@ -85,7 +65,7 @@ Copper.Options.prototype.addOptions = function(coapMessage) {
         return;
     }
     
-    if (this.token !== "") {
+    if (this.token !== undefined) {
         var token;
         if (this.token === 'empty' || this.token === '0x') {
             token = new ArrayBuffer(0);
@@ -108,7 +88,7 @@ Copper.Options.prototype.addOptions = function(coapMessage) {
         coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, this.contentFormat.number, true);
     }
 
-    if (!Copper.Session.settings.blockwiseEnabled) {
+    if (!this.blockwiseEnabled) {
         if (this.block1 !== undefined) {
             coapMessage.addOption(Copper.CoapMessage.OptionHeader.BLOCK1, new Copper.CoapMessage.BlockOption(this.block1, Copper.Session.settings.blockSize, false), true);
         }
@@ -143,7 +123,7 @@ Copper.Options.prototype.addOptions = function(coapMessage) {
         }
     }
 
-    if (this.uriHost !== "") {
+    if (this.uriHost !== undefined) {
         coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_HOST, this.uriHost, true);
     }
 
@@ -151,7 +131,7 @@ Copper.Options.prototype.addOptions = function(coapMessage) {
         coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PORT, this.uriPort, true);
     }
 
-    if (this.proxyUri !== "") {
+    if (this.proxyUri !== undefined) {
         // Proxy takes precedence over URI-Options (which MUST NOT be present)
         coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_HOST);
         coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_PORT);

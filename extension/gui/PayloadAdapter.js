@@ -58,17 +58,16 @@ Copper.PayloadAdapter.init = function(){
 		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-out"));
 		document.getElementById("copper-payload-tab-out").focus();
 		document.getElementById("copper-payload-tab-out").onchange = function() {
-			Copper.Session.settings.payloadText = this.value;
-			Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+			Copper.Session.payload.payloadText = this.value;
 		}
 	};
 };
 
 Copper.PayloadAdapter.onProfileLoaded = function() {
-	let settings = Copper.Session.settings;
+	let payload = Copper.Session.payload;
 
-	if (settings.payloadText !== undefined) {
-		document.getElementById("copper-payload-tab-out").value = settings.payloadText;
+	if (payload.payloadText !== undefined) {
+		document.getElementById("copper-payload-tab-out").value = payload.payloadText;
 	}
 };
 

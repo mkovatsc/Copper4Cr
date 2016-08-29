@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2016, Institute for Pervasive Computing, ETH Zurich.
  * All rights reserved.
  * 
@@ -28,8 +28,12 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
-﻿// Called when the user clicks on the browser action.
-chrome.browserAction.onClicked.addListener(function(tab) {
-  chrome.tabs.create({url: chrome.extension.getURL('index.html')});
-});
+
+Copper.Payload = function() {
+};
+
+
+Copper.Payload.prototype.payloadMode = "text";
+Copper.Payload.prototype.payloadText = undefined;
+Copper.Payload.prototype.payloadFileData = undefined;
+Copper.Payload.prototype.payloadFileName = undefined;

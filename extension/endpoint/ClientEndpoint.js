@@ -42,11 +42,11 @@ Copper.ClientEndpoint.prototype.port = undefined;
 Copper.ClientEndpoint.prototype.id = undefined;
 Copper.ClientEndpoint.prototype.eventCallback = undefined;
 
-Copper.ClientEndpoint.prototype.sendCoapMessage = function(coapMessage){
+Copper.ClientEndpoint.prototype.sendCoapMessage = function(coapMessage, blockwiseEnabled){
 	if (!(coapMessage instanceof Copper.CoapMessage)){
 		throw new Error("Illegal Argument");
 	}
-	this.port.sendMessage(Copper.Event.createClientSendCoapMessageEvent(coapMessage, this.id));
+	this.port.sendMessage(Copper.Event.createClientSendCoapMessageEvent(coapMessage, blockwiseEnabled, this.id));
 	return true;
 };
 

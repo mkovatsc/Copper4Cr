@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2016, Institute for Pervasive Computing, ETH Zurich.
  * All rights reserved.
  * 
@@ -28,8 +28,38 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
-﻿// Called when the user clicks on the browser action.
-chrome.browserAction.onClicked.addListener(function(tab) {
-  chrome.tabs.create({url: chrome.extension.getURL('index.html')});
-});
+
+Copper.CoapResourceHandler = function(){
+};
+
+Copper.CoapResourceHandler.resolveCoapResource = function(callback){
+	let search = window.location.search;
+    let uri = undefined;
+    if (search && search.startsWith("?")){
+        uri = Copper.StringUtils.parseUri(decodeURIComponent(search.substr(1)));
+    }
+    if (uri === undefined){
+        Copper.OverlayAdapter.addInputOverlay("Enter Endpoint", "Enter the URL of the Coap Endpoint", undefined, "coap://", "OK", function(value, errorCallback){
+            uri = Copper.StringUtils.parseUri(value);
+            if (uri === undefined){
+                errorCallback("Please enter a valid URL");
+            }
+            else {
+                Copper.CoapResourceHandler.changeCoapResource(uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query, true);
+            }
+        });
+    }
+    else {
+        callback(uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query);
+    }
+};
+
+Copper.CoapResourceHandler.changeCoapResource = function(protocol, remoteAddress, remotePort, path, query, reload){
+	if (reload) {
+		window.location.search = "?" + encodeURIComponent((protocol ? protocol + "://" : "") + remoteAddress + ":" + remotePort +
+				(path ? ("/" + path) : "") + (query ? ("?" + query) : ""));
+	} else {
+		window.history.pushState("", "", "?" + encodeURIComponent((protocol ? protocol + "://" : "") + remoteAddress + ":" + remotePort +
+				(path ? ("/" + path) : "") + (query ? ("?" + query) : "")));
+	}
+};

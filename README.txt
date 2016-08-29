@@ -6,4 +6,4 @@ Copper Chrome
 
 * Launch App & Extension in Chrome
 
-* Set application id of the Chrome App in the File extension/endpoint/ChromeStartup.js
+* Set application id of the Chrome App in the File extension/endpoint/ClientPortChrome.js

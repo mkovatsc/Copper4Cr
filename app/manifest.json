@@ -22,10 +22,7 @@
                      "shared/utils/StringUtils.js",
                      "shared/utils/ByteUtils.js",
                      "shared/utils/Settings.js",
-                     "shared/utils/Options.js",
-                     "shared/utils/Profiles.js",
                      "shared/utils/JsonUtils.js",
-                     "shared/utils/ComponentFactory.js",
 
                      "shared/logging/Log.js",
                      "shared/logging/ConsoleLogger.js",
@@ -39,10 +36,10 @@
                      "shared/coap/CoapMessageOptionHeader.js",
                      "shared/coap/CoapMessageBlockOption.js",
                      "shared/coap/CoapMessageOption.js",
-                     "shared/coap/CoapMessageSerializer.js",
                      "shared/coap/CoapMessageContentFormat.js",
+                     "shared/coap/CoapMessageSerializer.js",
 
-                     "shared/endpoint/ChromePort.js",
+                     "shared/endpoint/Port.js",
                      
                      //server part
                      "endpoint/request/receiver/BlockwiseReceiver.js",
@@ -55,11 +52,14 @@
                      "endpoint/transmission/ResponseMessageTransmission.js",
                      "endpoint/transmission/MessagesInTransmissionSet.js",
                      "endpoint/transmission/TransmissionHandler.js",
-  
-                     "endpoint/ChromeUdpClient.js",
+                     "endpoint/UdpClient.js",
                      "endpoint/ServerEndpoint.js",
 
-                     "background.js"
+                     "background.js",
+
+                     // Chrome Specific Overloads
+                     "endpoint/UdpClientChrome.js",
+                     "shared/endpoint/PortChrome.js"
                     ]
       }
   },

@@ -65,9 +65,7 @@ Copper.DebugOptionsAdapter.initContentFormat = function() {
 Copper.DebugOptionsAdapter.initResetListener = function() {
     let resetButton = document.getElementById("reset_button");
     resetButton.onclick = function() {
-        Copper.Session.settings.blockwiseEnabled = true;
         Copper.Session.options = new Copper.Options();
-        Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
         let sidebar = document.getElementById('sidebar');
         let allInputBoxes = sidebar.getElementsByTagName('INPUT');
         for (let i = 0; i < allInputBoxes.length; i++) {
@@ -177,8 +175,8 @@ Copper.DebugOptionsAdapter.onProfileLoaded = function() {
         options.removeEmptyMultipleOptions(options.locationQueries);
     }
 
-    if (settings.blockwiseEnabled) {
-        Copper.DebugOptionsAdapter.loadCheckbox('chk_debug_option_block_auto', settings.blockwiseEnabled);
+    if (options.blockwiseEnabled) {
+        Copper.DebugOptionsAdapter.loadCheckbox('chk_debug_option_block_auto', options.blockwiseEnabled);
         Copper.DebugOptionsAdapter.setBlockOptionAccess(false);
     }
 
@@ -326,26 +324,6 @@ Copper.DebugOptionsAdapter.multipleOptionsHTMLFactory = function(id, inputValue)
 
 Copper.DebugOptionsAdapter.onDebugOptionsEnabledChange = function() {
     Copper.Session.options.optionsEnabled = !Copper.Session.options.optionsEnabled;
-
-    // Only change blockwise setting if debug option enabled
-    let blockwiseCheckbox = document.getElementById("chk_debug_option_block_auto");
-    if (Copper.Session.options.optionsEnabled) {
-        if (blockwiseCheckbox.checked && !Copper.Session.settings.blockwiseEnabled) {
-            Copper.Session.settings.blockwiseEnabled = true;
-            Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
-            return;
-        } else if (!blockwiseCheckbox.checked && Copper.Session.settings.blockwiseEnabled) {
-            Copper.Session.settings.blockwiseEnabled = false;
-            Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
-            return;
-        }
-    } else {
-        if (!Copper.Session.settings.blockwiseEnabled) {
-            Copper.Session.settings.blockwiseEnabled = true;
-            Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
-            return;
-        }
-    }
     Copper.Session.storeChange();
 };
 

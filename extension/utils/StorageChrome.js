@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2016, Institute for Pervasive Computing, ETH Zurich.
  * All rights reserved.
  * 
@@ -29,7 +29,23 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-﻿// Called when the user clicks on the browser action.
-chrome.browserAction.onClicked.addListener(function(tab) {
-  chrome.tabs.create({url: chrome.extension.getURL('index.html')});
-});
+// Implementation of the storage API for Chrome
+
+Copper.Storage = function(){
+};
+
+Copper.Storage.storeLocally = function(id, value, callback) {
+	let storeObject = {};
+	storeObject[id] = value;
+	chrome.storage.local.set(storeObject, function(items) {
+		if (callback !== undefined) {
+			callback();
+		}
+	});
+};
+
+Copper.Storage.retrieveLocally = function(id, callback) {
+	chrome.storage.local.get(id, function(items) {
+		callback(id, items);
+	});
+};

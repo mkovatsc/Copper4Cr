@@ -71,7 +71,7 @@ Copper.ResourceViewAdapter.onEvent = function(event){
 
 Copper.ResourceViewAdapter.onClickResource = function() {
     Copper.Session.path = this.getAttribute("data-uri");
-    Copper.ComponentFactory.changeCoapResource(Copper.Session.protocol, Copper.Session.remoteAddress, Copper.Session.remotePort, this.getAttribute("data-uri"), false);
+    Copper.CoapResourceHandler.changeCoapResource(Copper.Session.protocol, Copper.Session.remoteAddress, Copper.Session.remotePort, this.getAttribute("data-uri"), false);
 };
 
 Copper.ResourceViewAdapter.updateResourceLinks = function(add) {
