@@ -80,11 +80,11 @@ Copper.Options.prototype.addOptions = function(coapMessage) {
         coapMessage.setToken(token);
     }
 
-    if (this.accept !== undefined) {
+    if (this.accept !== 0) {
         coapMessage.addOption(Copper.CoapMessage.OptionHeader.ACCEPT, this.accept.number, true);
     }
 
-    if (this.contentFormat !== undefined) {
+    if (this.contentFormat !== 0) {
         coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, this.contentFormat.number, true);
     }
 
