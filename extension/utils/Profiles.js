@@ -34,24 +34,21 @@ Copper.Profiles = function() {
 };
 
 Copper.Profiles.prototype.allProfiles = undefined;
-Copper.Profiles.prototype.autoStore = false;
+Copper.Profiles.prototype.autoStore = true;
 
 Copper.Profiles.defaultProfile = "default_profile";
 
-Copper.Profiles.profilesKey = "profiles";
-
-Copper.Profiles.selectedProfileKey = "selected_profile";
+Copper.Profiles.selectedProfile = "";
 
 
-
-Copper.Profiles.prototype.addNewProfile = function(name, settings, options) {
+Copper.Profiles.prototype.addNewProfile = function(name) {
     if (!(name in this.allProfiles)) {
-        this.allProfiles[name] = {settings: settings, options: options};
+        this.allProfiles[name] = {settings: Copper.Session.settings, options: Copper.Session.options, payload: Copper.Session.payload};
         let newStorageObj = Copper.JsonUtils.stringify(Copper.Session.profiles);
-        Copper.Storage.storeLocally(Copper.Profiles.profilesKey, newStorageObj, function () {
-            Copper.Storage.retrieveLocally(Copper.Profiles.profilesKey, function (id, items) {
+        Copper.Storage.storeLocally(Copper.Storage.keys.PROFILES_KEY, newStorageObj, function () {
+            Copper.Storage.retrieveLocally(Copper.Storage.keys.PROFILES_KEY, function (id, items) {
                 let profiles = items[id];
-
+                console.log(profiles);
                 Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
             });
         });
@@ -60,18 +57,21 @@ Copper.Profiles.prototype.addNewProfile = function(name, settings, options) {
 
 Copper.Profiles.prototype.deleteProfile = function(name) {
     if (name in this.allProfiles) {
+        if (Copper.Profiles.selectedProfile === name) {
+            Copper.Profiles.selectedProfile = Copper.Profiles.defaultProfile;
+        }
         delete this.allProfiles[name];
         let newStorageObj = Copper.JsonUtils.stringify(Copper.Session.profiles);
-        Copper.Storage.storeLocally(Copper.Profiles.profilesKey, newStorageObj);
+        Copper.Storage.storeLocally(Copper.Storage.keys.PROFILES_KEY, newStorageObj);
     }
 };
 
 Copper.Profiles.prototype.createAndSelectDefaultProfile = function() {
     if (!(Copper.Profiles.defaultProfile in this.allProfiles)) {
         this.allProfiles = {};
-        this.addNewProfile(Copper.Profiles.defaultProfile, Copper.Session.settings, Copper.Session.options);
+        this.addNewProfile(Copper.Profiles.defaultProfile);
         this.loadProfile(Copper.Profiles.defaultProfile);
-        Copper.Storage.storeLocally(Copper.Profiles.selectedProfileKey, Copper.Profiles.defaultProfile);
+        Copper.Storage.storeLocally(Copper.Storage.keys.SELECTED_PROFILE, Copper.Profiles.defaultProfile);
     }
 };
 
@@ -82,43 +82,45 @@ Copper.Profiles.prototype.loadProfile = function(name) {
     }
 
     var thisRef = this;
-    Copper.Storage.retrieveLocally(Copper.Profiles.profilesKey, function(id, items) {
+    Copper.Storage.retrieveLocally(Copper.Storage.keys.PROFILES_KEY, function(id, items) {
         let profiles = items[id];
 
-            Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
+        Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
 
-            Copper.Profiles.selectedProfile = name;
-            let profile = Copper.Session.profiles.allProfiles[name];
-            Copper.Session.settings = profile.settings;
-            Copper.Session.options = profile.options;
+        Copper.Profiles.selectedProfile = name;
+        let profile = Copper.Session.profiles.allProfiles[name];
+        Copper.Session.settings = profile.settings;
+        Copper.Session.options = profile.options;
+        Copper.Session.payload = profile.payload;
 
-            let guiAdapters = Copper.Session.guiAdapters;
+        let guiAdapters = Copper.Session.guiAdapters;
 
-            // init
-            for (let i=0; i<guiAdapters.length; i++){
-                if (typeof(guiAdapters[i].onProfileLoaded) === "function"){
-                    guiAdapters[i].onProfileLoaded();
-                }
+        // init
+        for (let i=0; i<guiAdapters.length; i++){
+            if (typeof(guiAdapters[i].onProfileLoaded) === "function"){
+                guiAdapters[i].onProfileLoaded();
             }
+        }
 
-            Copper.Session.profiles.updateCurrentProfile();
+        Copper.Session.profiles.updateCurrentProfile();
     });
-
 };
 
 Copper.Profiles.prototype.changeProfile = function(name) {
-    Copper.Storage.storeLocally(Copper.Profiles.selectedProfileKey, name, function() {
-        window.location.reload();
+    var thisRef = this;
+    Copper.Storage.storeLocally(Copper.Storage.keys.SELECTED_PROFILE, name, function() {
+        thisRef.loadProfile(name);
     });
 }
 
 Copper.Profiles.prototype.updateCurrentProfile = function(forceUpdate) {
     if (forceUpdate || this.autoStore) {
 
-        let profileSettings = {settings: Copper.Session.settings, options: Copper.Session.options};
+        console.log("yes");
+        let profileSettings = {settings: Copper.Session.settings, options: Copper.Session.options, payload: Copper.Session.payload};
 
         this.allProfiles[Copper.Profiles.selectedProfile] = profileSettings;
         let newStorageObj = Copper.JsonUtils.stringify(this);
-        Copper.Storage.storeLocally(Copper.Profiles.profilesKey, newStorageObj);
+        Copper.Storage.storeLocally(Copper.Storage.keys.PROFILES_KEY, newStorageObj);
     }
 };

@@ -42,3 +42,13 @@ Copper.Storage.storeLocally = function(id, value, callback) {
 Copper.Storage.retrieveLocally = function(id, callback) {
 	throw new Error("not implemented");
 };
+
+Copper.Storage.clear = function() {
+	throw new Error("not implemented");
+};
+
+Copper.Storage.keys = function() {
+};
+
+Copper.Storage.keys.SELECTED_PROFILE = "selected_profile";
+Copper.Storage.keys.PROFILES_KEY = "all_profiles";

@@ -54,5 +54,12 @@ Copper.Storage.clear = function(callback) {
 	Copper.Session.profiles = new Copper.Profiles();
 	Copper.Session.settings = new Copper.Settings();
 	Copper.Session.options = new Copper.Options();
+	Copper.Session.payload = new Copper.Payload();
 	chrome.storage.local.clear(function() { callback();});
-}
+};
+
+Copper.Storage.keys = function() {
+};
+
+Copper.Storage.keys.SELECTED_PROFILE = "selected_profile";
+Copper.Storage.keys.PROFILES_KEY = "all_profiles";

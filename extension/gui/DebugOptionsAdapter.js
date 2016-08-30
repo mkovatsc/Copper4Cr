@@ -203,7 +203,7 @@ Copper.DebugOptionsAdapter.loadAllInputTooltips = function() {
 
 Copper.DebugOptionsAdapter.initSingleOptionsInputBox = function(inputId, onChangeFunction) {
     let input = document.getElementById(inputId);
-    input.onchange = onChangeFunction; //TODO: oninput
+    input.oninput = onChangeFunction;
     input.parentNode.lastElementChild.onclick = function () {
         input.value = "";
         onChangeFunction();
@@ -230,6 +230,9 @@ Copper.DebugOptionsAdapter.initMultipleOptionsInputBox = function(id) {
             }
             Copper.DebugOptionsAdapter.setStringToHexTooltip(inputBox);
         };
+        inputBox.onblur = function() {
+            console.log("finish");
+        }
         let clearSign = next.lastElementChild.lastElementChild;
         clearSign.onclick = function () {
             inputBox.value = "";

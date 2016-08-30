@@ -45,37 +45,39 @@ Copper.PayloadAdapter.setVisiblePane = function(element){
 	}
 };
 
-Copper.PayloadAdapter.init = function(){
+Copper.PayloadAdapter.init = function() {
 	Copper.PayloadAdapter.visiblePane = document.getElementById("copper-payload-tab-in");
 
-	document.getElementById("copper-payload-btn-in").onclick = function(){
+	document.getElementById("copper-payload-btn-in").onclick = function () {
 		Copper.PayloadAdapter.toggleHighlight(this);
 		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-in"));
 	};
-	document.getElementById("copper-payload-btn-rendered").onclick = function(){
+	document.getElementById("copper-payload-btn-rendered").onclick = function () {
 		Copper.PayloadAdapter.toggleHighlight(this);
 		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-rendered"));
 	};
-	document.getElementById("copper-payload-btn-out").onclick = function(){
+	document.getElementById("copper-payload-btn-out").onclick = function () {
 		Copper.PayloadAdapter.toggleHighlight(this);
 		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-out"));
 		document.getElementById("copper-payload-tab-out").focus();
-		document.getElementById("copper-payload-tab-out").onchange = function() {
-			Copper.Session.payload.payloadText = this.value;
-		}
+		document.getElementById("copper-payload-tab-out").onchange = Copper.PayloadAdapter.onOutgoingChange;
 	};
 };
 
 Copper.PayloadAdapter.onProfileLoaded = function() {
 	let payload = Copper.Session.payload;
+	console.log(payload);
+	document.getElementById("copper-payload-tab-out").value = payload.payloadText;
+};
 
-	if (payload.payloadText !== undefined) {
-		document.getElementById("copper-payload-tab-out").value = payload.payloadText;
-	}
+Copper.PayloadAdapter.onOutgoingChange = function() {
+	Copper.Session.payload.payloadText = this.value;
+	console.log(this.value);
+	Copper.Session.storeChange();
+	console.log(Copper.Session.payload.payloadText);
 };
 
 Copper.PayloadAdapter.toggleHighlight = function(element) {
-	console.log(element)
 	if (element.classList.contains("selected")) {
 		return;
 	}

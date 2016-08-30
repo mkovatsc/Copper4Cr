@@ -89,16 +89,16 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
                 } else {
                     validationProfileSet[managerProfileName.value] = true;
                 }
-            }
 
-            if (managerProfileName.value === "") {
-                managerProfileName.style.backgroundColor = "rgba(255,255,0,0.6)";
-                hasFormError = true;
-            }
+                if (managerProfileName.value === "") {
+                    managerProfileName.style.backgroundColor = "rgba(255,255,0,0.6)";
+                    hasFormError = true;
+                }
 
-            if (!/^[A-Za-z0-9]*$/g.test(managerProfileName.value)) {
-                managerProfileName.style.backgroundColor = "rgba(255,0,0,0.6)";
-                hasFormError = true
+                if (!/^[A-Za-z0-9]*$/g.test(managerProfileName.value)) {
+                    managerProfileName.style.backgroundColor = "rgba(255,0,0,0.6)";
+                    hasFormError = true
+                }
             }
         }
 
@@ -115,15 +115,12 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
             if (managerProfileName.disabled) {
                 // Profile deleted
 
-                delete Copper.Session.profiles.allProfiles[dropdownProfileName];
+                Copper.Session.profiles.deleteProfile(dropdownProfileName);
+                
                 let profileToDeleteInDropdown = dropDownProfiles[i];
                 if (profileToDeleteInDropdown.firstElementChild.classList.contains("selected")) {
                     // Select standard profile if profile to delete was previously selected
                     Copper.ToolbarAdapter.radioElement("copper-toolbar-profiles-standard");
-                    Copper.Profiles.selectedProfile = Copper.Profiles.defaultProfile;
-                    Copper.Storage.storeLocally(Copper.Profiles.selectedProfileKey, Copper.Profiles.selectedProfile);
-
-                    Copper.Session.profiles.updateCurrentProfile(true);
                 }
                 profileToDeleteInDropdown.parentNode.removeChild(profileToDeleteInDropdown);
 
@@ -156,7 +153,7 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
             }
 
             // Add new profile
-            Copper.Session.profiles.addNewProfile(nextInput.value, Copper.Session.settings, Copper.Session.options);
+            Copper.Session.profiles.addNewProfile(nextInput.value);
             Copper.ProfilesAdapter.addNewHTMLDropdownProfile(nextInput.value, Copper.Session.profiles, false);
             lastNewlyCreatedProfile = nextInput.value;
         }

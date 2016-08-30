@@ -503,6 +503,12 @@ button
 	margin-bottom: 5px;
 }
 
+.main-content .sidebar-right input:disabled {
+	background: rgba(230,150,20,0.4);
+	-webkit-filter: blur(2px);
+	filter: blur(2px);
+}
+
 
 .main-content .sidebar-right .checkbox 
 {

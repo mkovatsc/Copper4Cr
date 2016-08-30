@@ -32,6 +32,11 @@
 Copper.Numeric = function(){
 };
 
+/**
+ * Test if str represents a positive integer
+ * @param str
+ * @returns {boolean}
+ */
 Copper.Numeric.isPositiveInteger = function(str) {
     return /^\+?(0|[1-9]\d*)$/.test(str);
 }
