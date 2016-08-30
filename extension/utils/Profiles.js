@@ -68,7 +68,6 @@ Copper.Profiles.prototype.deleteProfile = function(name) {
 
 Copper.Profiles.prototype.createAndSelectDefaultProfile = function() {
     if (!(Copper.Profiles.defaultProfile in this.allProfiles)) {
-
         this.allProfiles = {};
         this.addNewProfile(Copper.Profiles.defaultProfile, Copper.Session.settings, Copper.Session.options);
         this.loadProfile(Copper.Profiles.defaultProfile);
@@ -108,22 +107,13 @@ Copper.Profiles.prototype.loadProfile = function(name) {
 };
 
 Copper.Profiles.prototype.changeProfile = function(name) {
-
     Copper.Storage.storeLocally(Copper.Profiles.selectedProfileKey, name, function() {
         window.location.reload();
     });
-
 }
 
 Copper.Profiles.prototype.updateCurrentProfile = function(forceUpdate) {
-
-    //let profileSettings = {settings: Copper.Session.settings, options: Copper.Session.options};
-
-    //this.allProfiles[Copper.Profiles.defaultProfile] = profileSettings;
-    //let newStorageObj = Copper.JsonUtils.stringify(this);
-    //Copper.Storage.storeLocally(Copper.Profiles.profilesKey, newStorageObj);
-
-    if (forceUpdate || this.autoStore || Copper.Profiles.selectedProfile === Copper.Profiles.defaultProfile) {
+    if (forceUpdate || this.autoStore) {
 
         let profileSettings = {settings: Copper.Session.settings, options: Copper.Session.options};
 

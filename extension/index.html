@@ -50,6 +50,7 @@
 	<script src="utils/Payload.js"></script>
 	<script src="utils/Profiles.js"></script>
 	<script src="utils/ExtensionJsonUtils.js"></script>
+	<script src="utils/Numeric.js"></script>
 
 	<script src="endpoint/CoapResourceHandler.js"></script>
 	<script src="endpoint/ClientEndpoint.js"></script>
@@ -519,19 +520,19 @@
 						
 						<p>ETag(s)</p>
 						<div class="flex vbox multiple-options" id="debug_option_etags">
-							<div class="flex hbox last-option-with-add">
-								<img class="add-option-button" src="skin/collapsed.png">
+							<div class="flex hbox fixed-option-entry">
+								<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
 								<span class="flex hbox text-input-custom">
 									<input class="flex str2Hex" type="text"  placeholder="use hex (0x..) or string">
 									<span class="clear_text" title="Clear">&times;</span>
 								</span>
 							</div>
 						</div>
-						
+
 						<p>If-Match(s)</p>
 						<div class="flex vbox multiple-options" id="debug_option_if_matchs">
-							<div class="flex hbox last-option-with-add">
-								<img class="add-option-button" src="skin/collapsed.png">
+							<div class="flex hbox fixed-option-entry">
+								<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
 								<span class="flex hbox text-input-custom">
 									<input class="flex str2Hex" type="text"  placeholder="use hex (0x..) or string">
 									<span class="clear_text" title="Clear">&times;</span>
@@ -587,8 +588,8 @@
 
 						<p>Location-Path</p>
 						<div class="flex vbox multiple-options" id="debug_option_location_paths">
-							<div class="flex hbox last-option-with-add">
-								<img class="add-option-button" src="skin/collapsed.png">
+							<div class="flex hbox fixed-option-entry">
+								<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
 								<span class="flex hbox text-input-custom">
 									<input class="flex str2Hex" type="text"  placeholder="not set">
 									<span class="clear_text" title="Clear">&times;</span>
@@ -598,8 +599,8 @@
 
 						<p>Location-Query</p>
 						<div class="flex vbox multiple-options" id="debug_option_location_queries">
-							<div class="flex hbox last-option-with-add">
-								<img class="add-option-button" src="skin/collapsed.png">
+							<div class="flex hbox fixed-option-entry">
+								<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
 								<span class="flex hbox text-input-custom">
 									<input class="flex str2Hex" type="text"  placeholder="not set">
 									<span class="clear_text" title="Clear">&times;</span>
@@ -670,6 +671,7 @@
 					</div>
 					<button id="preferences-window-clear-resource-cache">Clear resource cache</button>
 					<button id="preferences-window-clear-payload-cache">Clear payload cache</button>
+					<button id="preferences-window-clear-entire-cache">Clear entire cache</button>
 				</fieldset>
 			<button class="close-button">OK</button>
 			</div>

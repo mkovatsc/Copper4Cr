@@ -84,6 +84,10 @@ button
 	visibility : hidden;
 }
 
+.invalid_input {
+	background-color: rgba(255,0,0,0.6);
+}
+
 /* Tables */
 .table {
 	position: relative;
@@ -557,9 +561,8 @@ button
   height: 25px;
 }
 
-.text-input-custom  input {
+.text-input-custom input {
   border:none;
-  background:white;
   outline:none;
   width: 0;
 }
@@ -593,10 +596,10 @@ button
 	width: 13px;
 	height: 13px;
 	top: 6px;
-	cursor: pointer;
+	cursor: help;
 }
 
-.main-content .last-option-with-add {
+.main-content .fixed-option-entry {
 	position: relative;
 }
 

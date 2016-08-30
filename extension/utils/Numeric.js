@@ -1,7 +1,7 @@
 /*******************************************************************************
  * Copyright (c) 2016, Institute for Pervasive Computing, ETH Zurich.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -13,7 +13,7 @@
  * 3. Neither the name of the Institute nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE INSTITUTE AND CONTRIBUTORS "AS IS" AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -25,34 +25,13 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
- * 
+ *
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
-// Implementation of the storage API for Chrome
 
-Copper.Storage = function(){
+Copper.Numeric = function(){
 };
 
-Copper.Storage.storeLocally = function(id, value, callback) {
-	let storeObject = {};
-	storeObject[id] = value;
-	chrome.storage.local.set(storeObject, function(items) {
-		if (callback !== undefined) {
-			callback();
-		}
-	});
-};
-
-Copper.Storage.retrieveLocally = function(id, callback) {
-	chrome.storage.local.get(id, function(items) {
-		callback(id, items);
-	});
-};
-
-Copper.Storage.clear = function(callback) {
-	Copper.Session.profiles = new Copper.Profiles();
-	Copper.Session.settings = new Copper.Settings();
-	Copper.Session.options = new Copper.Options();
-	chrome.storage.local.clear(function() { callback();});
+Copper.Numeric.isPositiveInteger = function(str) {
+    return /^\+?(0|[1-9]\d*)$/.test(str);
 }
