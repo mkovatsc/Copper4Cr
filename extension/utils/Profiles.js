@@ -48,7 +48,6 @@ Copper.Profiles.prototype.addNewProfile = function(name) {
         Copper.Storage.storeLocally(Copper.Storage.keys.PROFILES_KEY, newStorageObj, function () {
             Copper.Storage.retrieveLocally(Copper.Storage.keys.PROFILES_KEY, function (id, items) {
                 let profiles = items[id];
-                console.log(profiles);
                 Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
             });
         });
@@ -116,7 +115,6 @@ Copper.Profiles.prototype.changeProfile = function(name) {
 Copper.Profiles.prototype.updateCurrentProfile = function(forceUpdate) {
     if (forceUpdate || this.autoStore) {
 
-        console.log("yes");
         let profileSettings = {settings: Copper.Session.settings, options: Copper.Session.options, payload: Copper.Session.payload};
 
         this.allProfiles[Copper.Profiles.selectedProfile] = profileSettings;

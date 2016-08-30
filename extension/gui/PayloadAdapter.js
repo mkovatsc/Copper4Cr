@@ -66,15 +66,12 @@ Copper.PayloadAdapter.init = function() {
 
 Copper.PayloadAdapter.onProfileLoaded = function() {
 	let payload = Copper.Session.payload;
-	console.log(payload);
 	document.getElementById("copper-payload-tab-out").value = payload.payloadText;
 };
 
 Copper.PayloadAdapter.onOutgoingChange = function() {
 	Copper.Session.payload.payloadText = this.value;
-	console.log(this.value);
 	Copper.Session.storeChange();
-	console.log(Copper.Session.payload.payloadText);
 };
 
 Copper.PayloadAdapter.toggleHighlight = function(element) {

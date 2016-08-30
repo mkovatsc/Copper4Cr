@@ -39,8 +39,8 @@ Copper.Options = function() {
 
 Copper.Options.prototype.optionsEnabled = false;
 Copper.Options.prototype.token = undefined;
-Copper.Options.prototype.accept = undefined;
-Copper.Options.prototype.contentFormat = undefined;
+Copper.Options.prototype.accept = 0;
+Copper.Options.prototype.contentFormat = 0;
 Copper.Options.prototype.blockwiseEnabled = true;
 Copper.Options.prototype.block1 = undefined;
 Copper.Options.prototype.block2 = undefined;

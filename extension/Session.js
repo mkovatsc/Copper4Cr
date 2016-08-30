@@ -212,8 +212,6 @@ Copper.Session.loadAllProfilesAndSelect = function() {
 
         } else {
             Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
-            console.log(profiles);
-            console.log(Copper.Session.profiles);
             Copper.Storage.retrieveLocally(Copper.Storage.keys.SELECTED_PROFILE, function(id2, items2) {
                 let name = items2[id2];
                 Copper.Session.profiles.loadProfile(name);

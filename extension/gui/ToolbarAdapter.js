@@ -339,7 +339,6 @@ Copper.ToolbarAdapter.behaviorRequestNon = function() {
 };
 
 Copper.ToolbarAdapter.behaviorRetransmissions = function() {
-    console.log("here");
     Copper.Session.settings.retransmissions = !Copper.Session.settings.retransmissions;
     Copper.ToolbarAdapter.checkboxElement(this.id);
     Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);

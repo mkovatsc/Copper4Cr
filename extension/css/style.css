@@ -592,6 +592,10 @@ button
 	margin-right: auto;
 }
 
+.main-content .multiple-options {
+	position: relative;
+}
+
 .main-content .multiple-options span {
 	margin-bottom: 5px;
 }
@@ -604,11 +608,6 @@ button
 	top: 6px;
 	cursor: help;
 }
-
-.main-content .fixed-option-entry {
-	position: relative;
-}
-
 
 /* Coap Message Log Box */
 .main-content-bottom-box 

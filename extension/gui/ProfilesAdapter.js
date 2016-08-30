@@ -79,8 +79,6 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
         let validationProfileSet = {};
         for (var i = 0; i < oldManagerProfileCount; i++) {
             let managerProfileName = managerProfiles[i].firstElementChild.firstElementChild;
-            console.log(managerProfileName);
-            console.log(managerProfileName.value);
 
             if (!managerProfileName.disabled) {
                 if (managerProfileName.value in validationProfileSet) {

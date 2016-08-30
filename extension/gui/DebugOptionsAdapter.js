@@ -1,41 +1,36 @@
 Copper.DebugOptionsAdapter = function(){
 };
 
-Copper.DebugOptionsAdapter.beforeSendingCoapMessage = function(coapMessage) {
-    //Copper.DebugOptionsAdapter.removeEmptyMultipleOptionInputs();
-};
-
 Copper.DebugOptionsAdapter.init = function() {
     Copper.DebugOptionsAdapter.initContentFormat();
     Copper.DebugOptionsAdapter.initResetListener();
 
+    // Checkboxes
     document.getElementById("chk_debug_options").onclick = Copper.DebugOptionsAdapter.onDebugOptionsEnabledChange;
     document.getElementById("chk_debug_option_block_auto").onclick = Copper.DebugOptionsAdapter.onBlockwiseEnabledChange;
     document.getElementById("debug_option_if_none_match").onclick = Copper.DebugOptionsAdapter.onIfNoneMatchChange;
     document.getElementById("debug_option_proxy_scheme").onclick = Copper.DebugOptionsAdapter.onProxySchemeChange;
 
+    // Selection Menus
     document.getElementById("debug_option_accept").onchange = Copper.DebugOptionsAdapter.onAcceptChange;
     document.getElementById("debug_option_content_format").onchange = Copper.DebugOptionsAdapter.onContentFormatChange;
 
-    Copper.DebugOptionsAdapter.initSingleOptionsInputBox('debug_option_token', Copper.DebugOptionsAdapter.onTokenChange);
-    Copper.DebugOptionsAdapter.initSingleOptionsInputBox('debug_option_block1', Copper.DebugOptionsAdapter.onBlock1Change);
-    Copper.DebugOptionsAdapter.initSingleOptionsInputBox('debug_option_block2', Copper.DebugOptionsAdapter.onBlock2Change);
-    Copper.DebugOptionsAdapter.initSingleOptionsInputBox('debug_option_size1', Copper.DebugOptionsAdapter.onSize1Change);
-    Copper.DebugOptionsAdapter.initSingleOptionsInputBox('debug_option_size2', Copper.DebugOptionsAdapter.onSize2Change);
-    Copper.DebugOptionsAdapter.initSingleOptionsInputBox('debug_option_observe', Copper.DebugOptionsAdapter.onObserveChange);
-    Copper.DebugOptionsAdapter.initSingleOptionsInputBox('debug_option_uri_host', Copper.DebugOptionsAdapter.onUriHostChange);
-    Copper.DebugOptionsAdapter.initSingleOptionsInputBox('debug_option_uri_port', Copper.DebugOptionsAdapter.onUriPortChange);
-    Copper.DebugOptionsAdapter.initSingleOptionsInputBox('debug_option_proxy_uri', Copper.DebugOptionsAdapter.onProxyUriChange);
-    Copper.DebugOptionsAdapter.initSingleOptionsInputBox('debug_option_max_age', Copper.DebugOptionsAdapter.onMaxAgeChange);
+    // Single Menu Options
+    Copper.DebugOptionsAdapter.initSingleOptionsListeners('debug_option_token', Copper.DebugOptionsAdapter.onTokenChange);
+    Copper.DebugOptionsAdapter.initSingleOptionsListeners('debug_option_block1', Copper.DebugOptionsAdapter.onBlock1Change);
+    Copper.DebugOptionsAdapter.initSingleOptionsListeners('debug_option_block2', Copper.DebugOptionsAdapter.onBlock2Change);
+    Copper.DebugOptionsAdapter.initSingleOptionsListeners('debug_option_size1', Copper.DebugOptionsAdapter.onSize1Change);
+    Copper.DebugOptionsAdapter.initSingleOptionsListeners('debug_option_size2', Copper.DebugOptionsAdapter.onSize2Change);
+    Copper.DebugOptionsAdapter.initSingleOptionsListeners('debug_option_observe', Copper.DebugOptionsAdapter.onObserveChange);
+    Copper.DebugOptionsAdapter.initSingleOptionsListeners('debug_option_uri_host', Copper.DebugOptionsAdapter.onUriHostChange);
+    Copper.DebugOptionsAdapter.initSingleOptionsListeners('debug_option_uri_port', Copper.DebugOptionsAdapter.onUriPortChange);
+    Copper.DebugOptionsAdapter.initSingleOptionsListeners('debug_option_proxy_uri', Copper.DebugOptionsAdapter.onProxyUriChange);
+    Copper.DebugOptionsAdapter.initSingleOptionsListeners('debug_option_max_age', Copper.DebugOptionsAdapter.onMaxAgeChange);
 
-    Copper.DebugOptionsAdapter.initMultipleOptionsInputBox('debug_option_etags');
-    Copper.DebugOptionsAdapter.initMultipleOptionsInputBox('debug_option_if_matchs');
-    Copper.DebugOptionsAdapter.initMultipleOptionsInputBox('debug_option_location_paths');
-    Copper.DebugOptionsAdapter.initMultipleOptionsInputBox('debug_option_location_queries');
 };
 
 /**
- * Init Select Menus
+ * Init Selection Menus
  */
 Copper.DebugOptionsAdapter.initContentFormat = function() {
     let acceptMenu = document.getElementById("debug_option_accept");
@@ -60,7 +55,7 @@ Copper.DebugOptionsAdapter.initContentFormat = function() {
 };
 
 /**
- * Reset all options to default
+ * Initialize listener for reset button to reset all options
  */
 Copper.DebugOptionsAdapter.initResetListener = function() {
     let resetButton = document.getElementById("reset_button");
@@ -70,7 +65,7 @@ Copper.DebugOptionsAdapter.initResetListener = function() {
 };
 
 /**
- * Reset all options to default
+ * Reset all options
  */
 Copper.DebugOptionsAdapter.resetAllDebugOptions = function() {
     Copper.Session.options = new Copper.Options();
@@ -94,7 +89,23 @@ Copper.DebugOptionsAdapter.resetAllDebugOptions = function() {
         let nextSelectMenu = allSelectionMenus[i];
         nextSelectMenu.selectedIndex = 0;
     }
-    Copper.DebugOptionsAdapter.removeAllEmptyMultipleOptionInputs();
+    Copper.DebugOptionsAdapter.removeAllAdditionalMultipleOptionInputBoxes();
+    Copper.Session.options = new Copper.Options();
+    Copper.Session.storeChange();
+};
+
+/**
+ * Initialize listener for single options.
+ * @param inputId
+ * @param onChangeFunction
+ */
+Copper.DebugOptionsAdapter.initSingleOptionsListeners = function(inputId, onChangeFunction) {
+    let input = document.getElementById(inputId);
+    input.oninput = onChangeFunction;
+    input.parentNode.lastElementChild.onclick = function () {
+        input.value = "";
+        onChangeFunction();
+    }
 };
 
 /**
@@ -132,16 +143,18 @@ Copper.DebugOptionsAdapter.onProfileLoaded = function() {
     Copper.DebugOptionsAdapter.loadSingleOptionInputBox("debug_option_max_age", options.maxAge);
 
     // Multiple Options
-    Copper.DebugOptionsAdapter.loadMultipleOptionInputBox("debug_option_etags", options.etags);
-    Copper.DebugOptionsAdapter.loadMultipleOptionInputBox("debug_option_if_matchs", options.ifMatchs);
-    Copper.DebugOptionsAdapter.loadMultipleOptionInputBox("debug_option_location_paths", options.locationPaths);
-    Copper.DebugOptionsAdapter.loadMultipleOptionInputBox("debug_option_location_queries", options.locationQueries);
-
-    Copper.DebugOptionsAdapter.loadAllInputTooltips();
+    Copper.DebugOptionsAdapter.loadMultipleOptionInputBox("debug_options_etags", options.etags);
+    Copper.DebugOptionsAdapter.loadMultipleOptionInputBox("debug_options_if_matchs", options.ifMatchs);
+    Copper.DebugOptionsAdapter.loadMultipleOptionInputBox("debug_options_location_paths", options.locationPaths);
+    Copper.DebugOptionsAdapter.loadMultipleOptionInputBox("debug_options_location_queries", options.locationQueries);
 };
 
 /**
- * Load checkbox value based on option value. The default value will be selected
+ * Methods called upon profile loaded
+ */
+
+/**
+ * Load checkbox value from storage. The default value will be selected
  * as defined in the prototype
  * @param id
  * @param option
@@ -151,96 +164,81 @@ Copper.DebugOptionsAdapter.loadCheckbox = function(id, checked) {
     checkbox.checked = checked;
 };
 
+/**
+ * Load selected index from storage. The default value will be
+ * @param id
+ * @param option
+ */
 Copper.DebugOptionsAdapter.loadSelectionMenu = function(id, option) {
-    let index;
-
-    if (option === undefined) {
-        index = 0;
-    } else {
-        index = option.index;
-    }
-
     let selectionMenu = document.getElementById(id);
-    selectionMenu.selectedIndex = index;
+    selectionMenu.selectedIndex = option.index;
 };
 
+/**
+ * Load single option input box value from storage. The default value will be selected
+ * as defined in the prototype
+ * @param id
+ * @param option
+ */
 Copper.DebugOptionsAdapter.loadSingleOptionInputBox = function(id, value) {
     if (value === undefined) {
         value = "";
     }
     let inputBox = document.getElementById(id);
-
     inputBox.value = value;
 };
 
+/**
+ * Load multiple option input box values from storage and generate additional HTML entries if necessary.
+ * Add listeners to all entries.
+ * @param id
+ * @param option
+ */
 Copper.DebugOptionsAdapter.loadMultipleOptionInputBox = function(id, values) {
     let option = document.getElementById(id);
+    let inputBox = option.lastElementChild.firstElementChild.firstElementChild;
 
     if (values.length === 0) {
         // No value in storage
-        option.firstElementChild.lastElementChild.firstElementChild.value = "";
+        inputBox.value = "";
     } else {
         // Init if only one value
-        option.firstElementChild.lastElementChild.firstElementChild.value = values[0];
-        if (values.length === 1 && values[0] !== "") {
-            Copper.DebugOptionsAdapter.addNewMultipleOptionsEntry(id);
-        }
+        inputBox.value = values[0];
 
-        // Init with stored values
         for (let i = 1; i < values.length; i++) {
             Copper.DebugOptionsAdapter.addNewMultipleOptionsEntry(id, values[i]);
         }
+        Copper.DebugOptionsAdapter.addNewMultipleOptionsEntry(id);
+    }
+
+    inputBox.oninput = function() {
+        Copper.DebugOptionsAdapter.onMultipleOptionsInputChange(id,inputBox, inputBox.parentNode.parentNode);
+    }
+    let clearSign = option.lastElementChild.lastElementChild.lastElementChild;
+    clearSign.onclick = function () {
+        Copper.DebugOptionsAdapter.onMultipleOptionsInputChange(id, inputBox, inputBox.parentNode.parentNode);
     }
 };
 
-Copper.DebugOptionsAdapter.loadAllInputTooltips = function() {
-    let allTooltipInputs = document.getElementsByClassName("str2Hex");
-    for (let i = 0; i < allTooltipInputs.length; i++) {
-        let nextInput = allTooltipInputs[i];
-        Copper.DebugOptionsAdapter.setStringToHexTooltip(nextInput);
-    }
-}
 
-Copper.DebugOptionsAdapter.initSingleOptionsInputBox = function(inputId, onChangeFunction) {
-    let input = document.getElementById(inputId);
-    input.oninput = onChangeFunction;
-    input.parentNode.lastElementChild.onclick = function () {
-        input.value = "";
-        onChangeFunction();
+Copper.DebugOptionsAdapter.onMultipleOptionsInputChange = function(id, inputBox, parent) {
+    Copper.DebugOptionsAdapter.setStringToHexTooltip(inputBox);
+    let newElementIndex = 0;
+    let elem = parent;
+    while (elem = elem.previousElementSibling ) {
+        newElementIndex++;
+    }
+    newElementIndex--; // First element is <img>
+
+    Copper.DebugOptionsAdapter.callOnChangeFunction(id, inputBox, newElementIndex);
+
+    if (inputBox.value === "") {
+        Copper.DebugOptionsAdapter.removeEmptyMultipleOptionInputs(inputBox, id);
+    } else {
+        Copper.DebugOptionsAdapter.addNewMultipleOptionsEntry(id);
     }
 };
 
-Copper.DebugOptionsAdapter.initMultipleOptionsInputBox = function(id) {
-    let option = document.getElementById(id);
-    let optionChildren = option.children;
-    let lastChild = option.lastElementChild.firstElementChild;
-    lastChild.onclick = function() {
-        //Copper.DebugOptionsAdapter.addNewMultipleOptionsEntry(id);
-    }
-    for (let i = optionChildren.length-1; i >= 0; i--) {
-        let next = optionChildren[i];
-        let inputBox = next.lastElementChild.firstElementChild;
-
-        inputBox.oninput = function () {
-            Copper.DebugOptionsAdapter.callOnChangeFunction(id, inputBox.value, i);
-            if (inputBox.value === "") {
-                Copper.DebugOptionsAdapter.removeEmptyMultipleOptionInputs(inputBox, id);
-            } else {
-                Copper.DebugOptionsAdapter.addNewMultipleOptionsEntry(id);
-            }
-            Copper.DebugOptionsAdapter.setStringToHexTooltip(inputBox);
-        };
-        inputBox.onblur = function() {
-            console.log("finish");
-        }
-        let clearSign = next.lastElementChild.lastElementChild;
-        clearSign.onclick = function () {
-            inputBox.value = "";
-            Copper.DebugOptionsAdapter.callOnChangeFunction(id, inputBox.value, i);
-            Copper.DebugOptionsAdapter.setStringToHexTooltip(inputBox);
-        }
-    }
-};
 
 /**
  * All onChange functions (on GUI Element change)
@@ -390,23 +388,39 @@ Copper.DebugOptionsAdapter.onMaxAgeChange = function() {
     Copper.Session.storeChange();
 };
 
-Copper.DebugOptionsAdapter.onEtagsChange = function(value, index) {
-    Copper.Session.options.etags[index] = value;
+Copper.DebugOptionsAdapter.onEtagsChange = function(index, inputBox) {
+    if (inputBox.value === "") {
+        Copper.Session.options.etags.splice(index, 1);
+    } else {
+        Copper.Session.options.etags[index] = inputBox.value;
+    }
     Copper.Session.storeChange();
 };
 
-Copper.DebugOptionsAdapter.onIfMatchsChange = function(value, index) {
-    Copper.Session.options.ifMatchs[index] = value;
+Copper.DebugOptionsAdapter.onIfMatchsChange = function(index, inputBox) {
+    if (inputBox.value === "") {
+        Copper.Session.options.ifMatchs.splice(index, 1);
+    } else {
+        Copper.Session.options.ifMatchs[index] = inputBox.value;
+    }
     Copper.Session.storeChange();
 };
 
-Copper.DebugOptionsAdapter.onLocationPathsChange = function(value, index) {
-    Copper.Session.options.locationPaths[index] = value;
+Copper.DebugOptionsAdapter.onLocationPathsChange = function(index, inputBox) {
+    if (inputBox.value === "") {
+        Copper.Session.options.locationPaths.splice(index, 1);
+    } else {
+        Copper.Session.options.locationPaths[index] = inputBox.value;
+    }
     Copper.Session.storeChange();
 };
 
-Copper.DebugOptionsAdapter.onLocationQueriesChange = function(value, index) {
-    Copper.Session.options.locationQueries[index] = value;
+Copper.DebugOptionsAdapter.onLocationQueriesChange = function(index, inputBox) {
+    if (inputBox.value === "") {
+        Copper.Session.options.locationQueries.splice(index, 1);
+    } else {
+        Copper.Session.options.locationQueries[index] = inputBox.value;
+    }
     Copper.Session.storeChange();
 };
 
@@ -446,7 +460,7 @@ Copper.DebugOptionsAdapter.addNewMultipleOptionsEntry = function(id, inputValue)
     let element = document.getElementById(id);
     let emptyInputBoxesCount = 0;
     let emptyInputBoxes = [];
-    for (let i = 0; i < element.children.length; i++) {
+    for (let i = 1; i < element.children.length; i++) {
         let next = element.children[i];
         if (next.lastElementChild.firstElementChild.value === "") {
             emptyInputBoxesCount++;
@@ -481,12 +495,12 @@ Copper.DebugOptionsAdapter.addNewMultipleOptionsEntry = function(id, inputValue)
     }
     let placeholder;
     switch(id) {
-        case "debug_option_etags":
-        case "debug_option_if_matchs":
+        case "debug_options_etags":
+        case "debug_options_if_matchs":
             placeholder = 'use hex (0x..) or string';
             break;
-        case "debug_option_location_paths":
-        case "debug_option_location_queries":
+        case "debug_options_location_paths":
+        case "debug_options_location_queries":
             placeholder = 'not set';
             break;
     }
@@ -496,21 +510,12 @@ Copper.DebugOptionsAdapter.addNewMultipleOptionsEntry = function(id, inputValue)
     div.appendChild(span);
     element.appendChild(div);
 
-    let newElementIndex = element.children.length - 1;
     input.oninput = function() {
-
-        if (input.value === "") {
-            Copper.DebugOptionsAdapter.removeEmptyMultipleOptionInputs(input, id);
-        } else {
-            Copper.DebugOptionsAdapter.addNewMultipleOptionsEntry(id);
-        }
-
-        Copper.DebugOptionsAdapter.callOnChangeFunction(id, input.value, newElementIndex);
-        Copper.DebugOptionsAdapter.setStringToHexTooltip(input);
+        Copper.DebugOptionsAdapter.onMultipleOptionsInputChange(id, input, div);
     };
+
     clearText.onclick = function() {
-        input.value = "";
-        Copper.DebugOptionsAdapter.callOnChangeFunction(id, input.value, newElementIndex);
+        Copper.DebugOptionsAdapter.onMultipleOptionsInputChange(id, input, div);
     };
 };
 
@@ -523,37 +528,27 @@ Copper.DebugOptionsAdapter.removeEmptyMultipleOptionInputs = function(inputBox, 
     let element = document.getElementById(id);
     let emptyInputBoxesCount = 0;
     let emptyInputBoxes = [];
-    for (let i = 0; i < element.children.length; i++) {
+    for (let i = 1; i < element.children.length; i++) {
         let next = element.children[i];
         if (next.lastElementChild.firstElementChild.value === "") {
             emptyInputBoxesCount++;
-            if (!next.classList.contains("fixed-option-entry")) {
-                emptyInputBoxes.push(next);
-            }
+            emptyInputBoxes.push(next);
         }
     }
 
     if (emptyInputBoxesCount > 1) {
-        if (inputBox.parentNode.parentNode.classList.contains("fixed-option-entry")) {
-            element.removeChild(emptyInputBoxes[0]);
-        } else {
-            for (let i = 0; i < emptyInputBoxes.length-1; i++) {
-                if (!emptyInputBoxes[i].classList.contains("fixed-option-entry"))
-                {
-                    element.removeChild(emptyInputBoxes[i]);
-                }
-            }
-        }
+        element.removeChild(emptyInputBoxes[0]);
     }
 };
 
-Copper.DebugOptionsAdapter.removeAllEmptyMultipleOptionInputs = function() {
+Copper.DebugOptionsAdapter.removeAllAdditionalMultipleOptionInputBoxes = function() {
     let allMultipleOptions = document.getElementsByClassName("multiple-options");
+
     for (let i = 0; i < allMultipleOptions.length; i++) {
         let next = allMultipleOptions[i];
         // Remove all empty input boxes, except the last one
         let childrenCount = next.children.length;
-        for (let j = 1; j < next.children.length;) {
+        for (let j = 2; j < next.children.length;) {
             let optionChild = next.children[j];
             if (optionChild.lastElementChild.firstElementChild.value == "") {
                 next.removeChild(optionChild);
@@ -569,22 +564,23 @@ Copper.DebugOptionsAdapter.removeAllEmptyMultipleOptionInputs = function() {
  * @param value
  * @param index
  */
-Copper.DebugOptionsAdapter.callOnChangeFunction = function(id, value, index) {
+Copper.DebugOptionsAdapter.callOnChangeFunction = function(id, inputBox, index) {
     switch(id) {
-        case "debug_option_etags":
-            Copper.DebugOptionsAdapter.onEtagsChange(value, index);
+        case "debug_options_etags":
+            Copper.DebugOptionsAdapter.onEtagsChange(index, inputBox);
             break;
-        case "debug_option_if_matchs":
-            Copper.DebugOptionsAdapter.onIfMatchsChange(value, index);
+        case "debug_options_if_matchs":
+            Copper.DebugOptionsAdapter.onIfMatchsChange(index, inputBox);
             break;
-        case "debug_option_location_paths":
-            Copper.DebugOptionsAdapter.onLocationPathsChange(value, index);
+        case "debug_options_location_paths":
+            Copper.DebugOptionsAdapter.onLocationPathsChange(index, inputBox);
             break;
-        case "debug_option_location_queries":
-            Copper.DebugOptionsAdapter.onLocationQueriesChange(value, index);
+        case "debug_options_location_queries":
+            Copper.DebugOptionsAdapter.onLocationQueriesChange(index, inputBox);
             break;
     }
 };
+
 
 /**
  * Only called for elements with class 'str2Hex"
