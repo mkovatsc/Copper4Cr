@@ -37,7 +37,7 @@ Copper.Settings = function() {
 Copper.Settings.prototype.requests = 0;
 
 // Retransmit messages after timeout (up to MAX_RETRANSMIT)
-Copper.Settings.prototype.retransmission = true;
+Copper.Settings.prototype.retransmissions = true;
 
 // Do not increase MID to send duplicates
 // TODO: in FF-Copper not used...

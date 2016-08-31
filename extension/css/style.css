@@ -84,6 +84,10 @@ button
 	visibility : hidden;
 }
 
+.invalid_input {
+	background-color: rgba(255,0,0,0.6);
+}
+
 /* Tables */
 .table {
 	position: relative;
@@ -499,6 +503,12 @@ button
 	margin-bottom: 5px;
 }
 
+.main-content .sidebar-right input:disabled {
+	background: rgba(230,150,20,0.4);
+	-webkit-filter: blur(2px);
+	filter: blur(2px);
+}
+
 
 .main-content .sidebar-right .checkbox 
 {
@@ -557,9 +567,8 @@ button
   height: 25px;
 }
 
-.text-input-custom  input {
+.text-input-custom input {
   border:none;
-  background:white;
   outline:none;
   width: 0;
 }
@@ -583,6 +592,10 @@ button
 	margin-right: auto;
 }
 
+.main-content .multiple-options {
+	position: relative;
+}
+
 .main-content .multiple-options span {
 	margin-bottom: 5px;
 }
@@ -593,13 +606,8 @@ button
 	width: 13px;
 	height: 13px;
 	top: 6px;
-	cursor: pointer;
+	cursor: help;
 }
-
-.main-content .last-option-with-add {
-	position: relative;
-}
-
 
 /* Coap Message Log Box */
 .main-content-bottom-box 
@@ -944,6 +952,10 @@ button
 	cursor: pointer;
 }
 
-#manage-profile-window #profile-add {
+#manage-profile-window #copper-profile-manager-add-profile {
 	margin-bottom: 0px;
+}
+
+#manage-profile-window .text-input-custom {
+	padding: 1px;
 }

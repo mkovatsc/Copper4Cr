@@ -50,6 +50,7 @@
 	<script src="utils/Payload.js"></script>
 	<script src="utils/Profiles.js"></script>
 	<script src="utils/ExtensionJsonUtils.js"></script>
+	<script src="utils/Numeric.js"></script>
 
 	<script src="endpoint/CoapResourceHandler.js"></script>
 	<script src="endpoint/ClientEndpoint.js"></script>
@@ -328,7 +329,7 @@
 								<div class="selection-icon hidden">
 									<span>&#8203;</span>
 								</div>
-								<p>Store to current Profile</p>
+								<p class="close-dropdown-on-click">Store to current Profile</p>
 							</li>
 						</ul>
 						<div class="separation-line"></div>
@@ -337,7 +338,7 @@
 								<div class="selection-icon hidden">
 									<span>&#8203;</span>
 								</div>
-								<p>Manage Profiles...</p>
+								<p class="close-dropdown-on-click">Manage Profiles...</p>
 							</li>
 						</ul>
 					</div>
@@ -422,7 +423,7 @@
 						</div>
 						<div class="center-box-bottom flex-filler">
 							<h2>Payload</h2>
-							<button id="copper-payload-btn-in" type="button">
+							<button id="copper-payload-btn-in" class="selected" type="button">
 								<img src="skin/payload_in.png"> Incoming
 							</button>
 							<button id="copper-payload-btn-rendered" type="button">
@@ -518,22 +519,22 @@
 						</div>
 						
 						<p>ETag(s)</p>
-						<div class="flex vbox multiple-options" id="debug_option_etags">
-							<div class="flex hbox last-option-with-add">
-								<img class="add-option-button" src="skin/collapsed.png">
+						<div class="flex vbox multiple-options" id="debug_options_etags">
+							<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
+							<div class="flex hbox fixed-option-entry">
 								<span class="flex hbox text-input-custom">
 									<input class="flex str2Hex" type="text"  placeholder="use hex (0x..) or string">
 									<span class="clear_text" title="Clear">&times;</span>
 								</span>
 							</div>
 						</div>
-						
+
 						<p>If-Match(s)</p>
-						<div class="flex vbox multiple-options" id="debug_option_if_matchs">
-							<div class="flex hbox last-option-with-add">
-								<img class="add-option-button" src="skin/collapsed.png">
+						<div class="flex vbox multiple-options" id="debug_options_if_matchs">
+							<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
+							<div class="flex hbox fixed-option-entry">
 								<span class="flex hbox text-input-custom">
-									<input class="flex str2Hex" type="text"  placeholder="use hex (0x..) or string">
+									<input class="flex str2Hex" type="text" placeholder="use hex (0x..) or string">
 									<span class="clear_text" title="Clear">&times;</span>
 								</span>
 							</div>
@@ -586,22 +587,22 @@
 						</div>
 
 						<p>Location-Path</p>
-						<div class="flex vbox multiple-options" id="debug_option_location_paths">
-							<div class="flex hbox last-option-with-add">
-								<img class="add-option-button" src="skin/collapsed.png">
+						<div class="flex vbox multiple-options" id="debug_options_location_paths">
+							<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
+							<div class="flex hbox fixed-option-entry">
 								<span class="flex hbox text-input-custom">
-									<input class="flex str2Hex" type="text"  placeholder="not set">
+									<input class="flex str2Hex" type="text" placeholder="not set">
 									<span class="clear_text" title="Clear">&times;</span>
 								</span>
 							</div>
 						</div>
 
 						<p>Location-Query</p>
-						<div class="flex vbox multiple-options" id="debug_option_location_queries">
-							<div class="flex hbox last-option-with-add">
-								<img class="add-option-button" src="skin/collapsed.png">
+						<div class="flex vbox multiple-options" id="debug_options_location_queries">
+							<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
+							<div class="flex hbox fixed-option-entry">
 								<span class="flex hbox text-input-custom">
-									<input class="flex str2Hex" type="text"  placeholder="not set">
+									<input class="flex str2Hex" type="text" placeholder="not set">
 									<span class="clear_text" title="Clear">&times;</span>
 								</span>
 							</div>
@@ -663,21 +664,14 @@
 
 			<div class="vbox content">
 				<fieldset>
-					<legend>Appearance</legend>
-				</fieldset>
-
-				<fieldset>
 					<legend>Debug</legend>
 					<div class="checkbox">
 						<label><input id="preferences-window-encode-utf-8" type="checkbox">
 							Use UTF-8 encoding</label>
 					</div>
-					<div class="checkbox">
-						<label><input id="preferences-window-plugtest" type="checkbox">
-							Enable ETSI Plugtest menu</label>
-					</div>
 					<button id="preferences-window-clear-resource-cache">Clear resource cache</button>
 					<button id="preferences-window-clear-payload-cache">Clear payload cache</button>
+					<button id="preferences-window-clear-entire-cache">Clear entire cache</button>
 				</fieldset>
 			<button class="close-button">OK</button>
 			</div>
@@ -693,14 +687,18 @@
 				<fieldset id="copper-profile-manager-container">
 					<legend>Profiles</legend>
 
-
-					<button id="profile-add">Add Profile with current Settings</button>
+					<button id="copper-profile-manager-add-profile">Add Profile with current Settings</button>
 
 				</fieldset>
 
+				<div class="checkbox" style="margin-bottom: 6px">
+					<label><input id="copper-profile-manager-load-newest-profile" type="checkbox">
+						Load newest created profile (if any)</label>
+				</div>
+
 				<div class="hbox">
-					<button id="profile-save-and-exit">Save and Exit</button>
-					<button id="profile-cancel">Cancel</button>
+					<button id="copper-profile-manage-save-and-exit">Save and Exit</button>
+					<button title="Close and do not save any changes to the profiles" id="copper-profile-manager-cancel">Cancel</button>
 				</div>
 
 			</div>

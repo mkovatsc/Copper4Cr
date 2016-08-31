@@ -33,7 +33,6 @@ Copper.PopupWindowAdapter = function(){
 };
 
 Copper.PopupWindowAdapter.encode_utf_8 = true;
-Copper.PopupWindowAdapter.plugtest = false;
 
 Copper.PopupWindowAdapter.init = function()
 {
@@ -43,9 +42,9 @@ Copper.PopupWindowAdapter.init = function()
     }
     
     document.getElementById("preferences-window-encode-utf-8").onclick = Copper.PopupWindowAdapter.checkEncode_utf_8;
-    document.getElementById("preferences-window-plugtest").onclick = Copper.PopupWindowAdapter.checkPlugtest;
     document.getElementById("preferences-window-clear-resource-cache").onclick = Copper.PopupWindowAdapter.clearResourceCache;
     document.getElementById("preferences-window-clear-payload-cache").onclick = Copper.PopupWindowAdapter.clearPayloadCache;
+    document.getElementById("preferences-window-clear-entire-cache").onclick = Copper.PopupWindowAdapter.clearEntireCache;
 
 
     // Init default
@@ -91,5 +90,17 @@ Copper.PopupWindowAdapter.clearPayloadCache = function(){
         Copper.Session.payload.payloadText = "";
         Copper.ToolbarAdapter.resetPayload();
         Copper.PayloadAdapter.resetPayload();
+    }
+};
+
+Copper.PopupWindowAdapter.clearEntireCache = function(){
+    if (confirm('This will delete the ENTIRE cache. Continue?')) {
+        Copper.Storage.clear(function() {
+            Copper.ToolbarAdapter.resetPayload();
+            Copper.PayloadAdapter.resetPayload();
+            Copper.DebugOptionsAdapter.resetAllDebugOptions();
+            Copper.Session.profiles.createAndSelectDefaultProfile();
+        });
+
     }
 };

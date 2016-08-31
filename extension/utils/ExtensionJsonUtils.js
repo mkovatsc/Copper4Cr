@@ -52,17 +52,22 @@ Copper.ExtensionJsonUtils.jsonToCopperProfiles = function(data){
 			for (let j=0; j<profileNames.length; j++){
 				let settings = new Copper.Settings();
 				let options = new Copper.Options();
+				let payload = new Copper.Payload();
 				let profileKeysSettings = Object.keys(data[profiles[i]][profileNames[j]]["settings"]);
 				let profileKeysOptions = Object.keys(data[profiles[i]][profileNames[j]]["options"]);
-				
+				let profileKeysPayload = Object.keys(data[profiles[i]][profileNames[j]]["payload"]);
+
 				for (let k=0; k<profileKeysSettings.length; k++){
 					settings[profileKeysSettings[k]] = data[profiles[i]][profileNames[j]]["settings"][profileKeysSettings[k]];
 				}
 				for (let k=0; k<profileKeysOptions.length; k++){
 					options[profileKeysOptions[k]] = data[profiles[i]][profileNames[j]]["options"][profileKeysOptions[k]];
 				}
+				for (let k=0; k<profileKeysPayload.length; k++){
+					payload[profileKeysPayload[k]] = data[profiles[i]][profileNames[j]]["payload"][profileKeysPayload[k]];
+				}
 
-				res[profiles[i]][profileNames[j]] = {settings: settings, options: options};
+				res[profiles[i]][profileNames[j]] = {settings: settings, options: options, payload: payload};
 
 
 			}

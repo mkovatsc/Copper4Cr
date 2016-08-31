@@ -39,8 +39,8 @@ Copper.Options = function() {
 
 Copper.Options.prototype.optionsEnabled = false;
 Copper.Options.prototype.token = undefined;
-Copper.Options.prototype.accept = undefined;
-Copper.Options.prototype.contentFormat = undefined;
+Copper.Options.prototype.accept = 0;
+Copper.Options.prototype.contentFormat = 0;
 Copper.Options.prototype.blockwiseEnabled = true;
 Copper.Options.prototype.block1 = undefined;
 Copper.Options.prototype.block2 = undefined;
@@ -80,11 +80,11 @@ Copper.Options.prototype.addOptions = function(coapMessage) {
         coapMessage.setToken(token);
     }
 
-    if (this.accept !== undefined) {
+    if (this.accept !== 0) {
         coapMessage.addOption(Copper.CoapMessage.OptionHeader.ACCEPT, this.accept.number, true);
     }
 
-    if (this.contentFormat !== undefined) {
+    if (this.contentFormat !== 0) {
         coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, this.contentFormat.number, true);
     }
 

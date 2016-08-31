@@ -32,13 +32,14 @@
 Copper.ProfilesAdapter = function(){
 };
 
+Copper.ProfilesAdapter.loadNewestCreatedProfile = false;
 
 Copper.ProfilesAdapter.init = function() {
-    document.getElementById("profile-add").onclick = function() { Copper.ProfilesAdapter.addNewHTMLProfileInManager() };
-    document.getElementById("profile-save-and-exit").onclick = function() { Copper.ProfilesAdapter.closeProfileManager(true); };
-    document.getElementById("profile-cancel").onclick = function() { Copper.ProfilesAdapter.closeProfileManager(false); };
+    document.getElementById("copper-profile-manager-add-profile").onclick = function() { Copper.ProfilesAdapter.addNewHTMLProfileInManager() };
+    document.getElementById("copper-profile-manage-save-and-exit").onclick = function() { Copper.ProfilesAdapter.closeProfileManager(true); };
+    document.getElementById("copper-profile-manager-cancel").onclick = function() { Copper.ProfilesAdapter.closeProfileManager(false); };
     document.getElementById("copper-toolbar-profiles-manage").onclick = Copper.ProfilesAdapter.openProfileManager;
-
+    document.getElementById("copper-profile-manager-load-newest-profile").onclick = Copper.ProfilesAdapter.toggleLoadNewestProfile;
 };
 
 
@@ -58,6 +59,9 @@ Copper.ProfilesAdapter.openProfileManager = function() {
     for (let i = 0; i < dropDownProfiles.length; i++) {
         Copper.ProfilesAdapter.addNewHTMLProfileInManager(dropDownProfiles[i].lastElementChild.innerHTML);
     }
+
+    Copper.ProfilesAdapter.loadNewestCreatedProfile = false;
+    document.getElementById("copper-profile-manager-load-newest-profile").checked = false;
 };
 
 Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
@@ -68,24 +72,53 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
 
         let oldProfileCount = dropDownProfiles.length;
         let oldManagerProfileCount = managerProfiles.length;
+
+        // Profile name validation
+        // First loop to check if profile names not empty, contain only letters and numbers and are unique
+        var hasFormError = false;
+        let validationProfileSet = {};
+        for (var i = 0; i < oldManagerProfileCount; i++) {
+            let managerProfileName = managerProfiles[i].firstElementChild.firstElementChild;
+
+            if (!managerProfileName.disabled) {
+                if (managerProfileName.value in validationProfileSet) {
+                    managerProfileName.style.backgroundColor = "rgba(255,0,0,0.6)";
+                    hasFormError = true;
+                } else {
+                    validationProfileSet[managerProfileName.value] = true;
+                }
+
+                if (managerProfileName.value === "") {
+                    managerProfileName.style.backgroundColor = "rgba(255,255,0,0.6)";
+                    hasFormError = true;
+                }
+
+                if (!/^[A-Za-z0-9]*$/g.test(managerProfileName.value)) {
+                    managerProfileName.style.backgroundColor = "rgba(255,0,0,0.6)";
+                    hasFormError = true
+                }
+            }
+        }
+
+        if (hasFormError) {
+            alert("One or more profile names are either empty, contain an illegal character (use letters and numbers only) or have a non-unique name!")
+            return;
+        }
+
+        // Update profiles
         for (var i = 0; i < dropDownProfiles.length; i++) {
-
-
             let managerProfileName = managerProfiles[i].firstElementChild.firstElementChild;
             let dropdownProfileName = dropDownProfiles[i].lastElementChild.innerHTML;
 
             if (managerProfileName.disabled) {
                 // Profile deleted
 
-                delete Copper.Session.profiles.allProfiles[dropdownProfileName];
+                Copper.Session.profiles.deleteProfile(dropdownProfileName);
+                
                 let profileToDeleteInDropdown = dropDownProfiles[i];
                 if (profileToDeleteInDropdown.firstElementChild.classList.contains("selected")) {
                     // Select standard profile if profile to delete was previously selected
                     Copper.ToolbarAdapter.radioElement("copper-toolbar-profiles-standard");
-                    Copper.Profiles.selectedProfile = Copper.Profiles.defaultProfile;
-                    Copper.Storage.storeLocally(Copper.Profiles.selectedProfileKey, Copper.Profiles.selectedProfile);
-
-                    Copper.Session.profiles.updateCurrentProfile(true);
                 }
                 profileToDeleteInDropdown.parentNode.removeChild(profileToDeleteInDropdown);
 
@@ -106,9 +139,11 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
         }
 
         // New profiles
+        let lastNewlyCreatedProfile = undefined;
         for (; i < managerProfiles.length; i++) {
+            let managerProfileName = managerProfiles[i].firstElementChild.firstElementChild;
             let nextInput = managerProfiles[i].firstElementChild.firstElementChild;
-            if (nextInput.value === "") {
+            if (managerProfileName.disabled) {
                 // Empty profile name -> skip
                 //managerProfiles[i].parentNode.removeChild(managerProfiles[i]);
                 //i--;
@@ -116,8 +151,13 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
             }
 
             // Add new profile
-            Copper.Session.profiles.addNewProfile(nextInput.value, Copper.Session.settings, Copper.Session.options);
+            Copper.Session.profiles.addNewProfile(nextInput.value);
             Copper.ProfilesAdapter.addNewHTMLDropdownProfile(nextInput.value, Copper.Session.profiles, false);
+            lastNewlyCreatedProfile = nextInput.value;
+        }
+
+        if (Copper.ProfilesAdapter.loadNewestCreatedProfile && lastNewlyCreatedProfile !== undefined) {
+            Copper.Session.profiles.changeProfile(lastNewlyCreatedProfile);
         }
     }
 
@@ -143,8 +183,8 @@ Copper.ProfilesAdapter.addNewHTMLProfileInManager = function(name) {
     input.classList.add("flex");
     input.type = "text";
     input.maxLength = 20;
-    input.placeholder = "Name your new Profile";
-    
+    input.placeholder = "Name - Use letters/numbers";
+
     if (name !== undefined) {
         input.value = name;
     }
@@ -152,25 +192,55 @@ Copper.ProfilesAdapter.addNewHTMLProfileInManager = function(name) {
     let imgDelete = document.createElement("img");
     imgDelete.src = "skin/tool_delete.png";
     imgDelete.title = "Delete Profile";
+    imgDelete.classList.add("profile-delete-button");
     span.appendChild(input);
     div.appendChild(span);
     div.appendChild(imgDelete);
 
     imgDelete.onclick = function() {
-        let crossOut = document.createElement("div");
-        crossOut.style.width = "100%";
-        crossOut.style.borderBottom = "3px solid red";
-        crossOut.style.position = "absolute"
-        crossOut.style.top = "10px";
-        div.appendChild(crossOut);
-        let cover = document.createElement("div");
-        cover.style.width = "100%";
-        cover.style.height = "100%";
-        cover.style.position = "absolute"
-        input.disabled = true;
-        input.classList.add("disabled-profile-input")
-        div.appendChild(cover);
+
+        if (this.classList.contains("profile-delete-button")) {
+            this.classList.remove("profile-delete-button");
+            this.classList.add("profile-undo-button");
+            this.src = "skin/undo.png";
+            this.title = "Undo Deletion of Profile";
+
+            let crossOut = document.createElement("div");
+            crossOut.style.width = "85%";
+            crossOut.style.left = "0";
+            crossOut.style.borderBottom = "3px solid red";
+            crossOut.style.position = "absolute"
+            crossOut.style.top = "10px";
+            crossOut.classList.add("cross-out");
+            div.appendChild(crossOut);
+            let cover = document.createElement("div");
+            cover.style.width = "85%";
+            cover.style.left = "0";
+            cover.style.height = "100%";
+            cover.style.position = "absolute"
+            cover.classList.add("cross-out");
+            input.disabled = true;
+            input.classList.add("disabled-profile-input")
+            div.appendChild(cover);
+        } else {
+            this.classList.remove("profile-undo-button");
+            this.classList.add("profile-delete-button");
+            this.src = "skin/tool_delete.png";
+            this.title = "Delete Profile";
+
+            let divsCrossout = div.getElementsByClassName("cross-out");
+            let bound = divsCrossout.length;
+            for (let i = 0; i < bound; i++) {
+                divsCrossout[0].parentNode.removeChild(divsCrossout[0]);
+            }
+            input.disabled = false;
+            input.classList.remove("disabled-profile-input")
+        }
+
     }
+
+    document.getElementById("copper-profile-manager-load-newest-profile").checked = true;
+    Copper.ProfilesAdapter.loadNewestCreatedProfile = true;
 
     document.getElementById("copper-profile-manager-container").insertBefore(div, document.getElementById("copper-profile-manager-container").lastElementChild);
 };
@@ -206,4 +276,9 @@ Copper.ProfilesAdapter.addNewHTMLDropdownProfile = function(name, profiles, sele
         Copper.ToolbarAdapter.radioElement(li.id);
         profiles.changeProfile(name);
     }
+};
+
+Copper.ProfilesAdapter.toggleLoadNewestProfile = function() {
+    Copper.ProfilesAdapter.loadNewestCreatedProfile = !Copper.ProfilesAdapter.loadNewestCreatedProfile;
+    this.checked = Copper.ProfilesAdapter.loadNewestCreatedProfile;
 };
