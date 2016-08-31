@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2016, Institute for Pervasive Computing, ETH Zurich.
  * All rights reserved.
  * 
@@ -28,8 +28,26 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
-﻿// Called when the user clicks on the browser action.
-chrome.browserAction.onClicked.addListener(function(tab) {
-  chrome.tabs.create({url: chrome.extension.getURL('index.html')});
-});
+
+// Stub for a port implementation
+ Copper.Port = function(port, id){
+	throw new Error("not implemented");
+};
+
+/*
+* Register a callback of the that is called when the other port disconnects
+* 
+* @arg callback: callback of the form function()
+*/ 
+Copper.Port.prototype.registerDisconnectCallback = function(callback) {
+	throw new Error("not implemented");
+};
+
+/*
+* Send the message to the other port
+*
+* @arg: message in form of an event
+*/ 
+Copper.Port.prototype.sendMessage = function(msg){
+	throw new Error("not implemented");
+};

@@ -34,18 +34,20 @@
 * - It performs blockwise transfer where appropriate
 * - It handles observable resources
 */
-Copper.SingleRequestHandler = function(coapMessage, transmissionHandler, settings, endpointId){
+Copper.SingleRequestHandler = function(coapMessage, blockwiseEnabled, transmissionHandler, settings, endpointId){
 	if (!(coapMessage instanceof Copper.CoapMessage) || !(transmissionHandler instanceof Copper.TransmissionHandler) || !(settings instanceof Copper.Settings)
 			|| !Number.isInteger(endpointId)){
 		throw new Error("Illegal Argument");
 	}
 	this.coapMessage = coapMessage;
+	this.blockwiseEnabled = blockwiseEnabled;
 	this.transmissionHandler = transmissionHandler;
 	this.settings = settings;
 	this.endpointId = endpointId;
 };
 
 Copper.SingleRequestHandler.prototype.coapMessage = undefined;
+Copper.SingleRequestHandler.prototype.blockwiseEnabled = undefined;
 Copper.SingleRequestHandler.prototype.transmissionHandler = undefined;
 Copper.SingleRequestHandler.prototype.settings = undefined;
 Copper.SingleRequestHandler.prototype.endpointId = undefined;
@@ -86,7 +88,7 @@ Copper.SingleRequestHandler.prototype.start = function(){
 		this.sender = new Copper.ObserveSender(this.coapMessage, this, function(){ thisRef.onSenderFinished(); });
 	}
 	else {
-		this.sender = new Copper.BlockwiseSender(this.coapMessage, this, function(){ thisRef.onSenderFinished(); });
+		this.sender = new Copper.BlockwiseSender(this.coapMessage, this.blockwiseEnabled, this, function(){ thisRef.onSenderFinished(); });
 	}
 
 	this.sender.start();
@@ -103,7 +105,7 @@ Copper.SingleRequestHandler.prototype.handleResponse = function(sentCoapMessage,
 	else {
 		if (this.receiver === undefined){
 			let block2Option = receivedCoapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2);
-			let isBlockwiseReceiver = this.settings.blockwiseEnabled && block2Option.length === 1;
+			let isBlockwiseReceiver = this.blockwiseEnabled && block2Option.length === 1;
 			if (isBlockwiseReceiver){
 				this.receiver = new Copper.BlockwiseReceiver(this, sentCoapMessage.clone(), receivedCoapMessage.clone());
 			}

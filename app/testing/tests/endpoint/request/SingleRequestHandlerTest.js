@@ -60,7 +60,7 @@ Copper.SingleRequestHandlerTest.runTest = function(assert, firstRequest, respons
 	Copper.TimeUtils.clearTimeout(transmissionHandler.timer);
 	transmissionHandler.bind();
 
-	let requestHandler = new Copper.SingleRequestHandler(firstRequest, transmissionHandler, settings, id);
+	let requestHandler = new Copper.SingleRequestHandler(firstRequest, true, transmissionHandler, settings, id);
 	requestHandler.start();
 
 	assert.deepEqual(responses.length, nextResponseIdx);

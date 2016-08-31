@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2016, Institute for Pervasive Computing, ETH Zurich.
  * All rights reserved.
  * 
@@ -29,7 +29,37 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-﻿// Called when the user clicks on the browser action.
-chrome.browserAction.onClicked.addListener(function(tab) {
-  chrome.tabs.create({url: chrome.extension.getURL('index.html')});
-});
+/* Stub of a simple UDP Client interface for sending and receiving plain datagrams. 
+*  The following methods are provided:
+*
+*  -> bind(function onBind, function onReceive, function onReceiveError)
+*  -> send(ArrayBuffer datagram, string remoteAddress, int remotePort, function onSent)
+*  -> close()
+*/
+
+Copper.UdpClient = function(){
+	throw new Error("not implemented");
+}
+
+/* Binds the socket to a local port. Calls onBind function once the socket is bound.
+*  @arg function onBind(boolean socketReady, int port, string errorMsg)
+*  @arg function onReceive(ArrayBuffer datagram, string remoteAddress, int remotePort)
+*  @arg function onReceiveError(boolean socketReady, string errorMsg)
+*/
+Copper.UdpClient.prototype.bind = function(onBind, onReceive, onReceiveError){
+		throw new Error("not implemented");
+};
+
+/**
+* Sends a datagram 
+* @arg datagram: array buffer to send
+* @arg onSent(boolean successful, int bytesSent, boolean socketOpen, string errorMsg)
+*/
+Copper.UdpClient.prototype.send = function(datagram, remoteAddress, remotePort, onSent){
+	throw new Error("not implemented");
+};
+
+/* Closes the socket, releases resources */
+Copper.UdpClient.prototype.close = function() {
+	throw new Error("not implemented");
+};

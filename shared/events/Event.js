@@ -195,9 +195,10 @@ Copper.Event.createUpdateSettingsEvent = function(settings, endpointId){
 	return Copper.Event.createEvent(Copper.Event.TYPE_UPDATE_SETTINGS, data, endpointId);
 };
 
-Copper.Event.createClientSendCoapMessageEvent = function(coapMessage, endpointId){
+Copper.Event.createClientSendCoapMessageEvent = function(coapMessage, blockwiseEnabled, endpointId){
 	let data = {
-		coapMessage: coapMessage
+		coapMessage: coapMessage,
+		blockwiseEnabled: (blockwiseEnabled ? true : false)
 	};
 	return Copper.Event.createEvent(Copper.Event.TYPE_SEND_COAP_MESSAGE, data, endpointId);
 };

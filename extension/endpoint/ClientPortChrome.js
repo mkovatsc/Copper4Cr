@@ -28,60 +28,35 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
-Copper.ChromeStartup = function(){
+
+Copper.ClientPort = function(){
 };
 
-Copper.ChromeStartup.resolvePortAndCoapEndpoint = function(clientId, finalDisconnectHandler, callback){
-	let appId = "kdgfcijijlbhfondicahdjhchebnnmei";
-	let port = Copper.ComponentFactory.createPort(chrome.runtime.connect(appId), clientId);
+Copper.ClientPort.connect = function(clientId, finalDisconnectHandler, callback){
+	let appId = "mbighlecbopknoggoappifafoffcnocc";
+	let port = new Copper.Port(chrome.runtime.connect(appId), clientId);
 
-	let resolveEndpointFunction = function(){
-		Copper.ChromeStartup.resolveCoapEndpoint(clientId, port, finalDisconnectHandler, callback);
+	let connectedCallback = function(){
+        if (port !== undefined){
+            port.registerDisconnectCallback(finalDisconnectHandler);
+        }
+        callback(port);
 	};
-    let firstTimeout = Copper.TimeUtils.setTimeout(resolveEndpointFunction, 350);
+    let firstTimeout = Copper.TimeUtils.setTimeout(connectedCallback, 400);
 
     port.registerDisconnectCallback(function(){
         // app not started
         Copper.Log.logFine("Starting application");
         Copper.TimeUtils.clearTimeout(firstTimeout);
-        Copper.TimeUtils.setTimeout(resolveEndpointFunction, 750)
+        let secondTimeout = Copper.TimeUtils.setTimeout(connectedCallback, 750)
         Copper.OverlayAdapter.addTitleTextOverlay("Starting...", "Try to start the Copper Application");
         chrome.management.launchApp(appId, function(){
-            port = Copper.ComponentFactory.createPort(chrome.runtime.connect(appId), clientId);
+            port = new Copper.Port(chrome.runtime.connect(appId), clientId);
             port.registerDisconnectCallback(function(){
                 // app was not started
-                port = undefined;
+                Copper.TimeUtils.clearTimeout(secondTimeout);
+                Copper.OverlayAdapter.addTitleTextOverlay("Copper App not installed", "This extension needs the Copper application to send Coap-Messages. Please install the app and reload.");
             });
         });
     });
-};
-
-Copper.ChromeStartup.resolveCoapEndpoint = function(clientId, port, finalDisconnectHandler, callback){
-    if (port === undefined){
-        Copper.OverlayAdapter.addTitleTextOverlay("Copper App not installed", "This extension needs the Copper application to send Coap-Messages. Please install the app and reload.");
-    }
-    else {
-        port.registerDisconnectCallback(finalDisconnectHandler);
-
-        let search = window.location.search;
-        let uri = undefined;
-        if (search && search.startsWith("?")){
-            uri = Copper.StringUtils.parseUri(decodeURIComponent(search.substr(1)));
-        }
-        if (uri === undefined){
-            Copper.OverlayAdapter.addInputOverlay("Enter Endpoint", "Enter the URL of the Coap Endpoint", undefined, "coap://", "OK", function(value, errorCallback){
-                uri = Copper.StringUtils.parseUri(value);
-                if (uri === undefined){
-                    errorCallback("Please enter a valid URL");
-                }
-                else {
-                    Copper.ComponentFactory.changeCoapResource(uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query, true);
-                }
-            });
-        }
-        else {
-            callback(clientId, port, uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query);
-        }
-    }
 };

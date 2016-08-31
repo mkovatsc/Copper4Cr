@@ -83,7 +83,7 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
                     // Select standard profile if profile to delete was previously selected
                     Copper.ToolbarAdapter.radioElement("copper-toolbar-profiles-standard");
                     Copper.Profiles.selectedProfile = Copper.Profiles.defaultProfile;
-                    Copper.ChromeComponentFactory.storeLocally(Copper.Profiles.selectedProfileKey, Copper.Profiles.selectedProfile);
+                    Copper.Storage.storeLocally(Copper.Profiles.selectedProfileKey, Copper.Profiles.selectedProfile);
 
                     Copper.Session.profiles.updateCurrentProfile(true);
                 }

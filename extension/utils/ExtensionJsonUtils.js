@@ -29,42 +29,51 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-/* Settings object. Set a pref to override the default behavior */
-Copper.Settings = function() {
+// Builds on top of the shared JsonUtils
+Copper.ExtensionJsonUtils = function(){
 };
 
-// Message type to use. See Copper.CoapMessage.Type object for different values
-Copper.Settings.prototype.requests = 0;
+Copper.ExtensionJsonUtils.jsonToCopperOptions = function(data){
+	let res = new Copper.Options();
+	let options = Object.keys(data);
+	for (let i=0; i<options.length; i++){
+		res[options[i]] = data[options[i]];
+	}
+	return res;
+};
 
-// Retransmit messages after timeout (up to MAX_RETRANSMIT)
-Copper.Settings.prototype.retransmission = true;
+Copper.ExtensionJsonUtils.jsonToCopperProfiles = function(data){
+	let res = new Copper.Profiles();
+	let profiles = Object.keys(data);
 
-// Do not increase MID to send duplicates
-// TODO: in FF-Copper not used...
-Copper.Settings.prototype.sendDuplicates = false;
+	for (let i=0; i<profiles.length; i++){
+		if (profiles[i] === "allProfiles") {
+			let profileNames = Object.keys(data[profiles[i]]);
+			for (let j=0; j<profileNames.length; j++){
+				let settings = new Copper.Settings();
+				let options = new Copper.Options();
+				let profileKeysSettings = Object.keys(data[profiles[i]][profileNames[j]]["settings"]);
+				let profileKeysOptions = Object.keys(data[profiles[i]][profileNames[j]]["options"]);
+				
+				for (let k=0; k<profileKeysSettings.length; k++){
+					settings[profileKeysSettings[k]] = data[profiles[i]][profileNames[j]]["settings"][profileKeysSettings[k]];
+				}
+				for (let k=0; k<profileKeysOptions.length; k++){
+					options[profileKeysOptions[k]] = data[profiles[i]][profileNames[j]]["options"][profileKeysOptions[k]];
+				}
 
-// Show unknown messages in the message log
-Copper.Settings.prototype.showUnknown = true;
+				res[profiles[i]][profileNames[j]] = {settings: settings, options: options};
 
-// Reject unknown messages using a RST message
-Copper.Settings.prototype.rejectUnknown = true;
 
-// Send URI-Host Option
-Copper.Settings.prototype.sendUriHost = false;
+			}
+		}
+		else {
+			res[profiles[i]] = data[profiles[i]];
+		}
 
-// Send size1 option
-Copper.Settings.prototype.sendSize1 = false;
+	}
+	return res;
+};
 
-// Choose block size
-// 0 --> late block negotiation, otherwise 4 - 10 (32 - 1024)
-Copper.Settings.prototype.blockSize = 6;
-
-// Use token for observe
-Copper.Settings.prototype.observeToken = true;
-
-// Observe cancellation (get, rst, lazy)
-Copper.Settings.prototype.observeCancellation = "lazy";
-
-Copper.Settings.prototype.resources = new Object();
-
-Copper.Settings.prototype.encode_utf_8 = true;
+Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Options}, "Copper.Options", undefined, Copper.ExtensionJsonUtils.jsonToCopperOptions]);
+Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Profiles}, "Copper.Profiles", undefined, Copper.ExtensionJsonUtils.jsonToCopperProfiles]);

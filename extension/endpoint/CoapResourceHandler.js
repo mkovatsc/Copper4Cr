@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2016, Institute for Pervasive Computing, ETH Zurich.
  * All rights reserved.
  * 
@@ -28,8 +28,15 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
-﻿// Called when the user clicks on the browser action.
-chrome.browserAction.onClicked.addListener(function(tab) {
-  chrome.tabs.create({url: chrome.extension.getURL('index.html')});
-});
+
+Copper.CoapResourceHandler = function(){
+    throw new Error("not implemented");
+};
+
+Copper.CoapResourceHandler.resolveCoapResource = function(){
+	throw new Error("not implemented");
+};
+
+Copper.CoapResourceHandler.changeCoapResource = function(protocol, remoteAddress, remotePort, path, query, reload){
+	throw new Error("not implemented");
+};

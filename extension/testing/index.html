@@ -39,27 +39,38 @@
 
   <script src="../shared/endpoint/Port.js"></script>
   
-  <!-- App -->
-  <script src="../endpoint/request/receiver/BlockwiseReceiver.js"></script>
-  <script src="../endpoint/request/receiver/SingleReceiver.js"></script>
-  <script src="../endpoint/request/sender/BlockwiseSender.js"></script>
-  <script src="../endpoint/request/sender/ObserveSender.js"></script>
-  <script src="../endpoint/request/SingleRequestHandler.js"></script>
+  <!-- Extension -->
+  <script src="../gui/OverlayAdapter.js"></script>
+  <script src="../gui/MessageLogAdapter.js"></script>
+  <script src="../gui/PacketHeaderAdapter.js"></script>
+  <script src="../gui/PacketOptionsAdapter.js"></script>
+  <script src="../gui/PayloadAdapter.js"></script>
+  <script src="../gui/ToolbarAdapter.js"></script>
+  <script src="../gui/ResourceViewAdapter.js"></script>
+  <script src="../gui/PopupWindowAdapter.js"></script>
+  <script src="../gui/DebugOptionsAdapter.js"></script>
+  <script src="../gui/ProfilesAdapter.js"></script>
 
-  <script src="../endpoint/transmission/RequestMessageTransmission.js"></script>
-  <script src="../endpoint/transmission/ResponseMessageTransmission.js"></script>
-  <script src="../endpoint/transmission/MessagesInTransmissionSet.js"></script>
-  <script src="../endpoint/transmission/TransmissionHandler.js"></script>
-  <script src="../endpoint/UdpClient.js"></script>
-  <script src="../endpoint/ServerEndpoint.js"></script>
+  <script src="../utils/Storage.js"></script>
+  <script src="../utils/Options.js"></script>
+  <script src="../utils/Payload.js"></script>
+  <script src="../utils/Profiles.js"></script>
+  <script src="../utils/ExtensionJsonUtils.js"></script>
 
-  <!-- Tests -->
+  <script src="../endpoint/CoapResourceHandler.js"></script>
+  <script src="../endpoint/ClientEndpoint.js"></script>
+  <script src="../endpoint/ClientPort.js"></script>
+
+  <script src="../Session.js"></script>
+
+  <!-- Test Utils and Overloads -->
+  <script src="StorageTesting.js"></script>
   <script src="../shared/testing/tests/TestUtils.js"></script>
 
-  <script src="tests/endpoint/transmission/RequestMessageTransmissionTest.js"></script>
-  <script src="tests/endpoint/transmission/ResponseMessageTransmissionTest.js"></script>
-  <script src="tests/endpoint/transmission/MessagesInTransmissionSetTest.js"></script>
-  <script src="tests/endpoint/transmission/TransmissionHandlerTest.js"></script>
-  <script src="tests/endpoint/request/SingleRequestHandlerTest.js"></script>
+  <script src="tests/utils/ExtensionJsonUtilsTest.js"></script>
+
+  <script type="text/javascript">
+    window.onload = function(){};
+  </script>
 </body>
 </html>

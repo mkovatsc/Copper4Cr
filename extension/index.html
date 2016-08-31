@@ -14,11 +14,8 @@
 	<script src="shared/utils/TimeUtils.js"></script>
 	<script src="shared/utils/StringUtils.js"></script>
 	<script src="shared/utils/ByteUtils.js"></script>
-	<script src="shared/utils/Options.js"></script>
 	<script src="shared/utils/Settings.js"></script>
-	<script src="shared/utils/Profiles.js"></script>
 	<script src="shared/utils/JsonUtils.js"></script>
-	<script src="shared/utils/ComponentFactory.js"></script>
 
     <script src="shared/logging/Log.js"></script>
     <script src="shared/logging/ConsoleLogger.js"></script>
@@ -32,13 +29,12 @@
 	<script src="shared/coap/CoapMessageOptionHeader.js"></script>
 	<script src="shared/coap/CoapMessageBlockOption.js"></script>
 	<script src="shared/coap/CoapMessageOption.js"></script>
-	<script src="shared/coap/CoapMessageSerializer.js"></script>
 	<script src="shared/coap/CoapMessageContentFormat.js"></script>
+	<script src="shared/coap/CoapMessageSerializer.js"></script>
 
-	<script src="shared/endpoint/ChromePort.js"></script>
+	<script src="shared/endpoint/Port.js"></script>
 
 	<script src="gui/OverlayAdapter.js"></script>
-	
 	<script src="gui/MessageLogAdapter.js"></script>
 	<script src="gui/PacketHeaderAdapter.js"></script>
 	<script src="gui/PacketOptionsAdapter.js"></script>
@@ -49,10 +45,24 @@
 	<script src="gui/DebugOptionsAdapter.js"></script>
 	<script src="gui/ProfilesAdapter.js"></script>
 
+	<script src="utils/Storage.js"></script>
+	<script src="utils/Options.js"></script>
+	<script src="utils/Payload.js"></script>
+	<script src="utils/Profiles.js"></script>
+	<script src="utils/ExtensionJsonUtils.js"></script>
+
+	<script src="endpoint/CoapResourceHandler.js"></script>
 	<script src="endpoint/ClientEndpoint.js"></script>
-	<script src="endpoint/ChromeStartup.js"></script>
+	<script src="endpoint/ClientPort.js"></script>
 
 	<script src="Session.js"></script>
+
+	<!-- Chrome Specific Overloads -->
+	<script src="shared/endpoint/PortChrome.js"></script>
+	<script src="utils/StorageChrome.js"></script>
+	<script src="endpoint/CoapResourceHandlerChrome.js"></script>
+	<script src="endpoint/ClientPortChrome.js"></script>
+
 </head>
 <body>
 <div class="main-container">

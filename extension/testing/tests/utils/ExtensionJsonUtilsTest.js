@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2016, Institute for Pervasive Computing, ETH Zurich.
  * All rights reserved.
  * 
@@ -29,7 +29,22 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-﻿// Called when the user clicks on the browser action.
-chrome.browserAction.onClicked.addListener(function(tab) {
-  chrome.tabs.create({url: chrome.extension.getURL('index.html')});
+QUnit.test("ExtensionJsonUtils: Options", function(assert) {
+	let data = new Copper.Options();
+	data.size1 = 2000;
+	let json = Copper.JsonUtils.stringify(data);
+	assert.deepEqual(Copper.JsonUtils.parse(json), data);
+	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Options), true);
+});
+
+QUnit.test("ExtensionJsonUtils: Profile", function(assert) {
+	let data = new Copper.Profiles();
+	let settings = new Copper.Settings();
+	settings.blockSize = 0;
+	let options = new Copper.Options();
+	options.size1 = 2000;
+	data.addNewProfile("test", settings, options);
+	let json = Copper.JsonUtils.stringify(data);
+	assert.deepEqual(Copper.JsonUtils.parse(json), data);
+	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Profiles), true);
 });

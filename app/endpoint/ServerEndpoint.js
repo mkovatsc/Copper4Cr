@@ -103,7 +103,7 @@ Copper.ServerEndpoint.prototype.dispatchEvent = function(event){
 				return this.onUpdateSettings(event.data.settings);
 
 			case Copper.Event.TYPE_SEND_COAP_MESSAGE:
-				return this.onClientSendCoapMessage(event.data.coapMessage);
+				return this.onClientSendCoapMessage(event.data.coapMessage, event.data.blockwiseEnabled);
 			case Copper.Event.TYPE_COAP_MESSAGE_SENT:
 			case Copper.Event.TYPE_MESSAGE_TRANSMISSION_TIMED_OUT:
 			case Copper.Event.TYPE_MESSAGE_TRANSMISSION_CONFIRMED:
@@ -171,7 +171,7 @@ Copper.ServerEndpoint.prototype.onRegisterClient = function(remoteAddress, remot
 		this.onError(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", this.state === Copper.ServerEndpoint.STATE_UDP_SOCKET_READY);
 	}
 	else {
-		this.transmissionHandler = new Copper.TransmissionHandler(Copper.ComponentFactory.createUdpClient(), remoteAddress, remotePort, settings, this.id);
+		this.transmissionHandler = new Copper.TransmissionHandler(new Copper.UdpClient(), remoteAddress, remotePort, settings, this.id);
 		this.transmissionHandler.bind();
 	}
 	return true;
@@ -205,13 +205,13 @@ Copper.ServerEndpoint.prototype.onCancelRequests = function(){
 	return true;
 };
 
-Copper.ServerEndpoint.prototype.onClientSendCoapMessage = function(coapMessage){
+Copper.ServerEndpoint.prototype.onClientSendCoapMessage = function(coapMessage, blockwiseEnabled){
 	if (this.state !== Copper.ServerEndpoint.STATE_UDP_SOCKET_READY){
 		this.onError(Copper.Event.ERROR_ILLEGAL_STATE, "Illegal State", false);
 	}
 	else {
 		this.onCancelRequests();
-		this.currentRequest = new Copper.SingleRequestHandler(coapMessage, this.transmissionHandler, this.transmissionHandler.settings, this.id);
+		this.currentRequest = new Copper.SingleRequestHandler(coapMessage, blockwiseEnabled, this.transmissionHandler, this.transmissionHandler.settings, this.id);
 		this.currentRequest.start();
 	}
 	return true;
