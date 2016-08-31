@@ -216,6 +216,7 @@ Copper.DebugOptionsAdapter.loadMultipleOptionInputBox = function(id, values) {
     }
     let clearSign = option.lastElementChild.lastElementChild.lastElementChild;
     clearSign.onclick = function () {
+        inputBox.value = "";
         Copper.DebugOptionsAdapter.onMultipleOptionsInputChange(id, inputBox, inputBox.parentNode.parentNode);
     }
 };
@@ -515,6 +516,7 @@ Copper.DebugOptionsAdapter.addNewMultipleOptionsEntry = function(id, inputValue)
     };
 
     clearText.onclick = function() {
+        input.value = "";
         Copper.DebugOptionsAdapter.onMultipleOptionsInputChange(id, input, div);
     };
 };
