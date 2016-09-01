@@ -42,9 +42,13 @@ QUnit.test("ByteUtils: mergeByteArrays", function(assert) {
 });
 
 QUnit.test("ByteUtils: toByteArray", function(assert) {
-	
+	assert.deepEqual(Copper.ByteUtils.convertBytesToString(Copper.ByteUtils.convertToByteArray("0x")), "0x");
+	assert.deepEqual(Copper.ByteUtils.convertBytesToString(Copper.ByteUtils.convertToByteArray("0x333asdfwere")), "0x333asdfwere");
+	assert.deepEqual(Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertToByteArray("0x30000000000023423540002545453435")), "0x30000000000023423540002545453435");
+	assert.deepEqual(Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertToByteArray("0x000025")), "0x25");
+	assert.deepEqual(Copper.ByteUtils.convertBytesToUint(Copper.ByteUtils.convertToByteArray("22")), 22);
 	assert.throws(function(){
-		Copper.ByteUtils.toByteArray(3.3);
+		Copper.ByteUtils.convertToByteArray(3.3);
 	});
 });
 
@@ -142,4 +146,7 @@ QUnit.test("ByteUtils: convertBytesToHexString", function(assert) {
 	assert.deepEqual(Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertStringToBytes(str)), "0x7FC280DFBF");
 	let num = 232414325;
 	assert.deepEqual(Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertUintToBytes(num)), "0x" + num.toString(16).toUpperCase());
+	let longStr = "0xFFFFFFFFFFFFFFFF";
+	assert.deepEqual(Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertHexStringToBytes(longStr)), longStr);
+	assert.deepEqual(Copper.ByteUtils.convertBytesToHexString(Copper.ByteUtils.convertToByteArray(longStr)), longStr);
 });

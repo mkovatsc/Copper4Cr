@@ -66,5 +66,3 @@ Copper.Settings.prototype.observeToken = true;
 Copper.Settings.prototype.observeCancellation = "lazy";
 
 Copper.Settings.prototype.resources = new Object();
-
-Copper.Settings.prototype.encode_utf_8 = true;

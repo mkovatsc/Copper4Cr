@@ -544,10 +544,10 @@ button
 .main-content .sidebar-right p {
 	margin: 0;
 	margin-left: 2px;
-	margin-top: 5px;
+	margin-top: 3px;
 }
 
-#reset_button
+#copper-debug-options-reset
 {
 	border: 1px solid rgba(0, 0, 0, 0.3);
 	background-color: #ddd;
@@ -565,15 +565,21 @@ button
   padding:1px 5px 1px 1px;
   background: white;
   height: 25px;
+  margin-bottom: 2px;
 }
 
-.text-input-custom input {
+.text-input-custom.error, .checkbox.error{
+	color: #F00;
+}
+
+.text-input-custom input, .text-input-custom select {
   border:none;
   outline:none;
+  background: transparent;
   width: 0;
 }
 
-.text-input-custom  span {
+.text-input-custom  span.reset {
   cursor:pointer;
   width: 5px;
   padding-right: 5px;
@@ -582,22 +588,17 @@ button
   font-weight:bold;
 }
 
-#sidebar_block_options > div
+.text-input-custom span.error {
+  cursor: help;
+  width: 12px;
+  margin-right: 5px;
+  padding-top: 2px;
+  padding-left: 2px;
+}
+
+#copper-debug-options-block-options > div
 {
 	margin-left: 5px;
-}
-
-#chk_debug_option_block_auto {
-	margin-left: auto;
-	margin-right: auto;
-}
-
-.main-content .multiple-options {
-	position: relative;
-}
-
-.main-content .multiple-options span {
-	margin-bottom: 5px;
 }
 
 .main-content .add-option-button {

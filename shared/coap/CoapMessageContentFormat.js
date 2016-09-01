@@ -40,25 +40,6 @@ Copper.CoapMessage.ContentFormat = function(number, name) {
 	this.name = name;
 };
 
-/*
- * @return content format for a given name (e.g. 2.01 Success)
- */
-Copper.CoapMessage.ContentFormat.getCodeForName = function(name){
-	if (typeof(name) !== "string"){
-		throw new Error("Illegal argument");
-	}
-	if (name === "") {
-		return -1; // No ContentFormat selected
-	}
-	let reg = Copper.CoapMessage.ContentFormat.Registry;
-	for (let i = 0; i < reg.length; i++) {
-		if (reg[i].name === name){
-			return reg[i].number;
-		}
-	}
-	throw new Error("No matching content format code");
-};
-
 /* Content Format Codes */
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_PLAIN = new Copper.CoapMessage.ContentFormat(0, "text/plain");
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_XML = new Copper.CoapMessage.ContentFormat(1, "text/xml");

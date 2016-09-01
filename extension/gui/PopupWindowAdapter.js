@@ -32,8 +32,6 @@
 Copper.PopupWindowAdapter = function(){
 };
 
-Copper.PopupWindowAdapter.encode_utf_8 = true;
-
 Copper.PopupWindowAdapter.init = function()
 {
     var closeButtons = document.getElementById("popup-windows").getElementsByClassName("close-button");
@@ -48,14 +46,15 @@ Copper.PopupWindowAdapter.init = function()
 
 
     // Init default
-    var encode_utf_8 = document.getElementById("preferences-window-encode-utf-8");
-    encode_utf_8.checked = "checked"
+    if (Copper.Session.options.useUtf8){
+        var encode_utf_8 = document.getElementById("preferences-window-encode-utf-8");
+        encode_utf_8.checked = "checked"
+    }
 };
 
 
 Copper.PopupWindowAdapter.checkEncode_utf_8 = function(){
-    Copper.Session.settings.encode_utf_8 = this.checked;
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.options.useUtf8 = this.checked;
 };
 
 Copper.PopupWindowAdapter.checkPlugtest = function(){
@@ -98,7 +97,7 @@ Copper.PopupWindowAdapter.clearEntireCache = function(){
         Copper.Storage.clear(function() {
             Copper.ToolbarAdapter.resetPayload();
             Copper.PayloadAdapter.resetPayload();
-            Copper.DebugOptionsAdapter.resetAllDebugOptions();
+            Copper.DebugOptionsAdapter.onReset();
             Copper.Session.profiles.createAndSelectDefaultProfile();
         });
 

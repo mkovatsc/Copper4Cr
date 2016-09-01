@@ -60,20 +60,25 @@ Copper.ByteUtils.mergeByteArrays = function(byteArrays){
 
 /**
 * @arg val: unsigned integer or string
+* @arg ascii: only encode ascii chars (default false). If false, utf8 is used
+* @arg strict: throw an exception instead of skipping a char (default false)
 * @return: byte representation of val
 */
-Copper.ByteUtils.convertToByteArray = function(val){
+Copper.ByteUtils.convertToByteArray = function(val, ascii, strict){
 	if (val === null){
 		return new ArrayBuffer(0);
 	}
 	if (typeof(val) === "string"){
-		let intVersion = Number.parseInt(val);
-		if (Number.isInteger(intVersion) && intVersion >= 0){
-			return Copper.ByteUtils.convertUintToBytes(intVersion);
+		if (val.match(/^0[xX][0-9a-fA-F]+$/g)){
+			return Copper.ByteUtils.convertHexStringToBytes(val);
 		}
-		else {
-			return Copper.ByteUtils.convertStringToBytes(val);
+		else if (val.match(/^[0-9]+$/g)){
+			let intVersion = Number.parseInt(val);
+			if (Number.isInteger(intVersion) && intVersion >= 0 && intVersion.toString() === val){
+				return Copper.ByteUtils.convertUintToBytes(intVersion);
+			}
 		}
+		return Copper.ByteUtils.convertStringToBytes(val, ascii, strict);
 	}
 	else if (Number.isInteger(val) && val >= 0){
 		return Copper.ByteUtils.convertUintToBytes(val);
@@ -262,7 +267,13 @@ Copper.ByteUtils.convertBytesToHexString = function(buf, offset, length){
 	let bufView = new Uint8Array(buf, offset, length);
 	let res = ["0x"];
 	for (let i=0; i<bufView.byteLength; i++){
-		res.push(bufView[i].toString(16).toUpperCase());
+		let hexStr = bufView[i].toString(16).toUpperCase();
+		if (i===0){
+			res.push(hexStr);
+		}
+		else {
+			res.push(Copper.StringUtils.lpad(hexStr, 2));
+		}
 	}
 	return res.join("");
 };
@@ -270,24 +281,23 @@ Copper.ByteUtils.convertBytesToHexString = function(buf, offset, length){
 
 /**
  * @arg val: hex number in string format
- * @return: byte representation of val, truncate tail if more than 16 digits
+ * @return: byte representation of val
  */
 Copper.ByteUtils.convertHexStringToBytes = function(hexString) {
 	if (hexString.length < 2 || !(/^[0-9A-Fa-f]{1,64}$/.test(hexString.substring(2)))) {
 		throw new Error("Illegal Argument for HexString");
 	}
-
-	hexString = hexString.substring(0,18);
-
-	if (hexString.substring(10,17) === "") {
-		return Copper.ByteUtils.convertUintToBytes(parseInt(hexString));
-	}
-
-	let lower = hexString.substring(hexString.length-8);
-	let upper = hexString.substring(2, hexString.length-8);
-
+	let i=2;
+	while (hexString.charAt(i) === "0".charAt(0)) i++;
+	if (i >= hexString.length) return new ArrayBuffer(0);
+	hexString = hexString.substring(i);
 	let res = [];
-	res.push(Copper.ByteUtils.convertUintToBytes(parseInt('0x' + upper)));
-	res.push(Copper.ByteUtils.convertUintToBytes(parseInt('0x' + lower)));
+	if (hexString.length%2 === 1){
+		hexString = "0" + hexString;
+	}
+	for (i=0; i<hexString.length; i=i+2){
+		let n = Number.parseInt("0x" + hexString.substring(i, i+2));
+		res.push(n !== 0 ? Copper.ByteUtils.convertUintToBytes(n) : new ArrayBuffer(1));
+	}
 	return Copper.ByteUtils.mergeByteArrays(res);
 }
