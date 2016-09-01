@@ -855,10 +855,9 @@ button
 	width: 240px;
 	border: 1px solid rgba(0, 0, 0, 0.7);
 	position: fixed;
-	top: 40vh;
+	top: 20vh;
 	left: 50vw;
-	margin-left: -130px;
-	margin-top: -135px;
+	margin-left: -120px;
 	background: white;
 	z-index: 1000;
 	box-shadow: 6px 6px 3px #888888;
@@ -958,4 +957,27 @@ button
 
 #manage-profile-window .text-input-custom {
 	padding: 1px;
+}
+
+#popup-windows .start-resource-access .popup-container {
+	width: 530px;
+	margin-left: -265px;
+	top: 20vh;
+}
+#popup-windows .start-resource-access h1 {
+	font-weight: bold;
+	font-size: 18px;
+	margin-bottom: 10px;
+}
+
+#popup-windows .start-resource-access .input-box input {
+	height: 25px;
+	margin: 0;
+	padding: 0;
+}
+#popup-windows .start-resource-access .input-box button {
+	height: 25px;
+	width: 50px;
+	margin: 0 0 0 5px;
+	padding: 0;
 }

@@ -44,6 +44,7 @@
 	<script src="gui/PopupWindowAdapter.js"></script>
 	<script src="gui/DebugOptionsAdapter.js"></script>
 	<script src="gui/ProfilesAdapter.js"></script>
+	<script src="gui/StartupAdapter.js"></script>
 
 	<script src="utils/Storage.js"></script>
 	<script src="utils/Options.js"></script>
@@ -701,6 +702,34 @@
 					<button title="Close and do not save any changes to the profiles" id="copper-profile-manager-cancel">Cancel</button>
 				</div>
 
+			</div>
+		</div>
+	</div>
+
+	<!-- overlay startup -->
+	<div class="block_screen start-resource-access hidden">
+		<div id="copper-overlay-startup" class="popup-container vbox">
+			<label class="title">Copper (Cu) - Start</label>
+			<div class="hbox" style="padding: 40px 0px 10px 0px; margin-left: -30px;">
+				<div>
+					<img src="skin/Cu_box_256.png">;
+				</div>
+				<div style="margin: 0px 20px 0px 10px; width: 260px;">
+					<h1>Resource Access</h1>
+					<label style="margin-bottom: 5px;">Enter the URL of a Coap Endpoint:</label>
+					<div class="input-box hbox" style="margin-bottom: 20px;">
+						<input id="copper-startup-resource-input" class="flex" type="text">
+						<button id="copper-startup-resource-confirm-button">Enter</button>
+					</div>
+					<p>Use the
+						<img src="skin/tool_discover.png" align="middle" /> Discover
+						button to retrieve the list of available resources
+						from /.well-known/core.<br><br>
+						It is useful to first <img src="skin/tool_ping.png" align="center" /> Ping
+						the server to see if the remote endpoint responds to CoAP.<br><br>
+						You can try with <label style="cursor: text;">coap://vs0.inf.ethz.ch/</label>
+					</p>
+				</div>
 			</div>
 		</div>
 	</div>

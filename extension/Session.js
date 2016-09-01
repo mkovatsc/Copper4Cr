@@ -63,7 +63,8 @@ Copper.Session.guiAdapters = [
         Copper.ResourceViewAdapter,
         Copper.DebugOptionsAdapter,
         Copper.PopupWindowAdapter,
-        Copper.ProfilesAdapter
+        Copper.ProfilesAdapter,
+        Copper.StartupAdapter
     ];
 
 Copper.Session.initialize = function(){
