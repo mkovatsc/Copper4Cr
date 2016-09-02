@@ -444,195 +444,98 @@
 				</div>
 			
 			</div>
-			<div id="sidebar" class="sidebar-right vbox">
+			<div id="copper-debug-options" class="sidebar-right vbox">
 				<div style="padding: 0px 10px 0px 10px; min-height: 35px; height: 35px;">
-					<div class="checkbox">
-						<label><input id="chk_debug_options" type="checkbox">
-						Debug Control</label>
-						<button id="reset_button">Reset</button>
+					<div>
+						<span id="copper-debug-options-enabled"></span>
+						<button id="copper-debug-options-reset">Reset</button>
 					</div>
-					
 				</div>
 				
-				<div id="sidebar-debug-options" style="display: block; padding: 0 4px 0 10px; overflow-y: auto;">
+				<div style="display: block; padding: 0 4px 0 10px; overflow-y: auto;">
 					<div style="padding: 4px;">
 						<div style="text-align: center;"><label>Token</label></div>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom">
-								<input class="flex str2Hex" type="text" id="debug_option_token" placeholder="use hex (0x..) or string">
-								<span class="clear_text" title="Clear">&times;</span>
-							</span>		
-						</div>
+						<div id="copper-debug-options-token" class="flex vbox"></div>
 						
 						<div style="text-align: center;"><label style="padding-top: 2px; margin-bottom: 2px;">Request Options</label></div>
 						<p>Accept</p>
-						<div class="flex hbox dropdown">
-							<select id="debug_option_accept" class="flex text-input-custom">
-								<option></option>
-							</select>
-						</div>
+						<div id="copper-debug-options-accept" class="flex vbox dropdown"></div>
 						
 						<p>Content-Format</p>
-						<div class="flex hbox dropdown">
-							<select id="debug_option_content_format" class="flex text-input-custom">
-								<option></option>
-							</select>
-						</div>
+						<div id="copper-debug-options-content-format" class="flex vbox dropdown"></div>
 						
-						<div id="sidebar_block_options" class="hbox">
+						<div id="copper-debug-options-block-options" class="hbox">
 							<div class="vbox" style="flex: 3; margin-left: 0;">
 								<p>Block1 (Req.)</p>
-								<span class="hbox text-input-custom" title="Choose block size in Behavior menu">
-									<input class="flex" type="text" id="debug_option_block1" placeholder="block no.">
-									<span class="clear_text" title="Clear">&times;</span>
-								</span>		
+								<div id="copper-debug-options-block1" class="flex vbox"></div>
 								<p>Size1</p>
-								<span class="hbox text-input-custom"><input class="flex" type="text" id="debug_option_size1" placeholder="total size"><span onclick="clearInputText('debug_option_size1')" title="Clear">&times;</span></span>		
-
+								<div id="copper-debug-options-size1" class="flex vbox"></div>
 							</div>
 							
 							<div class="vbox" style="flex: 3;">
 								<p>Block2 (Res.)</p>
-								<span class="hbox text-input-custom" title="Choose block size in Behavior menu">
-									<input class="flex" type="text" id="debug_option_block2" placeholder="block no.">
-									<span class="clear_text" title="Clear">&times;</span>
-								</span>		
+								<div id="copper-debug-options-block2" class="flex vbox"></div>
 								<p>Size2</p>
-								<span class="hbox text-input-custom">
-									<input class="flex" type="text" id="debug_option_size2" placeholder="total size">
-									<span class="clear_text" title="Clear">&times;</span>
-								</span>		
-
+								<div id="copper-debug-options-size2" class="flex vbox"></div>
 							</div>
 							
-							<div class="checkbox flex vbox">
-								<label style="margin-left: auto; margin-right: auto;" >Auto
-								<input style="margin-left: 7px;" id="chk_debug_option_block_auto" type="checkbox" title="Automatically transmit all blocks"></label>
-							</div>
+							<div id="copper-debug-options-blockwise-enabled" class="flex vbox"></div>
 						</div>
 						
 						<p>Observe</p>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom">
-								<input class="flex" type="text" id="debug_option_observe" placeholder="use integer">
-								<span class="clear_text" title="Clear">&times;</span>
-							</span>		
-						</div>
+						<div id="copper-debug-options-observe" class="flex vbox"></div>
 						
 						<p>ETag(s)</p>
-						<div class="flex vbox multiple-options" id="debug_options_etags">
-							<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
-							<div class="flex hbox fixed-option-entry">
-								<span class="flex hbox text-input-custom">
-									<input class="flex str2Hex" type="text"  placeholder="use hex (0x..) or string">
-									<span class="clear_text" title="Clear">&times;</span>
-								</span>
-							</div>
-						</div>
+						<div id="copper-debug-options-etags" class="flex vbox"></div>
 
 						<p>If-Match(s)</p>
-						<div class="flex vbox multiple-options" id="debug_options_if_matchs">
-							<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
-							<div class="flex hbox fixed-option-entry">
-								<span class="flex hbox text-input-custom">
-									<input class="flex str2Hex" type="text" placeholder="use hex (0x..) or string">
-									<span class="clear_text" title="Clear">&times;</span>
-								</span>
-							</div>
-						</div>
-						
-						<div class="checkbox">
-							<label><input id="debug_option_if_none_match" type="checkbox">
-							If-None-Match</label>
-						</div>
+						<div id="copper-debug-options-ifmatches" class="flex vbox"></div>
+
+						<div id="copper-debug-options-if-none-match"></div>
 						
 						<div class="hbox">
 							<div class="flex">
 								<p>Uri-Host</p>
-								<span class="hbox text-input-custom">
-									<input class="flex" type="text" id="debug_option_uri_host" placeholder="not set">
-									<span class="clear_text" title="Clear">&times;</span>
-								</span>		
+								<div id="copper-debug-options-uri-host" class="vbox"></div>
 							</div>
 							
 							<div style="margin-left: 6px; width: 4em;">
 								<p>Uri-Port</p>
-								<span class="hbox text-input-custom">
-									<input class="flex" type="text" id="debug_option_uri_port" placeholder="n/s">
-									<span class="clear_text" title="Clear">&times;</span>
-								</span>		
+								<div id="copper-debug-options-uri-port" class="vbox"></div>	
 							</div>
 						</div>
 						
 						<p>Proxy-Uri</p>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom">
-								<input class="flex" type="text" id="debug_option_proxy_uri" placeholder="use absolute URI">
-								<span class="clear_text" title="Clear">&times;</span>
-							</span>		
-						</div>
+						<div id="copper-debug-options-proxy-uri" class="flex vbox"></div>
 						
-						<div class="checkbox">
-							<label><input id="debug_option_proxy_scheme" type="checkbox">
-							Use Proxy-Scheme option</label>
-						</div>
+						<div id="copper-debug-options-proxy-scheme"></div>
 						
 						<div style="text-align: center;"><label>Response Options</label></div>
 						
 						<p>Max-Age</p>
-						<div class="flex hbox">
-							<span class="flex hbox text-input-custom">
-								<input class="flex" type="text" id="debug_option_max_age" placeholder="use integer">
-								<span class="clear_text" title="Clear">&times;</span>
-							</span>		
-						</div>
+						<div id="copper-debug-options-max-age" class="flex vbox"></div>
 
 						<p>Location-Path</p>
-						<div class="flex vbox multiple-options" id="debug_options_location_paths">
-							<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
-							<div class="flex hbox fixed-option-entry">
-								<span class="flex hbox text-input-custom">
-									<input class="flex str2Hex" type="text" placeholder="not set">
-									<span class="clear_text" title="Clear">&times;</span>
-								</span>
-							</div>
-						</div>
+						<div id="copper-debug-options-location-path" class="flex vbox"></div>
 
 						<p>Location-Query</p>
-						<div class="flex vbox multiple-options" id="debug_options_location_queries">
-							<img title="This option can be included multiple times. A new text box entry will automatically be generated upon input" class="add-option-button" src="skin/collapsed.png">
-							<div class="flex hbox fixed-option-entry">
-								<span class="flex hbox text-input-custom">
-									<input class="flex str2Hex" type="text" placeholder="not set">
-									<span class="clear_text" title="Clear">&times;</span>
-								</span>
-							</div>
-						</div>
+						<div id="copper-debug-options-location-query" class="flex vbox"></div>
 						
 						<div style="text-align: center;"><label>Custom Options</label></div>
 
-						<div class="hbox" id="debug_option_custom_option">
-							<div style="flex: 1;">
-								<p>Number</p>
-								<span class="hbox text-input-custom">
-									<input class="flex" type="text" id="debug_option_custom_number" placeholder="not set">
-									<span class="clear_text" title="Clear">&times;</span>
-								</span>		
+						<div class="vbox">
+							<div class="hbox">
+								<div style="flex: 1;">
+									<p>Number</p>	
+								</div>
+								<div style="margin-left: 6px; flex: 2;">
+									<p>Value</p>	
+								</div>
 							</div>
-							
-							<div style="margin-left: 6px; flex: 2;">
-								<p>Value</p>
-								<span class="hbox text-input-custom">
-									<input class="flex str2Hex" type="text" id="debug_option_custom_value" placeholder="hex (0x..) or string">
-									<span class="clear_text" title="Clear">&times;</span>
-								</span>		
-							</div>
+							<div class="vbox" id="copper-debug-options-custom-options"></div>
 						</div>
-						
 					</div>
-					
 				</div>
-					
 			</div>
 		</div>
 		
@@ -649,8 +552,7 @@
 					<span class="coap-message-payload">Payload</span>
 				</div>
 				<div class="table-head-scrollbar"></div>
-				<div id="copper-coap-message-log-table" class="table-body">
-				</div>
+				<div id="copper-coap-message-log-table" class="table-body"></div>
 			</div>
 		</div>
 	</div>

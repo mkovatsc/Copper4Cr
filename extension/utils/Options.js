@@ -30,161 +30,181 @@
  ******************************************************************************/
  
 Copper.Options = function() {
-    this.etags = [];
-    this.ifMatchs = [];
-    this.locationPaths = [];
-    this.locationQueries = [];
-    this.customOptions = [];
+    this.options = new Object();
+    this.customOptions = new Object();
 };
 
 Copper.Options.prototype.optionsEnabled = false;
 Copper.Options.prototype.token = undefined;
-Copper.Options.prototype.accept = 0;
-Copper.Options.prototype.contentFormat = 0;
 Copper.Options.prototype.blockwiseEnabled = true;
-Copper.Options.prototype.block1 = undefined;
-Copper.Options.prototype.block2 = undefined;
-Copper.Options.prototype.size1 = undefined;
-Copper.Options.prototype.size2 = undefined;
-Copper.Options.prototype.observe = undefined;
-Copper.Options.prototype.etags = undefined;
-Copper.Options.prototype.ifMatchs = undefined;
-Copper.Options.prototype.ifNoneMatch = false;
-Copper.Options.prototype.uriHost = undefined;
-Copper.Options.prototype.uriPort = undefined;
-Copper.Options.prototype.proxyUri = undefined;
-Copper.Options.prototype.proxyScheme = false;
-Copper.Options.prototype.maxAge = undefined;
-Copper.Options.prototype.locationPaths = undefined;
-Copper.Options.prototype.locationQueries = undefined;
+Copper.Options.prototype.useProxyScheme = false;
+Copper.Options.prototype.useUtf8 = true;
+Copper.Options.prototype.options = undefined;
 Copper.Options.prototype.customOptions = undefined;
 
+Copper.Options.prototype.setOptionsEnabled = function(optionsEnabled){
+    this.optionsEnabled = optionsEnabled ? true : false;
+};
 
-Copper.Options.prototype.addOptions = function(coapMessage) {
-    if (!this.optionsEnabled) {
+Copper.Options.prototype.setToken = function(token){
+    if (token === undefined || token === ""){
+        this.token = undefined;
+    }
+    else {
+        // validate token
+        new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.GET).setToken(Copper.ByteUtils.convertToByteArray(token));
+        this.token = token;
+    }
+};
+
+Copper.Options.prototype.setBlockwiseEnabled = function(blockwiseEnabled){
+    this.blockwiseEnabled = blockwiseEnabled ? true : false;
+};
+
+Copper.Options.prototype.setProxyScheme = function(useProxyScheme){
+    this.useProxyScheme = useProxyScheme ? true : false;
+};
+
+Copper.Options.prototype.setUtf8 = function(useUtf8){
+    this.useUtf8 = useUtf8 ? true : false;
+};
+
+Copper.Options.prototype.isOptionSet = function(number){
+    return this.options[number] !== undefined || this.customOptions[number] !== undefined;
+};
+
+Copper.Options.prototype.addOption = function(number, value){
+    this.addOptionInternal(number, value, this.options);
+};
+
+Copper.Options.prototype.addCustomOption = function(number, value){
+    if (number === undefined || !number.match(/^[0-9]+$/g)){
+        throw new Error("Illegal option number");
+    }
+    this.addOptionInternal(Number.parseInt(number), (value === undefined ? "0" : value), this.customOptions);
+};
+
+Copper.Options.prototype.addOptionInternal = function(number, value, optionHolder){
+    if (value === undefined){
         return;
     }
-    
-    if (this.token !== undefined) {
-        var token;
-        if (this.token === 'empty' || this.token === '0x') {
-            token = new ArrayBuffer(0);
-        } else if (this.token.substr(0, 2) === '0x') {
-            token = Copper.ByteUtils.convertHexStringToBytes(this.token);
-        } else {
-            token = Copper.ByteUtils.convertStringToBytes(this.token);
+    let optionHeader = Copper.CoapMessage.OptionHeader.getOptionHeader(number);
+    if (!optionHeader.multipleValues && ()){
+        throw new Error("Option " + optionHeader.name + " must not be set more than once");
+    }
+    new Copper.CoapMessage.Option(optionHeader).addValue(this.transformValue(value, optionHeader.type, 4));
+    // check proxy-options / uri-options
+    if (number === Copper.CoapMessage.OptionHeader.PROXY_URI.number){
+        if (this.isOptionSet(Copper.CoapMessage.OptionHeader.URI_HOST.number) || this.isOptionSet(Copper.CoapMessage.OptionHeader.URI_PORT.number) ||
+              this.isOptionSet(Copper.CoapMessage.OptionHeader.URI_PATH.number) || this.isOptionSet(Copper.CoapMessage.OptionHeader.URI_QUERY.number)){
+            throw new Error("Proxy-uri cannot be used when URI-* options are set");
         }
-        if (token.byteLength > 8) {
-            token = token.slice(0,7);
-        }
-        coapMessage.setToken(token);
-    }
-
-    if (this.accept !== 0) {
-        coapMessage.addOption(Copper.CoapMessage.OptionHeader.ACCEPT, this.accept.number, true);
-    }
-
-    if (this.contentFormat !== 0) {
-        coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, this.contentFormat.number, true);
-    }
-
-    if (!this.blockwiseEnabled) {
-        if (this.block1 !== undefined) {
-            coapMessage.addOption(Copper.CoapMessage.OptionHeader.BLOCK1, new Copper.CoapMessage.BlockOption(this.block1, Copper.Session.settings.blockSize, false), true);
-        }
-
-        if (this.block2 !== undefined) {
-            coapMessage.addOption(Copper.CoapMessage.OptionHeader.BLOCK2, new Copper.CoapMessage.BlockOption(this.block2, Copper.Session.settings.blockSize, false), true);
-        }
-
-        if (this.size1 !== undefined) {
-            coapMessage.addOption(Copper.CoapMessage.OptionHeader.SIZE1, this.size1, true);
-        }
-
-        if (this.size2 !== undefined) {
-            coapMessage.addOption(Copper.CoapMessage.OptionHeader.SIZE2, this.size2, true);
-        }
-    }
-    if (this.observe !== undefined) {
-        coapMessage.addOption(Copper.CoapMessage.OptionHeader.OBSERVE, this.observe, true);
-    }
-
-    if (this.etags.length > 0) {
-        let newArray = this.addMultipleOptions(this.etags, Copper.CoapMessage.OptionHeader.ETAG, coapMessage);
-        if (newArray !== null) {
-            this.etags = newArray;
-        }
-    }
-
-    if (this.ifMatchs.length > 0) {
-        let newArray = this.addMultipleOptions(this.ifMatchs, Copper.CoapMessage.OptionHeader.IF_MATCH, coapMessage);
-        if (newArray !== null) {
-            this.ifMatchs = newArray;
-        }
-    }
-
-    if (this.uriHost !== undefined) {
-        coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_HOST, this.uriHost, true);
-    }
-
-    if (this.uriPort !== undefined) {
-        coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PORT, this.uriPort, true);
-    }
-
-    if (this.proxyUri !== undefined) {
-        // Proxy takes precedence over URI-Options (which MUST NOT be present)
-        coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_HOST);
-        coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_PORT);
-        coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_PATH);
-        coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_QUERY);
-        if (this.proxyScheme) {
+        if (this.useProxyScheme) {
             let uri = Copper.StringUtils.parseUri(this.proxyUri);
             if (uri === undefined){
                 throw new Error("Proxy URI is not a valid URI");
             }
-            else {
-                coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_SCHEME, uri.protocol ? uri.protocol : "coap", true);
-                coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_HOST, uri.address);
-                if (uri.port !== undefined) coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PORT, uri.port);
-                if (uri.path !== undefined){
-                    let pathParts = uri.path.split("/");
-                    for (let i=0; i<pathParts.length; i++){
-                        coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, pathParts[i]);
-                    }
+        }
+    }
+    if (this.isOptionSet(Copper.CoapMessage.OptionHeader.PROXY_URI.number) && 
+        (number === Copper.CoapMessage.OptionHeader.URI_HOST.number || number === Copper.CoapMessage.OptionHeader.URI_PORT.number ||
+          number === Copper.CoapMessage.OptionHeader.URI_PATH.number || number === Copper.CoapMessage.OptionHeader.URI_QUERY.number)) {
+        throw new Error("URI-* options must not be set if proxy-uri option is used");
+    }
+    optionHolder[number].push(value);
+};
+
+Copper.Options.prototype.transformValue = function(value, type, blockSize) {
+    switch (type){
+        case Copper.CoapMessage.OptionHeader.TYPE_EMPTY:
+            return null;
+        case Copper.CoapMessage.OptionHeader.TYPE_OPAQUE:
+            return value;
+        case Copper.CoapMessage.OptionHeader.TYPE_UINT:
+            return Number.parseInt(value);
+        case Copper.CoapMessage.OptionHeader.TYPE_STRING:
+            return value.toString();
+        case Copper.CoapMessage.OptionHeader.TYPE_BLOCK:
+            return new Copper.CoapMessage.BlockOption(Number.parseInt(value), blockSize, false);
+    }
+    throw new Error("Illegal type");
+};
+
+Copper.Options.prototype.addUriPathOption = function(optionHeader, path){
+    if (path !== undefined){
+        let pathParts = path.split("/");
+        for (let i=0; i<pathParts.length; i++){
+            coapMessage.addOption(optionHeader, pathParts[i]);
+        }
+    }
+};
+
+Copper.Options.prototype.addUriQueryOption = function(optionHeader, query){
+    if (query !== undefined){
+        let queryParts = path.split("&");
+        for (let i=0; i<queryParts.length; i++){
+            coapMessage.addOption(optionHeader, queryParts[i]);
+        }
+    }
+};
+
+Copper.Options.prototype.addOptionToCoapMessage = function(optionHeader, values, selectedBlockSize){
+    if (!this.blockwiseEnabled && (optionHeader.number === Copper.CoapMessage.OptionHeader.BLOCK1.number || optionHeader.number === Copper.CoapMessage.OptionHeader.BLOCK2.number)){
+        return;
+    }
+    for (let i=0; i<values.length; i++){
+        let value = this.transformValue(values[i], optionHeader.type, selectedBlockSize);
+        if (value === undefined) continue;
+        if (optionHeader.number === Copper.CoapMessage.OptionHeader.PROXY_URI.number){
+            // Proxy takes precedence over URI-Options (which MUST NOT be present)
+            coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_HOST);
+            coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_PORT);
+            coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_PATH);
+            coapMessage.removeOption(Copper.CoapMessage.OptionHeader.URI_QUERY);
+            if (this.useProxyScheme) {
+                let uri = Copper.StringUtils.parseUri(value);
+                if (uri === undefined){
+                    throw new Error("Proxy URI is not a valid URI");
                 }
-                if (uri.query !== undefined){
-                    let queryParts = uri.query.split("&");
-                    for (let i=0; i<queryParts.length; i++){
-                        coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_QUERY, queryParts[i]);
-                    }
+                else {
+                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_SCHEME, uri.protocol ? uri.protocol : "coap", true);
+                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_HOST, uri.address);
+                    if (uri.port !== undefined) coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PORT, uri.port);
+                    this.addUriPathOption(Copper.CoapMessage.OptionHeader.URI_PATH, uri.path);
+                    this.addUriQueryOption(Copper.CoapMessage.OptionHeader.URI_QUERY, uri.query);
                 }
             }
+            else {
+                coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_URI, value, true);
+            }
+        }
+        else if (optionHeader.number === Copper.CoapMessage.OptionHeader.LOCATION_PATH.number){
+            this.addUriPathOption(Copper.CoapMessage.OptionHeader.LOCATION_PATH, value);
+        }
+        else if (optionHeader.number === Copper.CoapMessage.OptionHeader.LOCATION_QUERY.number){
+            this.addUriPathOption(Copper.CoapMessage.OptionHeader.LOCATION_QUERY, value);
         }
         else {
-            coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_URI, this.proxyUri, true);
+            coapMessage.addOption(optionHeader, value, true);
         }
     }
+};
 
-    if (this.maxAge !== undefined) {
-        coapMessage.addOption(Copper.CoapMessage.OptionHeader.MAX_AGE, this.maxAge, true);
+Copper.Options.prototype.addOptionsToCoapMessage = function(coapMessage, selectedBlockSize) {
+    if (!this.optionsEnabled) {
+        return;
+    }
+    if (this.token !== undefined) {
+        coapMessage.setToken(Copper.ByteUtils.convertToByteArray(this.token));
     }
 
-    if (this.locationPaths.length > 0) {
-        let newArray = this.addMultipleOptions(this.locationPaths, Copper.CoapMessage.OptionHeader.LOCATION_PATH, coapMessage);
-        if (newArray !== null) {
-            this.locationPaths = newArray;
-        }
+    let optionNos = Object.keys(this.options);
+    for (let i=0; i<optionNos.length; i++){
+        this.addOptionToCoapMessage(Copper.CoapMessage.OptionHeader.getOptionHeader(optionNos[i]), this.options[optionNos[i]]);
     }
-
-    if (this.locationQueries.length > 0) {
-        let newArray = this.addMultipleOptions(this.locationQueries, Copper.CoapMessage.OptionHeader.LOCATION_QUERY, coapMessage);
-        if (newArray !== null) {
-            this.locationQueries = newArray;
-        }
-    }
-
-    if (this.customOptions.length > 0) {
-
+    let customOptionNos = Object.keys(this.customOptions);
+    for (let i=0; i<customOptionNos.length; i++){
+        this.addOptionToCoapMessage(Copper.CoapMessage.OptionHeader.getOptionHeader(customOptionNos[i]), this.customOptions[customOptionNos[i]]);
     }
 };
 
