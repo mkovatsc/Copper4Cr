@@ -298,6 +298,15 @@ button
     -moz-user-select: none;
 }
 
+#copper-toolbar-log-resizer {
+	position: absolute;
+	left: -4px;
+	bottom: -4px;
+	width: 14px;
+	height: 14px;
+	cursor: sw-resize;
+}
+
 #copper-toolbar-log p {
 	-webkit-user-select: text;
 	-moz-user-select: text;
@@ -379,7 +388,9 @@ button
 /* Tree view */
 .main-content .sidebar-left 
 {
+	position: relative;
 	width: 220px;
+	min-width: 28px;
 	border-right: 1px black solid;
 	padding: 4px;
 }
@@ -411,18 +422,19 @@ button
 /* Packet options table */
 #copper-packet-options
 {
+	min-width: 150px;
 	flex: 3;
 }
 
 #copper-packet-options .packet-option
 {
-    min-width: 90px;
+    min-width: 50px;
     flex: 1;
 }
 
 #copper-packet-options .packet-value
 {
-	min-width: 90px;
+	min-width: 50px;
 	flex: 1;
 }
 
@@ -614,7 +626,7 @@ button
 .main-content-bottom-box 
 {
 	height: 220px;
-	min-height: 220px; 
+	min-height: 24px;
 	border-top: 1px black solid;
 	position: relative;
 }
@@ -635,7 +647,12 @@ button
 	right: 0;
 }
 
-#copper-coap-message-log .coap-message-time 
+#copper-coap-message-log
+{
+	overflow: hidden;
+}
+
+#copper-coap-message-log .coap-message-time
 {
 	width: 55px;
 	min-width: 55px;
@@ -692,6 +709,14 @@ button
 	background-color: #FCC;
 }
 
+#copper-coap-message-log-resizer {
+	position: absolute;
+	top: -4px;
+	width: 100%;
+	height: 8px;
+	cursor: n-resize;
+}
+
 #copper-overlay{
 	position: fixed; 
 	top: 0; 
@@ -738,6 +763,15 @@ button
     overflow-x: hidden;
     overflow-y: auto;
 }
+
+#resource-tree-resizer {
+	position: absolute;
+	right: -4px;
+	width: 8px;
+	height: 100%;
+	cursor: e-resize;
+}
+
 
 .tree ul{
     list-style-type: none;
@@ -976,9 +1010,29 @@ button
 	margin: 0;
 	padding: 0;
 }
+
 #popup-windows .start-resource-access .input-box button {
 	height: 25px;
 	width: 50px;
 	margin: 0 0 0 5px;
 	padding: 0;
+}
+
+#popup-windows .copper-error .popup-container{
+	width: 400px;
+	margin-left: -200px;
+	padding-bottom: 30px;
+	top: 20vh;
+}
+
+#popup-windows .copper-error img {
+	width: 30px;
+	margin-right: 30px;
+}
+
+#popup-windows .copper-error #copper-error-exit-button {
+	position: absolute;
+	bottom: 5px;
+	width: 80px;
+	left: 160px;
 }

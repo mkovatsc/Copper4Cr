@@ -33,7 +33,7 @@ Copper.ClientPort = function(){
 };
 
 Copper.ClientPort.connect = function(clientId, finalDisconnectHandler, callback){
-	let appId = "mbighlecbopknoggoappifafoffcnocc";
+	let appId = "kdgfcijijlbhfondicahdjhchebnnmei";
 	let port = new Copper.Port(chrome.runtime.connect(appId), clientId);
 
 	let connectedCallback = function(){
@@ -49,13 +49,15 @@ Copper.ClientPort.connect = function(clientId, finalDisconnectHandler, callback)
         Copper.Log.logFine("Starting application");
         Copper.TimeUtils.clearTimeout(firstTimeout);
         let secondTimeout = Copper.TimeUtils.setTimeout(connectedCallback, 750)
-        Copper.OverlayAdapter.addTitleTextOverlay("Starting...", "Try to start the Copper Application");
+        //Copper.OverlayAdapter.addTitleTextOverlay("Starting...", "Try to start the Copper Application");
+        Copper.ErrorWindowAdapter.openInfoWindow("Starting...", "Try to start the Copper Application");
         chrome.management.launchApp(appId, function(){
             port = new Copper.Port(chrome.runtime.connect(appId), clientId);
             port.registerDisconnectCallback(function(){
                 // app was not started
                 Copper.TimeUtils.clearTimeout(secondTimeout);
-                Copper.OverlayAdapter.addTitleTextOverlay("Copper App not installed", "This extension needs the Copper application to send Coap-Messages. Please install the app and reload.");
+                //Copper.OverlayAdapter.addTitleTextOverlay("Copper App not installed", "This extension needs the Copper application to send Coap-Messages. Please install the app and reload.");
+                Copper.ErrorWindowAdapter.openErrorWindow("Copper App not installed", "This extension needs the Copper application to send Coap-Messages. Please install the app and reload.");
             });
         });
     });

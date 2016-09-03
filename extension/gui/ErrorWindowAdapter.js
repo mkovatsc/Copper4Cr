@@ -28,39 +28,36 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
-
-Copper.CoapResourceHandler = function(){
+ 
+Copper.ErrorWindowAdapter = function(){
 };
 
-Copper.CoapResourceHandler.resolveCoapResource = function(callback){
-	let search = window.location.search;
-    let uri = undefined;
-    if (search && search.startsWith("?")){
-        uri = Copper.StringUtils.parseUri(decodeURIComponent(search.substr(1)));
-    }
-    if (uri === undefined){
-        Copper.StartupWindowAdapter.openStartupWindow(function(value) {
-            uri = Copper.StringUtils.parseUri(value);
-            if (uri === undefined){
-                // TODO
-                //errorCallback("Please enter a valid URL");
-            }
-            else {
-                Copper.CoapResourceHandler.changeCoapResource(uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query, true);
-            }
-        });
-    }
-    else {
-        callback(uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query);
-    }
+Copper.ErrorWindowAdapter.openErrorWindow = function(errorTitle, errorMsg) {
+    Copper.ErrorWindowAdapter.openPopupWindow(errorTitle, errorMsg, "skin/tool_delete.png");
 };
 
-Copper.CoapResourceHandler.changeCoapResource = function(protocol, remoteAddress, remotePort, path, query, reload){
-	if (reload) {
-		window.location.search = "?" + encodeURIComponent((protocol ? protocol + "://" : "") + remoteAddress + ":" + remotePort +
-				(path ? ("/" + path) : "") + (query ? ("?" + query) : ""));
-	} else {
-		window.history.pushState("", "", "?" + encodeURIComponent((protocol ? protocol + "://" : "") + remoteAddress + ":" + remotePort +
-				(path ? ("/" + path) : "") + (query ? ("?" + query) : "")));
-	}
+Copper.ErrorWindowAdapter.openInfoWindow = function(title, msg) {
+    Copper.ErrorWindowAdapter.openPopupWindow(title, msg, "skin/tool_discover.png");
+};
+
+Copper.ErrorWindowAdapter.openPopupWindow = function(title, msg, icon) {
+    let blockScreen = document.getElementById("copper-overlay-error").parentNode;
+    blockScreen.classList.remove("hidden");
+    let errorMsgTitleElement = document.getElementById("copper-overlay-error-title");
+    errorMsgTitleElement.innerHTML = "Copper (Cu) - " + title;
+    let errorMsgElement = document.getElementById("copper-error-msg");
+    errorMsgElement.innerHTML = msg;
+    let iconElement = document.getElementById("copper-overlay-icon");
+    iconElement.src = icon;
+
+    let exitButton = document.getElementById("copper-error-exit-button");
+
+    exitButton.onclick = function() {
+        blockScreen.classList.add("hidden");
+    };
+};
+
+Copper.ErrorWindowAdapter.closeInfoWindow = function(title, msg) {
+    let blockScreen = document.getElementById("copper-overlay-error").parentNode;
+    blockScreen.classList.add("hidden");
 };

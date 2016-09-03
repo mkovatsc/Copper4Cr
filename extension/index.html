@@ -41,10 +41,12 @@
 	<script src="gui/PayloadAdapter.js"></script>
 	<script src="gui/ToolbarAdapter.js"></script>
 	<script src="gui/ResourceViewAdapter.js"></script>
-	<script src="gui/PopupWindowAdapter.js"></script>
+	<script src="gui/PreferenceWindowAdapter.js"></script>
 	<script src="gui/DebugOptionsAdapter.js"></script>
 	<script src="gui/ProfilesAdapter.js"></script>
-	<script src="gui/StartupAdapter.js"></script>
+	<script src="gui/StartupWindowAdapter.js"></script>
+	<script src="gui/StatusBarAdapter.js"></script>
+	<script src="gui/ErrorWindowAdapter.js"></script>
 
 	<script src="utils/Storage.js"></script>
 	<script src="utils/Options.js"></script>
@@ -367,7 +369,7 @@
   <!-- MENU BAR DONE -->
 
 	<div class="main-content vbox">
-		<div class="hbox flex-filler">
+		<div class="hbox flex-filler" style="overflow: hidden;">
 			<div class="vbox flex-filler">
 				<div class="main-content-top-box">
 					<fieldset>
@@ -381,7 +383,7 @@
 						<div id="resource_tree" class="tree border_solid white flex-filler"></div>
 					</div>
 					
-					<div class="vbox flex-filler">
+					<div class="vbox flex-filler" style="min-width: 380px;">
 						<div class="hbox center-box-top">
 							<div id="copper-packet-header" class="table no-scroll">
 								<div class="table-head">
@@ -538,7 +540,7 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<div class="main-content-bottom-box">
 			<h2>CoAP Message Log</h2>
 			<div id="copper-coap-message-log" class="table vbox">
@@ -632,6 +634,20 @@
 						You can try with <label style="cursor: text;">coap://vs0.inf.ethz.ch/</label>
 					</p>
 				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="block_screen copper-error hidden">
+		<div id="copper-overlay-error" class="popup-container vbox">
+			<label id="copper-overlay-error-title" class="title"></label>
+			<div class="hbox" style="padding: 30px 30px 20px 30px;">
+				<div>
+					<img id="copper-overlay-icon" src="">
+				</div>
+				<p id="copper-error-msg">
+				</p>
+				<button id="copper-error-exit-button">OK</button>
 			</div>
 		</div>
 	</div>

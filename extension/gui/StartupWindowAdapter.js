@@ -29,10 +29,10 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 
-Copper.StartupAdapter = function(){
+Copper.StartupWindowAdapter = function(){
 };
 
-Copper.StartupAdapter.openStartupWindow = function(callback) {
+Copper.StartupWindowAdapter.openStartupWindow = function(callback) {
     document.getElementById("copper-overlay-startup").parentNode.classList.remove("hidden");
 
     let buttonResource = document.getElementById("copper-startup-resource-confirm-button");

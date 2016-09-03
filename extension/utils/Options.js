@@ -89,7 +89,7 @@ Copper.Options.prototype.addOptionInternal = function(number, value, optionHolde
         return;
     }
     let optionHeader = Copper.CoapMessage.OptionHeader.getOptionHeader(number);
-    if (!optionHeader.multipleValues && ()){
+    if (!optionHeader.multipleValues){
         throw new Error("Option " + optionHeader.name + " must not be set more than once");
     }
     new Copper.CoapMessage.Option(optionHeader).addValue(this.transformValue(value, optionHeader.type, 4));

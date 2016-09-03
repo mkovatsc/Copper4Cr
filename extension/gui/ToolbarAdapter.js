@@ -105,7 +105,38 @@ Copper.ToolbarAdapter.init = function(){
     for (let i = 0; i < dropdowns.length; i++) {
         dropdowns[i].onclick = Copper.ToolbarAdapter.openDropdown;
     }
+    
+    Copper.ToolbarAdapter.initEventLogResizing()
 };
+
+Copper.ToolbarAdapter.initEventLogResizing = function() {
+    let resizer = document.createElement("div");
+    resizer.id = "copper-toolbar-log-resizer";
+
+    let eventLog = document.getElementById("copper-toolbar-log-event-log");
+    eventLog.appendChild(resizer);
+
+    var startX, startY, startWidth, startHeight;
+
+    var doEventLogDrag = function (e) {
+        eventLog.style.width = (startWidth + startX - e.clientX) + 'px';
+        eventLog.style.width = (startWidth + startX - e.clientX) + 'px';
+    };
+
+    var stopEventLogDrag = function (e) {
+        document.documentElement.removeEventListener('mousemove', doEventLogDrag, false);
+        document.documentElement.removeEventListener('mouseup', stopEventLogDrag, false);
+    };
+
+    var initEventLogDrag = function(e) {
+        startX = e.clientX;
+        startWidth = parseInt(document.defaultView.getComputedStyle(eventLog).width, 10);
+        document.documentElement.addEventListener('mousemove', doEventLogDrag, false);
+        document.documentElement.addEventListener('mouseup', stopEventLogDrag, false);
+    };
+
+    resizer.addEventListener('mousedown', initEventLogDrag, false);
+}
 
 Copper.ToolbarAdapter.onProfileLoaded = function() {
     let profiles = Copper.Session.profiles;
@@ -219,6 +250,9 @@ Copper.ToolbarAdapter.doDiscover = function(){
 	coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, ".well-known");
 	coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, "core");
     Copper.ToolbarAdapter.ongoingDiscoverRequest = true;
+    let toolbarIcon = document.getElementById("copper-toolbar-discover").firstElementChild;
+    toolbarIcon.src = "skin/spinner.gif";
+    Copper.StatusBarAdapter.setTextAndBlockUpdates("Discovering", "(completed)");
 	Copper.Session.sendCoapMessage(coapMessage, true);
 };
 
@@ -247,6 +281,7 @@ Copper.ToolbarAdapter.doObserve = function(){
     if (rootElement.firstChild.src.endsWith("skin/tool_unobserve.png")) {
         // stop observing
         Copper.Session.clientEndpoint.cancelRequests();
+        Copper.StatusBarAdapter.setTextAndBlockUpdates("Finished observing", "");
     }
     else {
         // start observing

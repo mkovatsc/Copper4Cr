@@ -1,6 +1,35 @@
 Copper.ResourceViewAdapter = function(){
 };
 
+Copper.ResourceViewAdapter.init = function(){
+    let resizer = document.createElement("div");
+    resizer.id = "resource-tree-resizer";
+
+    let sidebarLeft = document.getElementsByClassName("sidebar-left")[0];
+    sidebarLeft.appendChild(resizer);
+
+    var startX, startWidth;
+
+    var doResourceDrag = function (e) {
+        sidebarLeft.style.width = (startWidth + e.clientX - startX) + 'px';
+    };
+
+    var stopResourceDrag = function (e) {
+        document.documentElement.removeEventListener('mousemove', doResourceDrag, false);
+        document.documentElement.removeEventListener('mouseup', stopResourceDrag, false);
+    };
+
+    var initResourceDrag = function(e) {
+        startX = e.clientX;
+        startWidth = parseInt(document.defaultView.getComputedStyle(sidebarLeft).width, 10);
+
+        document.documentElement.addEventListener('mousemove', doResourceDrag, false);
+        document.documentElement.addEventListener('mouseup', stopResourceDrag, false);
+    };
+
+    resizer.addEventListener('mousedown', initResourceDrag, false);
+};
+
 Copper.ResourceViewAdapter.payloadStr = undefined;
 Copper.ResourceViewAdapter.resources = new Object();
 Copper.ResourceViewAdapter.allResourcesHTML = undefined;
@@ -10,6 +39,7 @@ Copper.ResourceViewAdapter.onProfileLoaded = function() {
     let settings = Copper.Session.settings;
     Copper.ResourceViewAdapter.resources = Copper.Session.settings.resources;
     Copper.ResourceViewAdapter.updateResourceLinks();
+    Copper.ResourceViewAdapter.selectRequestedPath();
 };
 
 
@@ -54,16 +84,22 @@ Copper.ResourceViewAdapter.onEvent = function(event){
             Copper.ResourceViewAdapter.payloadStr += Copper.ByteUtils.convertBytesToString(coapMessage.payload);
 
             if (!block2Option.more) {
-
+                let toolbarIcon = document.getElementById("copper-toolbar-discover").firstElementChild;
+                toolbarIcon.src = "skin/tool_discover.png";
                 Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
                 Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ResourceViewAdapter.payloadStr));
+                Copper.ResourceViewAdapter.selectResourceAfterDiscovery();
+
             }
 
             return;
         } else {
             // Not blockwise
+            let toolbarIcon = document.getElementById("copper-toolbar-discover").firstElementChild;
+            toolbarIcon.src = "skin/tool_discover.png";
             Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
             Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ByteUtils.convertBytesToString(coapMessage.payload)));
+            Copper.ResourceViewAdapter.selectResourceAfterDiscovery();
         }
     }
 };
@@ -75,7 +111,7 @@ Copper.ResourceViewAdapter.onClickResource = function() {
 };
 
 Copper.ResourceViewAdapter.updateResourceLinks = function(add) {
-
+    
     // merge links
     if (add) {
         for (var uri in add) {
@@ -91,8 +127,6 @@ Copper.ResourceViewAdapter.updateResourceLinks = function(add) {
         Copper.ResourceViewAdapter.resources['/.well-known/core']['title'] = 'Resource discovery';
     }
 
-    //Copper.ResourceViewAdapter.clearTree();
-
     // sort by path
     let sorted = new Array();
     for (var uri in Copper.ResourceViewAdapter.resources) {
@@ -104,10 +138,11 @@ Copper.ResourceViewAdapter.updateResourceLinks = function(add) {
 
         let uri = sorted[entry];
         // add to tree view
-        Copper.ResourceViewAdapter.addTreeResource( decodeURI(uri), Copper.ResourceViewAdapter.resources[uri] );
+        Copper.ResourceViewAdapter.addTreeResource( decodeURI(uri), Copper.ResourceViewAdapter.resources[uri]);
     }
 
-    let allResourcesHTML = document.getElementsByTagName("P");
+    var tree = document.getElementById('resource_tree');
+    let allResourcesHTML = tree.getElementsByTagName("P");
     for (let i = 0; i < allResourcesHTML.length; i++) {
         let resource = allResourcesHTML[i];
         resource.onclick = Copper.ResourceViewAdapter.onClickResource;
@@ -233,13 +268,13 @@ Copper.ResourceViewAdapter.addTreeResource = function(uri, attributes) {
                 }
 
                 // Update status label
-                let status = document.getElementById('status-label');
 
                 let search = window.location.search;
                 let uriObject = Copper.StringUtils.parseUri(decodeURIComponent(search.substr(1)));
 
-                status.innerHTML = "Opened coap://" + address + ':' + port + '/' + p.getAttribute("data-uri");
+                Copper.StatusBarAdapter.setText("Opened coap://" + address + ':' + port + '/' + p.getAttribute("data-uri"));
             });
+
             let textNode = document.createTextNode(segments[i]);
             p.appendChild(textNode);
 
@@ -289,4 +324,39 @@ Copper.ResourceViewAdapter.addTreeResource = function(uri, attributes) {
 
     Copper.Session.settings.resources = Copper.ResourceViewAdapter.resources;
     Copper.Session.storeChange();
+};
+
+Copper.ResourceViewAdapter.selectRequestedPath = function() {
+    if (Copper.Session.path === undefined) {
+        return;
+    }
+
+    var tree = document.getElementById('resource_tree');
+    let allResourcesHTML = tree.getElementsByTagName("P");
+
+    for (let i = 0; i < allResourcesHTML.length; i++) {
+        let resource = allResourcesHTML[i];
+        if (resource.dataset.uri === Copper.Session.path) {
+            resource.click();
+            return;
+        }
+    }
+
+    Copper.StatusBarAdapter.setTextAndBlockUpdates("Requested Path of Resource not found - Trying to discover it...", "");
+
+    Copper.ToolbarAdapter.doDiscover();
+};
+
+Copper.ResourceViewAdapter.selectResourceAfterDiscovery = function(uri) {
+    var tree = document.getElementById('resource_tree');
+    let allResourcesHTML = tree.getElementsByTagName("P");
+
+    for (let i = 0; i < allResourcesHTML.length; i++) {
+        let resource = allResourcesHTML[i];
+        if (resource.dataset.uri === Copper.Session.path) {
+            resource.click();
+            return;
+        }
+    }
+    Copper.StatusBarAdapter.setText("Requested path to resource not found");
 };

@@ -62,9 +62,11 @@ Copper.Session.guiAdapters = [
         Copper.ToolbarAdapter,
         Copper.ResourceViewAdapter,
         Copper.DebugOptionsAdapter,
-        Copper.PopupWindowAdapter,
+        Copper.PreferenceWindowAdapter,
         Copper.ProfilesAdapter,
-        Copper.StartupAdapter
+        Copper.StartupWindowAdapter,
+        Copper.StatusBarAdapter,
+        Copper.ErrorWindowAdapter
     ];
 
 Copper.Session.initialize = function(){
@@ -95,19 +97,21 @@ Copper.Session.registerClient = function(port){
         switch (event.type){
             case Copper.Event.TYPE_CLIENT_REGISTERED:
                 Copper.Event.unregisterCallback(registeredCallback, Copper.Session.clientId);
-                Copper.OverlayAdapter.removeOverlay();
+                Copper.ErrorWindowAdapter.closeInfoWindow();
 
                 Copper.Session.clientEndpoint = new Copper.ClientEndpoint(port, Copper.Session.clientId);
                 Copper.Session.localPort = event.port;
-
                 Copper.Session.loadAllProfilesAndSelect();
                 Copper.Session.startExtension();
+
                 break;
             case Copper.Event.TYPE_ERROR_ON_SERVER: 
-                Copper.OverlayAdapter.addTitleTextOverlay("Error", "Error " + event.data.errorType + ": " + event.data.errorMessage);
+                //Copper.OverlayAdapter.addTitleTextOverlay("Error", "Error " + event.data.errorType + ": " + event.data.errorMessage);
+                Copper.ErrorWindowAdapter.openErrorWindow("Error", "Error " + event.data.errorType + ": " + event.data.errorMessage);
                 break;
             default:
-                Copper.OverlayAdapter.addTitleTextOverlay("Error: Invalid Event", "Received invalid event(" + event.type + ") from app. Please restart the extension.");
+                //Copper.OverlayAdapter.addTitleTextOverlay("Error: Invalid Event", "Received invalid event(" + event.type + ") from app. Please restart the extension.");
+                Copper.ErrorWindowAdapter.openErrorWindow("Error: Invalid Event", "Error: Invalid Event", "Received invalid event(" + event.type + ") from app. Please restart the extension.");
                 break;
         }
         return true;
@@ -146,7 +150,8 @@ Copper.Session.showErrorMessage = function(errorNo, errorMessage){
     if (!Number.isInteger(errorNo) || typeof(errorMessage) !== "string"){
         throw new Error("Illegal Arguments");
     }
-    Copper.OverlayAdapter.addErrorMsgOverlay("Error " + errorNo, errorMessage);
+    //Copper.OverlayAdapter.addErrorMsgOverlay("Error " + errorNo, errorMessage);
+    Copper.ErrorWindowAdapter.openErrorWindow("Error " + errorNo, errorMessage);
 };
 
 Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
@@ -200,7 +205,8 @@ Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
 Copper.Session.onPortDisconnect = function(){
     Copper.Session.clientEndpoint = undefined;
     Copper.Session.localPort = undefined;
-    Copper.OverlayAdapter.addTitleTextOverlay("Connection lost...", "Connection to Copper app lost. Please restart the extension.");
+    //Copper.OverlayAdapter.addTitleTextOverlay("Connection lost...", "Connection to Copper app lost. Please restart the extension.");
+    Copper.ErrorWindowAdapter.openErrorWindow("Connection lost...", "Connection to Copper app lost. Please restart the extension.");
 };
 
 Copper.Session.loadAllProfilesAndSelect = function() {
