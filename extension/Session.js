@@ -38,23 +38,39 @@ Copper.Session = function(){
 };
 
 Copper.Session.clientId = undefined;
-Copper.Session.protocol = undefined;
-Copper.Session.remoteAddress = undefined;
-Copper.Session.remotePort = undefined;
-Copper.Session.path = undefined;
-Copper.Session.query = undefined;
+Copper.Session.storageManager = undefined;
 
 Copper.Session.profileName = undefined;
 Copper.Session.settings = undefined;
 Copper.Session.options = undefined;
 Copper.Session.payload = undefined;
 Copper.Session.profiles = undefined;
+Copper.Session.resources = undefined;
+
+Copper.Session.protocol = undefined;
+Copper.Session.remoteAddress = undefined;
+Copper.Session.remotePort = undefined;
+Copper.Session.path = undefined;
+Copper.Session.query = undefined;
 
 Copper.Session.clientEndpoint = undefined;
 Copper.Session.localPort = undefined;
 
 
-Copper.Session.guiAdapters = [
+/* 
+*  if a function from the following list is implemented, it gets called when appropriate
+*   - beforeSessionInitialization
+*   - onProfilesUpdated
+*   - onSettingsUpdated
+*   - onOptionsUpdated
+*   - onPayloadUpdated
+*   - onCoapEndpointResolved
+*   - onResourcesUpdated
+*   - onClientRegistered
+*   - onEvent
+*   - beforeSendingCoapMessage
+*/
+Copper.Session.eventListeners = [
         Copper.MessageLogAdapter,
         Copper.PacketHeaderAdapter,
         Copper.PacketOptionsAdapter,
@@ -69,16 +85,46 @@ Copper.Session.guiAdapters = [
         Copper.ErrorWindowAdapter
     ];
 
+Copper.Session.informListeners = function(funcName, args){
+    let listeners = Copper.Session.eventListeners;
+    for (let i=0; i<listeners.length; i++){
+        if (typeof(listeners[i][funcName]) === "function"){
+            try {
+                listeners[i][funcName].apply(listeners[i], args);
+            } catch (exception){
+                Copper.Log.logError(exception.stack);
+                Copper.Session.showErrorMessage(-1, exception.message);
+            }
+        }
+    }
+};
+
 Copper.Session.initialize = function(){
     Copper.Session.clientId = 1;
-    Copper.CoapResourceHandler.resolveCoapResource(function(protocol, remoteAddress, remotePort, path, query){
-        Copper.Session.protocol = protocol;
-        Copper.Session.remoteAddress = remoteAddress;
-        Copper.Session.remotePort = remotePort;
-        Copper.Session.path = path;
-        Copper.Session.query = query;
+    Copper.Session.storageManager = new Copper.StorageManager("copper");
+    Copper.Session.informListeners("beforeSessionInitialization");
+    
+    Copper.Session.storageManager.loadPayload(function(payload){
+        Copper.Session.updatePayload(payload === undefined ? new Copper.Payload() : payload, true);
+        
+        Copper.Session.storageManager.loadProfiles(function(profiles){
+            Copper.Session.updateProfilesSelection(profiles === undefined ? new Copper.Profiles() : profiles, true);    
 
-        Copper.ClientPort.connect(Copper.Session.clientId, Copper.Session.onPortDisconnect, Copper.Session.registerClient);
+            Copper.CoapResourceHandler.resolveCoapResource(function(protocol, remoteAddress, remotePort, path, query){
+                Copper.Session.protocol = protocol;
+                Copper.Session.remoteAddress = remoteAddress;
+                Copper.Session.remotePort = remotePort;
+                Copper.Session.path = path;
+                Copper.Session.query = query;
+
+                Copper.Session.informListeners("onCoapEndpointResolved");
+
+                Copper.Session.storageManager.loadResources(function(resources){
+                    Copper.Session.updateResources(resources === undefined ? new Copper.Resources() : resources, true);
+                    Copper.ClientPort.connect(Copper.Session.clientId, Copper.Session.onPortDisconnect, Copper.Session.registerClient);
+                });
+            });
+        });   
     });
 };
 
@@ -86,12 +132,6 @@ Copper.Session.initialize = function(){
 // register client
 // bind HTML to javascript
 Copper.Session.registerClient = function(port){
-
-    Copper.Session.settings = new Copper.Settings();
-    Copper.Session.options = new Copper.Options();
-    Copper.Session.payload = new Copper.Payload();
-    Copper.Session.profiles = new Copper.Profiles();
-
 
     let registeredCallback = function(event){
         switch (event.type){
@@ -101,7 +141,6 @@ Copper.Session.registerClient = function(port){
 
                 Copper.Session.clientEndpoint = new Copper.ClientEndpoint(port, Copper.Session.clientId);
                 Copper.Session.localPort = event.port;
-                Copper.Session.loadAllProfilesAndSelect();
                 Copper.Session.startExtension();
 
                 break;
@@ -121,22 +160,11 @@ Copper.Session.registerClient = function(port){
 };
 
 Copper.Session.startExtension = function(){
-    let guiAdapters = Copper.Session.guiAdapters;
-    
-    // init
-    for (let i=0; i<guiAdapters.length; i++){
-        if (typeof(guiAdapters[i].init) === "function"){
-            guiAdapters[i].init();
-        }
-    }
+    Copper.Session.informListeners("onClientRegistered");
 
     // event callback
     Copper.Event.registerCallback(function(event){
-        for (let i=0; i<guiAdapters.length; i++){
-            if (typeof(guiAdapters[i].onEvent) === "function"){
-                guiAdapters[i].onEvent(event);
-            }
-        }
+        Copper.Session.informListeners("onEvent", [event]);
         switch (event.type){
             case Copper.Event.TYPE_ERROR_ON_SERVER:
                 Copper.Session.showErrorMessage(event.data.errorType, event.data.errorMessage);
@@ -165,35 +193,15 @@ Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
         let blockwiseEnabled = true;
         if (!withoutModification){
             // add URI-PATH and URI-QUERY
-            if (Copper.Session.path !== undefined && Copper.Session.path !== null){
-                let pathParts = Copper.Session.path.split("/");
-                for (let i=0; i<pathParts.length; i++){
-                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, pathParts[i]);
-                }
-            }
-            if (Copper.Session.query !== undefined){
-                let queryParts = Copper.Session.query.split("&");
-                for (let i=0; i<queryParts.length; i++){
-                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_QUERY, queryParts[i]);
-                }
-            }
+            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_PATH, Copper.Session.path, "/");
+            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_QUERY, Copper.Session.query, "&");
 
             if (Copper.Session.options.optionsEnabled){
                 blockwiseEnabled = Copper.Session.options.blockwiseEnabled;
-                Copper.Session.options.addOptions(coapMessage);
+                Copper.Session.options.addOptionsToCoapMessage(coapMessage, Copper.Session.settings.blockSize);
             }
 
-            let guiAdapters = Copper.Session.guiAdapters;
-            for (let i=0; i<guiAdapters.length; i++){
-                if (typeof(guiAdapters[i].beforeSendingCoapMessage) === "function"){
-                    try {
-                        guiAdapters[i].beforeSendingCoapMessage(coapMessage);
-                    } catch (exception){
-                        Copper.Log.logError(exception.stack);
-                        Copper.Session.showErrorMessage(-1, exception.message);
-                    }
-                }
-            }
+            Copper.Session.informListeners("beforeSendingCoapMessage", [coapMessage]);
         }
         Copper.Session.clientEndpoint.sendCoapMessage(coapMessage, blockwiseEnabled);
     } catch (exception){
@@ -209,29 +217,47 @@ Copper.Session.onPortDisconnect = function(){
     Copper.ErrorWindowAdapter.openErrorWindow("Connection lost...", "Connection to Copper app lost. Please restart the extension.");
 };
 
-Copper.Session.loadAllProfilesAndSelect = function() {
-
-    Copper.Storage.retrieveLocally(Copper.Storage.keys.PROFILES_KEY, function(id, items) {
-        let profiles = items[id];
-        if (profiles === undefined) {
-            // No profiles stored yet -> Create default profile and load it
-            Copper.Session.profiles.createAndSelectDefaultProfile();
-
-        } else {
-            Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
-            Copper.Storage.retrieveLocally(Copper.Storage.keys.SELECTED_PROFILE, function(id2, items2) {
-                let name = items2[id2];
-                Copper.Session.profiles.loadProfile(name);
-            });
-        }
-    });
-
-};
-
 Copper.Session.storeChange = function() {
     Copper.Session.profiles.updateCurrentProfile();
 };
 
-Copper.Session.onOptionsUpdated = function() {
-    
+Copper.Session.updateSettings = function(newSettings, skipStoringToProfile) {
+    Copper.Session.settings = newSettings;
+    Copper.Session.informListeners("onSettingsUpdated");
+    if (this.clientEndpoint !== undefined) this.clientEndpoint.updateSettings(newSettings);
+    if (!skipStoringToProfile && Copper.Session.profiles.updateSelectedProfile(Copper.Session.settings, Copper.Session.options)){
+        Copper.Session.updateProfiles(Copper.Session.profiles);
+    }
+};
+
+Copper.Session.updateOptions = function(newOptions, skipStoringToProfile) {
+    Copper.Session.options = newOptions;
+    Copper.Session.informListeners("onOptionsUpdated");
+    if (!skipStoringToProfile && Copper.Session.profiles.updateSelectedProfile(Copper.Session.settings, Copper.Session.options)){
+        Copper.Session.updateProfiles(Copper.Session.profiles);
+    }
+};
+
+Copper.Session.updatePayload = function(newPayload, skipStoring) {
+    Copper.Session.payload = newPayload;
+    Copper.Session.informListeners("onPayloadUpdated");
+    if (!skipStoring) Copper.Session.storageManager.storePayload(newPayload);
+};
+
+Copper.Session.updateProfiles = function(newProfiles, skipStoring) {
+    Copper.Session.profiles = newProfiles;
+    Copper.Session.informListeners("onProfilesUpdated");
+    if (!skipStoring) Copper.Session.storageManager.storeProfiles(newProfiles);
+};
+
+Copper.Session.updateProfilesSelection = function(newProfiles, skipStoring) {
+    Copper.Session.updateProfiles(newProfiles, skipStoring);
+    Copper.Session.updateSettings(newProfiles.getSelectedProfile().settings.clone(), true);
+    Copper.Session.updateOptions(newProfiles.getSelectedProfile().options.clone(), true);
+};
+
+Copper.Session.updateResources = function(newResources, skipStoring) {
+    Copper.Session.resources = newResources;
+    Copper.Session.informListeners("onResourcesUpdated");
+    if (!skipStoring) Copper.Session.storageManager.storeResources(newResources);
 };

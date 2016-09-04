@@ -29,43 +29,50 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-QUnit.test("ExtensionJsonUtils: Options", function(assert) {
-	let data = new Copper.Options();
-	data.size1 = 2000;
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Options), true);
-});
+Copper.Resources = function() {
+	this.resources = new Object();	
+};
 
-QUnit.test("ExtensionJsonUtils: Profile", function(assert) {
-	let data = new Copper.Profiles();
-	let settings = new Copper.Settings();
-	settings.blockSize = 0;
-	let options = new Copper.Options();
-	options.setToken("0x33");
-	options.addOption(8, "0x2");
-	data.addProfile("test", settings, options);
-	data.autoStore = false;
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Profiles), true);
-});
+Copper.Resources.prototype.resources = undefined;
 
-QUnit.test("ExtensionJsonUtils: Resources", function(assert) {
-	let data = new Copper.Resources();
-	data.resources["vs0.inf.ethz.ch"] = {"blah blah blah": "test"};
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Resources), true);
-});
+Copper.Resources.prototype.getResourcesForAddress = function(address){
+	if (typeof(address) !== "string" || address === ""){
+		throw new Error("Illegal arguments");
+	}
+	let resources = this.resources[address];
+	
+	let uris = resources !== undefined ? Object.keys(resources) : [];
+	if (uris.indexOf("/.well-known/core") === -1) uris.push("/.well-known/core");
+	uris.sort();
 
-QUnit.test("ExtensionJsonUtils: Payload", function(assert) {
-	let data = new Copper.Payload();
-	data.payloadFileData = new ArrayBuffer(33);
-	data.payloadMode = "file";
-	data.payloadText = "blah blah";
-	data.payloadFileName = "temp.txt";
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Payload), true);
-});
+	let res = [];
+	for (let i=0; i<uris.length; i++){
+		let uri = decodeURI(uris[i]);
+		uri = uri.startsWith("/") ? uri.substr(1) : uri;
+		let segments = uri.split("/");
+		segments.unshift(address);
+		let attributes = resources !== undefined && resources[uris[i]] !== undefined ? resources[uris[i]] : (uris[i] === "/.well-known/core" ? {ct: 40, title: "Resource discovery"} : {});
+		res.push({
+			segments: segments,
+			attributes: attributes
+		});
+	}
+	return res;
+};
+
+Copper.Resources.prototype.addResource = function(address, path, attributes){
+	if (typeof(address) !== "string" || address === "" || typeof(path) !== "string"){
+		throw new Error("Illegal arguments");
+	}
+	if (this.resources[address] === undefined){
+		this.resources[address] = new Object();
+	}
+	this.resources[address][path] = attributes;
+};
+
+Copper.Resources.prototype.removeResources = function(address){
+	if (typeof(address) !== "string" || address === ""){
+		throw new Error("Illegal arguments");
+	}
+	delete this.resources[address];
+};

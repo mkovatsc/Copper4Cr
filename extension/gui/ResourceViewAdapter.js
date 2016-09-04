@@ -1,7 +1,7 @@
 Copper.ResourceViewAdapter = function(){
 };
 
-Copper.ResourceViewAdapter.init = function(){
+Copper.ResourceViewAdapter.beforeSessionInitialization = function(){
     let resizer = document.createElement("div");
     resizer.id = "resource-tree-resizer";
 
@@ -30,162 +30,57 @@ Copper.ResourceViewAdapter.init = function(){
     resizer.addEventListener('mousedown', initResourceDrag, false);
 };
 
-Copper.ResourceViewAdapter.payloadStr = undefined;
-Copper.ResourceViewAdapter.resources = new Object();
-Copper.ResourceViewAdapter.allResourcesHTML = undefined;
-
-
-Copper.ResourceViewAdapter.onProfileLoaded = function() {
-    let settings = Copper.Session.settings;
-    Copper.ResourceViewAdapter.resources = Copper.Session.settings.resources;
-    Copper.ResourceViewAdapter.updateResourceLinks();
-    Copper.ResourceViewAdapter.selectRequestedPath();
-};
-
-
-/* BUILD TEST TREE FOR DEBUG*/
-Copper.ResourceViewAdapter.testTree = function(){
-    var tree = document.getElementById('resource_tree');
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/.well-known/core", []);
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/obs", {obs: "true", rt: "observe", title: "obs title"});
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/multi-format", {ct: 0.41, title: "multi-format"});
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/seg1", {title: "seg1"});
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/seg1/seg2", {title: "seg2"});
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/seg1/seg2/seg3", {title: "seg3"});
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/random/subrandom", {first: "randomfirst", second: "randomsecond"});
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/random/subrandom", {first: "repeated", second: "discarded"});
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/path", {ct: 40, title: "path title"});
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/path/sub1", {title: "sub1 title"});
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/path/sub2", {title: "sub2 title"});
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/path/sub3", {title: "sub3 title"});
-    Copper.ResourceViewAdapter.addTreeResource("coap://vs0.inf.ethz.ch:5683/test", {title: "test title"});
-};
-
 Copper.ResourceViewAdapter.onEvent = function(event){
-    if (event.type === Copper.Event.TYPE_COAP_MESSAGE_RECEIVED) {
+    if (event.type === Copper.Event.TYPE_REQUEST_COMPLETED) {
+        let requestCoapMessage = event.data.requestCoapMessage;
+        let responseCoapMessage = event.data.responseCoapMessage;
 
-        let coapMessage = event.data.coapMessage;
-        if (coapMessage.code.number !== Copper.CoapMessage.Code.CONTENT.number || !Copper.ToolbarAdapter.ongoingDiscoverRequest) {
-            return;
-        }
-
-        let contentFormat = coapMessage.getOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT);
-        if (contentFormat[0] !== Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_LINK_FORMAT.number) {
-            throw new Error("Discovery requires 'application/link-format");
-        }
-
-        // On Discover Request
-        let block2Option = coapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2);
-        if (block2Option.length === 1) {
-            block2Option = block2Option[0];
-            if (block2Option.num === 0) {
-                Copper.ResourceViewAdapter.payloadStr = new String();
+        let uriPathOption = requestCoapMessage.getOption(Copper.CoapMessage.OptionHeader.URI_PATH);
+        let block2Option = responseCoapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2)
+        let contentFormatOption = responseCoapMessage.getOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT);
+        if (uriPathOption.length === 2 && uriPathOption[0] === ".well-known" && uriPathOption[1] === "core" && block2Option.length === 0){
+            if (responseCoapMessage.code.equals(Copper.CoapMessage.Code.CONTENT) && 
+                  contentFormatOption.length === 1 && contentFormatOption[0] === Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_LINK_FORMAT.number){
+                Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ByteUtils.convertBytesToString(responseCoapMessage.payload)));
             }
-            Copper.ResourceViewAdapter.payloadStr += Copper.ByteUtils.convertBytesToString(coapMessage.payload);
-
-            if (!block2Option.more) {
-                let toolbarIcon = document.getElementById("copper-toolbar-discover").firstElementChild;
-                toolbarIcon.src = "skin/tool_discover.png";
-                Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
-                Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ResourceViewAdapter.payloadStr));
-                Copper.ResourceViewAdapter.selectResourceAfterDiscovery();
-
-            }
-
-            return;
-        } else {
-            // Not blockwise
-            let toolbarIcon = document.getElementById("copper-toolbar-discover").firstElementChild;
-            toolbarIcon.src = "skin/tool_discover.png";
-            Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
-            Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ByteUtils.convertBytesToString(coapMessage.payload)));
-            Copper.ResourceViewAdapter.selectResourceAfterDiscovery();
         }
     }
 };
 
-
-Copper.ResourceViewAdapter.onClickResource = function() {
-    Copper.Session.path = this.getAttribute("data-uri");
-    Copper.CoapResourceHandler.changeCoapResource(Copper.Session.protocol, Copper.Session.remoteAddress, Copper.Session.remotePort, this.getAttribute("data-uri"), false);
+Copper.ResourceViewAdapter.updateResourceLinks = function(resources) {
+    let address = Copper.Session.remoteAddress + ":" + Copper.Session.remotePort;
+    Copper.Session.resources.removeResources(address);
+    if (resources === undefined){
+        return;
+    }
+    let uris = Object.keys(resources);
+    for (let i=0; i<uris.length; i++){
+        Copper.Session.resources.addResource(address, uris[i], resources[uris[i]]);
+    }
+    Copper.Session.updateResources(Copper.Session.resources);
 };
 
-Copper.ResourceViewAdapter.updateResourceLinks = function(add) {
-    
-    // merge links
-    if (add) {
-        for (var uri in add) {
-            if (!Copper.ResourceViewAdapter.resources[uri]) {
-                Copper.ResourceViewAdapter.resources[uri] = add[uri];
-            }
-        }
-    }
-    // add well-known resource to resource cache
-    if (!Copper.ResourceViewAdapter.resources['/.well-known/core']) {
-        Copper.ResourceViewAdapter.resources['/.well-known/core'] = new Object();
-        Copper.ResourceViewAdapter.resources['/.well-known/core']['ct'] = 40;
-        Copper.ResourceViewAdapter.resources['/.well-known/core']['title'] = 'Resource discovery';
-    }
-
-    // sort by path
-    let sorted = new Array();
-    for (var uri in Copper.ResourceViewAdapter.resources) {
-        sorted.push(uri);
-    }
-    sorted.sort();
-
-    for (var entry in sorted) {
-
-        let uri = sorted[entry];
-        // add to tree view
-        Copper.ResourceViewAdapter.addTreeResource( decodeURI(uri), Copper.ResourceViewAdapter.resources[uri]);
-    }
-
-    var tree = document.getElementById('resource_tree');
-    let allResourcesHTML = tree.getElementsByTagName("P");
-    for (let i = 0; i < allResourcesHTML.length; i++) {
-        let resource = allResourcesHTML[i];
-        resource.onclick = Copper.ResourceViewAdapter.onClickResource;
+Copper.ResourceViewAdapter.onResourcesUpdated = function(){
+    Copper.ResourceViewAdapter.clearTree();
+    let address = Copper.Session.remoteAddress + ":" + Copper.Session.remotePort;
+    let resources = Copper.Session.resources.getResourcesForAddress(address);
+    for (let i=0; i<resources.length; i++){
+        Copper.ResourceViewAdapter.addTreeResource(resources[i].segments, resources[i].attributes, address, Copper.Session.path);
     }
 };
 
 Copper.ResourceViewAdapter.clearTree = function() {
-	var tree = document.getElementById('resource_tree');
-    while (tree.hasChildNodes()) {
-        tree.removeChild(tree.firstChild);
-    }
+	let tree = document.getElementById('resource_tree');
+    while (tree.firstChild !== null) tree.removeChild(tree.firstChild);
     tree.classList.remove("can_expand");
 };
 
-Copper.ResourceViewAdapter.addTreeResource = function(uri, attributes) {
+Copper.ResourceViewAdapter.onClickResource = function() {
+    Copper.CoapResourceHandler.changeCoapResource(Copper.Session.protocol, Copper.Session.remoteAddress, Copper.Session.remotePort, this.dataset.uri);
+};
+
+Copper.ResourceViewAdapter.addTreeResource = function(segments, attributes, address, selectedPath) {
     var tree = document.getElementById('resource_tree');
-    var segments;
-
-    // Get Uri address, port and the path (if exist)
-    let search = window.location.search;
-    let uriObject = Copper.StringUtils.parseUri(decodeURIComponent(search.substr(1)));
-    var address = (uriObject.address != null ? uriObject.address : "");
-    var port = (uriObject.port != null ? uriObject.port : "");
-    var curPath = (uriObject.path != null ? uriObject.path : "");
-
-    // Build segments by splitting
-    var uriTokens = uri.match(/([a-zA-Z]+:\/\/)([^\/]+)(.*)/);
-
-    if (uriTokens) {
-        // absolute URI
-        if (uriTokens[1]=='coap://') {
-            segments = uriTokens[3].split('/');
-            segments.shift();
-            segments.unshift(uriTokens[2]);
-        } else {
-            Copper.logEvent("WARNING: Non-CoAP resource "+uri+"'");
-            return;
-        }
-    } else {
-        segments = uri.split('/');
-        segments.shift();
-        segments.unshift(address + ':' + port);
-    }
 
     var node = tree;
 
@@ -245,48 +140,24 @@ Copper.ResourceViewAdapter.addTreeResource = function(uri, attributes) {
                 ul = node.lastElementChild;
             }
 
-            let activePath = address+':'+port+curPath;
-
             // path until current level
             let path = segments.slice(0,i+1).join('/');
 
             let p = document.createElement("p");
-            p.addEventListener('click', function (event) {
-
-                // Remove highlight of previously clicked node
-                let tree = document.getElementById('resource_tree');
-                let all_selected = tree.getElementsByClassName("selected");
-                for (let i = 0; i < all_selected.length; i++) {
-                    all_selected[i].classList.remove("selected");
-                }
-
-                // Add highlight of currently clicked node
-                let p = event.srcElement;
-
-                if (!p.classList.contains("selected")) {
-                    p.classList.add("selected");
-                }
-
-                // Update status label
-
-                let search = window.location.search;
-                let uriObject = Copper.StringUtils.parseUri(decodeURIComponent(search.substr(1)));
-
-                Copper.StatusBarAdapter.setText("Opened coap://" + address + ':' + port + '/' + p.getAttribute("data-uri"));
-            });
-
             let textNode = document.createTextNode(segments[i]);
             p.appendChild(textNode);
 
             // Add uri as data attribute
             p.dataset.uri = segments.slice(1,i+1).join('/');
+            if (p.dataset.uri === selectedPath) p.classList.add("selected");
+            p.onclick = Copper.ResourceViewAdapter.onClickResource;
 
             // special icon
             let icon = document.createElement("img");
 
             if (path.match(/\/\.well-known$/)) {
                 icon.src = "skin/resource_world.png";
-            } else if (path==address+':'+port) {
+            } else if (path === address) {
                 icon.src = "skin/resource_home.png";
             } else if (i==0) {
                 icon.src = "skin/resource_link.png";
@@ -321,42 +192,4 @@ Copper.ResourceViewAdapter.addTreeResource = function(uri, attributes) {
             node = li;
         }
     }
-
-    Copper.Session.settings.resources = Copper.ResourceViewAdapter.resources;
-    Copper.Session.storeChange();
-};
-
-Copper.ResourceViewAdapter.selectRequestedPath = function() {
-    if (Copper.Session.path === undefined) {
-        return;
-    }
-
-    var tree = document.getElementById('resource_tree');
-    let allResourcesHTML = tree.getElementsByTagName("P");
-
-    for (let i = 0; i < allResourcesHTML.length; i++) {
-        let resource = allResourcesHTML[i];
-        if (resource.dataset.uri === Copper.Session.path) {
-            resource.click();
-            return;
-        }
-    }
-
-    Copper.StatusBarAdapter.setTextAndBlockUpdates("Requested Path of Resource not found - Trying to discover it...", "");
-
-    Copper.ToolbarAdapter.doDiscover();
-};
-
-Copper.ResourceViewAdapter.selectResourceAfterDiscovery = function(uri) {
-    var tree = document.getElementById('resource_tree');
-    let allResourcesHTML = tree.getElementsByTagName("P");
-
-    for (let i = 0; i < allResourcesHTML.length; i++) {
-        let resource = allResourcesHTML[i];
-        if (resource.dataset.uri === Copper.Session.path) {
-            resource.click();
-            return;
-        }
-    }
-    Copper.StatusBarAdapter.setText("Requested path to resource not found");
 };

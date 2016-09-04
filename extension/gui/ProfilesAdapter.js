@@ -34,7 +34,7 @@ Copper.ProfilesAdapter = function(){
 
 Copper.ProfilesAdapter.loadNewestCreatedProfile = false;
 
-Copper.ProfilesAdapter.init = function() {
+Copper.ProfilesAdapter.beforeSessionInitialization = function() {
     document.getElementById("copper-profile-manager-add-profile").onclick = function() { Copper.ProfilesAdapter.addNewHTMLProfileInManager() };
     document.getElementById("copper-profile-manage-save-and-exit").onclick = function() { Copper.ProfilesAdapter.closeProfileManager(true); };
     document.getElementById("copper-profile-manager-cancel").onclick = function() { Copper.ProfilesAdapter.closeProfileManager(false); };
@@ -44,20 +44,17 @@ Copper.ProfilesAdapter.init = function() {
 
 
 Copper.ProfilesAdapter.openProfileManager = function() {
-
-    var profileManagerWindow = document.getElementById("manage-profile-window").parentElement;
+    let profileManagerWindow = document.getElementById("manage-profile-window").parentElement;
     profileManagerWindow.classList.remove("hidden");
 
-    var dropDownProfiles = document.getElementById("copper-toolbar-profiles-container").getElementsByClassName("profile-dropdown-entry");
+    let managerProfiles = document.getElementById("copper-profile-manager-container").getElementsByClassName("profile-manager-entry");
+    while(managerProfiles.length > 0) managerProfiles[0].parentNode.removeChild(managerProfiles[0]);
 
-    var managerProfiles = document.getElementById("copper-profile-manager-container").getElementsByClassName("profile-manager-entry");
-    let length = managerProfiles.length;
-    for (let i = 0; i < length; i++) {
-        managerProfiles[0].parentNode.removeChild(managerProfiles[0]);
-    }
-
-    for (let i = 0; i < dropDownProfiles.length; i++) {
-        Copper.ProfilesAdapter.addNewHTMLProfileInManager(dropDownProfiles[i].lastElementChild.innerHTML);
+    let profiles = Copper.Session.profiles.getAllProfileNames();
+    for (let i= 0; i<profiles.length; i++) {
+        if (profiles[i] !== Copper.Profiles.DEFAULT_PROFILE_KEY){
+            Copper.ProfilesAdapter.addNewHTMLProfileInManager(profiles[i]);
+        }
     }
 
     Copper.ProfilesAdapter.loadNewestCreatedProfile = false;
@@ -66,18 +63,13 @@ Copper.ProfilesAdapter.openProfileManager = function() {
 
 Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
     if (storeChanges) {
-        var dropDownProfiles = document.getElementById("copper-toolbar-profiles-container").getElementsByClassName("profile-dropdown-entry");
-        var managerProfiles = document.getElementById("copper-profile-manager-container").getElementsByClassName("profile-manager-entry");
-
-
-        let oldProfileCount = dropDownProfiles.length;
-        let oldManagerProfileCount = managerProfiles.length;
+        let managerProfiles = document.getElementById("copper-profile-manager-container").getElementsByClassName("profile-manager-entry");
 
         // Profile name validation
         // First loop to check if profile names not empty, contain only letters and numbers and are unique
-        var hasFormError = false;
+        let hasFormError = false;
         let validationProfileSet = {};
-        for (var i = 0; i < oldManagerProfileCount; i++) {
+        for (let i = 0; i < managerProfiles.length; i++) {
             let managerProfileName = managerProfiles[i].firstElementChild.firstElementChild;
 
             if (!managerProfileName.disabled) {
@@ -105,67 +97,43 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
             return;
         }
 
-        // Update profiles
-        for (var i = 0; i < dropDownProfiles.length; i++) {
+        let lastNewlyCreatedProfile = undefined;
+        for (let i=0; i<managerProfiles.length; i++) {
             let managerProfileName = managerProfiles[i].firstElementChild.firstElementChild;
-            let dropdownProfileName = dropDownProfiles[i].lastElementChild.innerHTML;
+            let oldName = managerProfiles[i].dataset.name;
 
             if (managerProfileName.disabled) {
                 // Profile deleted
-
-                Copper.Session.profiles.deleteProfile(dropdownProfileName);
-                
-                let profileToDeleteInDropdown = dropDownProfiles[i];
-                if (profileToDeleteInDropdown.firstElementChild.classList.contains("selected")) {
-                    // Select standard profile if profile to delete was previously selected
-                    Copper.ToolbarAdapter.radioElement("copper-toolbar-profiles-standard");
+                if (oldName !== undefined){
+                    if (Copper.Session.profiles.selectedProfile === oldName){
+                        Copper.Session.profiles.selectProfile(Copper.Profiles.DEFAULT_PROFILE_KEY);
+                    }
+                    Copper.Session.profiles.deleteProfile(oldName);
                 }
-                profileToDeleteInDropdown.parentNode.removeChild(profileToDeleteInDropdown);
-
-                managerProfiles[i].parentNode.removeChild(managerProfiles[i]);
-                i--;
-
             }
-            else if (managerProfileName.value === dropdownProfileName) {
-                // Not changed
-                continue;
+            else if (oldName === undefined){
+                // New Profile
+                Copper.Session.profiles.addProfile(managerProfileName.value, Copper.Session.settings, Copper.Session.options);
+                lastNewlyCreatedProfile = managerProfileName.value;
             }
-            else {
+            else if (managerProfileName.value !== oldName){
                 // Profile renamed
-                Copper.Session.profiles.allProfiles[managerProfileName.value] = Copper.Session.profiles.allProfiles[dropdownProfileName];
-                delete Copper.Session.profiles.allProfiles[dropdownProfileName];
-                dropDownProfiles[i].lastElementChild.innerHTML = managerProfileName.value;
+                Copper.Session.profiles.renameProfile(oldName, managerProfileName.value);
             }
-        }
-
-        // New profiles
-        let lastNewlyCreatedProfile = undefined;
-        for (; i < managerProfiles.length; i++) {
-            let managerProfileName = managerProfiles[i].firstElementChild.firstElementChild;
-            let nextInput = managerProfiles[i].firstElementChild.firstElementChild;
-            if (managerProfileName.disabled) {
-                // Empty profile name -> skip
-                //managerProfiles[i].parentNode.removeChild(managerProfiles[i]);
-                //i--;
-                continue;
-            }
-
-            // Add new profile
-            Copper.Session.profiles.addNewProfile(nextInput.value);
-            Copper.ProfilesAdapter.addNewHTMLDropdownProfile(nextInput.value, Copper.Session.profiles, false);
-            lastNewlyCreatedProfile = nextInput.value;
         }
 
         if (Copper.ProfilesAdapter.loadNewestCreatedProfile && lastNewlyCreatedProfile !== undefined) {
-            Copper.Session.profiles.changeProfile(lastNewlyCreatedProfile);
+            Copper.Session.profiles.selectProfile(lastNewlyCreatedProfile);
+            Copper.Session.updateProfilesSelection(Copper.Session.profiles);
+        }
+        else {
+            Copper.Session.updateProfiles(Copper.Session.profiles);
         }
     }
 
-    var blockScreens = document.getElementById("popup-windows").getElementsByClassName("block_screen");
+    let blockScreens = document.getElementById("popup-windows").getElementsByClassName("block_screen");
     for (let i = 0; i < blockScreens.length; i++) {
-        if (!blockScreens[i].classList.contains("hidden")){
-            blockScreens[i].classList.add("hidden");
-        }
+        blockScreens[i].classList.add("hidden");
     }
 };
 
@@ -175,6 +143,7 @@ Copper.ProfilesAdapter.addNewHTMLProfileInManager = function(name) {
     div.classList.add("flex");
     div.classList.add("hbox");
     div.classList.add("profile-manager-entry")
+    if (name !== undefined) div.dataset.name = name;
     let span = document.createElement("span");
     span.classList.add("flex");
     span.classList.add("hbox");
@@ -243,39 +212,6 @@ Copper.ProfilesAdapter.addNewHTMLProfileInManager = function(name) {
     Copper.ProfilesAdapter.loadNewestCreatedProfile = true;
 
     document.getElementById("copper-profile-manager-container").insertBefore(div, document.getElementById("copper-profile-manager-container").lastElementChild);
-};
-
-Copper.ProfilesAdapter.removeHTMLProfileInManager = function() {
-
-};
-
-Copper.ProfilesAdapter.addNewHTMLDropdownProfile = function(name, profiles, selected) {
-    let li = document.createElement("li");
-    li.classList.add("dropdown-item");
-    li.classList.add("hbox");
-    li.classList.add("profile-dropdown-entry")
-    let div = document.createElement("div");
-    div.classList.add("selection-icon");
-    if (!selected) {
-        div.classList.add("hidden");
-    } else {
-        div.classList.add("selected");
-    }
-    let span = document.createElement("span");
-    span.innerHTML = '&#8226;';
-    let p = document.createElement("p");
-    p.innerHTML = name;
-    div.appendChild(span);
-    li.appendChild(div);
-    li.appendChild(p);
-    document.getElementById("copper-toolbar-profiles-container").appendChild(li);
-
-    li.id = "copper-toolbar-profiles-profile-" + name.split(' ').join('-');
-
-    li.onclick = function() {
-        Copper.ToolbarAdapter.radioElement(li.id);
-        profiles.changeProfile(name);
-    }
 };
 
 Copper.ProfilesAdapter.toggleLoadNewestProfile = function() {

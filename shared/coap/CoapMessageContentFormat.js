@@ -40,6 +40,10 @@ Copper.CoapMessage.ContentFormat = function(number, name) {
 	this.name = name;
 };
 
+Copper.CoapMessage.ContentFormat.prototype.equals = function(other){
+	return (other instanceof Copper.CoapMessage.ContentFormat) && this.number === other.number && this.name === other.name;
+};
+
 /* Content Format Codes */
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_PLAIN = new Copper.CoapMessage.ContentFormat(0, "text/plain");
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_XML = new Copper.CoapMessage.ContentFormat(1, "text/xml");

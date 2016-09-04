@@ -34,7 +34,7 @@
 Copper.Storage = function(){
 };
 
-Copper.Storage.storeLocally = function(id, value, callback) {
+Copper.Storage.store = function(id, value, callback) {
 	let storeObject = {};
 	storeObject[id] = value;
 	chrome.storage.local.set(storeObject, function(items) {
@@ -44,22 +44,18 @@ Copper.Storage.storeLocally = function(id, value, callback) {
 	});
 };
 
-Copper.Storage.retrieveLocally = function(id, callback) {
+Copper.Storage.load = function(id, callback) {
 	chrome.storage.local.get(id, function(items) {
-		callback(id, items);
+		if (callback !== undefined){
+			callback(items[id]);
+		}
 	});
 };
 
-Copper.Storage.clear = function(callback) {
-	Copper.Session.profiles = new Copper.Profiles();
-	Copper.Session.settings = new Copper.Settings();
-	Copper.Session.options = new Copper.Options();
-	Copper.Session.payload = new Copper.Payload();
-	chrome.storage.local.clear(function() { callback();});
+Copper.Storage.remove = function(id, callback) {
+	chrome.storage.local.remove(id, function(){
+		if (callback !== undefined){
+			callback();
+		}
+	});
 };
-
-Copper.Storage.keys = function() {
-};
-
-Copper.Storage.keys.SELECTED_PROFILE = "selected_profile";
-Copper.Storage.keys.PROFILES_KEY = "all_profiles";

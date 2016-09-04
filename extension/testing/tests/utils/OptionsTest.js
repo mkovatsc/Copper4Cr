@@ -29,43 +29,14 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-QUnit.test("ExtensionJsonUtils: Options", function(assert) {
-	let data = new Copper.Options();
-	data.size1 = 2000;
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Options), true);
-});
-
-QUnit.test("ExtensionJsonUtils: Profile", function(assert) {
-	let data = new Copper.Profiles();
-	let settings = new Copper.Settings();
-	settings.blockSize = 0;
+QUnit.test("Options: clone", function(assert) {
+	assert.deepEqual(new Copper.Options().clone(), new Copper.Options());
 	let options = new Copper.Options();
-	options.setToken("0x33");
-	options.addOption(8, "0x2");
-	data.addProfile("test", settings, options);
-	data.autoStore = false;
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Profiles), true);
-});
-
-QUnit.test("ExtensionJsonUtils: Resources", function(assert) {
-	let data = new Copper.Resources();
-	data.resources["vs0.inf.ethz.ch"] = {"blah blah blah": "test"};
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Resources), true);
-});
-
-QUnit.test("ExtensionJsonUtils: Payload", function(assert) {
-	let data = new Copper.Payload();
-	data.payloadFileData = new ArrayBuffer(33);
-	data.payloadMode = "file";
-	data.payloadText = "blah blah";
-	data.payloadFileName = "temp.txt";
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Payload), true);
+	let list = ["test"];
+	options.options["3"] = list;
+	options.customOptions["5"] = ["test1", "test2"];
+	let clone = options.clone();
+	assert.deepEqual(clone, options);
+	list.push("test2");
+	assert.notDeepEqual(clone, options);
 });

@@ -46,7 +46,7 @@ Copper.CoapResourceHandler.resolveCoapResource = function(callback){
                 //errorCallback("Please enter a valid URL");
             }
             else {
-                Copper.CoapResourceHandler.changeCoapResource(uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query, true);
+                Copper.CoapResourceHandler.changeCoapResource(uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query);
             }
         });
     }
@@ -55,12 +55,7 @@ Copper.CoapResourceHandler.resolveCoapResource = function(callback){
     }
 };
 
-Copper.CoapResourceHandler.changeCoapResource = function(protocol, remoteAddress, remotePort, path, query, reload){
-	if (reload) {
-		window.location.search = "?" + encodeURIComponent((protocol ? protocol + "://" : "") + remoteAddress + ":" + remotePort +
+Copper.CoapResourceHandler.changeCoapResource = function(protocol, remoteAddress, remotePort, path, query){
+	window.location.search = "?" + encodeURIComponent((protocol ? protocol + "://" : "") + remoteAddress + ":" + remotePort +
 				(path ? ("/" + path) : "") + (query ? ("?" + query) : ""));
-	} else {
-		window.history.pushState("", "", "?" + encodeURIComponent((protocol ? protocol + "://" : "") + remoteAddress + ":" + remotePort +
-				(path ? ("/" + path) : "") + (query ? ("?" + query) : "")));
-	}
 };

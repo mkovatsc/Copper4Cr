@@ -32,37 +32,26 @@
 Copper.PreferenceWindowAdapter = function(){
 };
 
-Copper.PreferenceWindowAdapter.init = function()
-{
-    var closeButtons = document.getElementById("popup-windows").getElementsByClassName("close-button");
+Copper.PreferenceWindowAdapter.beforeSessionInitialization = function(){
+    let closeButtons = document.getElementById("popup-windows").getElementsByClassName("close-button");
     for (let i = 0; i < closeButtons.length; i++) {
         closeButtons[i].onclick = Copper.PreferenceWindowAdapter.closeWindow;
     }
-    
-    document.getElementById("preferences-window-encode-utf-8").onclick = Copper.PreferenceWindowAdapter.checkEncode_utf_8;
+  
+    document.getElementById("preferences-window-encode-utf-8").onclick = Copper.PreferenceWindowAdapter.onUtf8Checkbox;
     document.getElementById("preferences-window-clear-resource-cache").onclick = Copper.PreferenceWindowAdapter.clearResourceCache;
     document.getElementById("preferences-window-clear-payload-cache").onclick = Copper.PreferenceWindowAdapter.clearPayloadCache;
     document.getElementById("preferences-window-clear-entire-cache").onclick = Copper.PreferenceWindowAdapter.clearEntireCache;
-
-
-    // Init default
-    if (Copper.Session.options.useUtf8){
-        var encode_utf_8 = document.getElementById("preferences-window-encode-utf-8");
-        encode_utf_8.checked = "checked"
-    }
 };
 
+Copper.PreferenceWindowAdapter.onOptionsUpdated = function(){
+    let utf8Checkbox = document.getElementById("preferences-window-encode-utf-8");;
+    utf8Checkbox.checked = Copper.Session.options.useUtf8;
+};
 
-Copper.PreferenceWindowAdapter.checkEncode_utf_8 = function(){
+Copper.PreferenceWindowAdapter.onUtf8Checkbox = function(){
     Copper.Session.options.useUtf8 = this.checked;
-};
-
-Copper.PreferenceWindowAdapter.checkPlugtest = function(){
-    if (this.checked) {
-        Copper.PreferenceWindowAdapter.plugtest = true;
-    } else {
-        Copper.PreferenceWindowAdapter.plugtest = false;
-    }
+    Copper.Session.updateOptions(Copper.Session.options);
 };
 
 Copper.PreferenceWindowAdapter.closeWindow = function(){
@@ -77,28 +66,24 @@ Copper.PreferenceWindowAdapter.closeWindow = function(){
 Copper.PreferenceWindowAdapter.clearResourceCache = function(){
     if (confirm('This will delete the RESOURCE cache. Continue?')) {
         Copper.Session.storageManager.removeResources();
+        Copper.Session.updateResources(new Copper.Resources(), true);
     }
 };
 
 Copper.PreferenceWindowAdapter.clearPayloadCache = function(){
     if (confirm('This will delete the PAYLOAD cache. Continue?')) {
-        Copper.Session.payload.payloadFileData = new ArrayBuffer();
-        Copper.Session.payload.payloadFileName = "";
-        Copper.Session.payload.payloadMode = "text";
-        Copper.Session.payload.payloadText = "";
-        Copper.ToolbarAdapter.resetPayload();
-        Copper.PayloadAdapter.resetPayload();
+        Copper.Session.storageManager.removePayload();
+        Copper.Session.updatePayload(new Copper.Payload(), true);
     }
 };
 
 Copper.PreferenceWindowAdapter.clearEntireCache = function(){
     if (confirm('This will delete the ENTIRE cache. Continue?')) {
-        Copper.Storage.clear(function() {
-            Copper.ToolbarAdapter.resetPayload();
-            Copper.PayloadAdapter.resetPayload();
-            Copper.DebugOptionsAdapter.onReset();
-            Copper.Session.profiles.createAndSelectDefaultProfile();
-        });
-
+        Copper.Session.storageManager.removePayload();
+        Copper.Session.updatePayload(new Copper.Payload(), true);
+        Copper.Session.storageManager.removeResources();
+        Copper.Session.updateResources(new Copper.Resources(), true);
+        Copper.Session.storageManager.removeProfiles();
+        Copper.Session.updateProfilesSelection(new Copper.Profiles, true);
     }
 };
