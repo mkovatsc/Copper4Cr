@@ -45,7 +45,7 @@ Copper.PayloadAdapter.setVisiblePane = function(element){
 	}
 };
 
-Copper.PayloadAdapter.init = function() {
+Copper.PayloadAdapter.beforeSessionInitialization = function() {
 	Copper.PayloadAdapter.visiblePane = document.getElementById("copper-payload-tab-in");
 
 	document.getElementById("copper-payload-btn-in").onclick = function () {
@@ -64,14 +64,14 @@ Copper.PayloadAdapter.init = function() {
 	};
 };
 
-Copper.PayloadAdapter.onProfileLoaded = function() {
+Copper.PayloadAdapter.onPayloadUpdated = function() {
 	let payload = Copper.Session.payload;
-	document.getElementById("copper-payload-tab-out").value = payload.payloadText;
+	document.getElementById("copper-payload-tab-out").value = payload.payloadText !== undefined ? payload.payloadText : "";
 };
 
 Copper.PayloadAdapter.onOutgoingChange = function() {
 	Copper.Session.payload.payloadText = this.value;
-	Copper.Session.storeChange();
+	Copper.Session.updatePayload(Copper.Session.payload);
 };
 
 Copper.PayloadAdapter.toggleHighlight = function(element) {
@@ -81,10 +81,6 @@ Copper.PayloadAdapter.toggleHighlight = function(element) {
 
 	element.parentNode.getElementsByClassName("selected")[0].classList.remove("selected");
 	element.classList.add("selected");
-};
-
-Copper.PayloadAdapter.resetPayload = function() {
-	document.getElementById("copper-payload-tab-out").value = "";
 };
 
 Copper.PayloadAdapter.onEvent = function(event){

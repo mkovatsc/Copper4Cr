@@ -8,8 +8,9 @@ Copper.DebugOptionsAdapter.useProxySchemeField = undefined;
 Copper.DebugOptionsAdapter.customOptionsField = undefined;
 Copper.DebugOptionsAdapter.optionFieldAppenders = new Object();
 Copper.DebugOptionsAdapter.optionFields = [];
+Copper.DebugOptionsAdapter.optionHolderUsed = undefined;
 
-Copper.DebugOptionsAdapter.init = function() {
+Copper.DebugOptionsAdapter.beforeSessionInitialization = function() {
     let opaquePlaceholder = "use hex (0x..) or string";
     let blockNoPlaceholder = "block no.";
     let totalSizePlaceholder = "total size";
@@ -50,7 +51,14 @@ Copper.DebugOptionsAdapter.init = function() {
 
     Copper.DebugOptionsAdapter.customOptionsField = document.getElementById("copper-debug-options-custom-options");
     Copper.DebugOptionsAdapter.customOptionsField.classList.add("debug-option-custom-options");
-    Copper.DebugOptionsAdapter.organizeCustomOptions();
+    Copper.DebugOptionsAdapter.onReset();
+};
+
+Copper.DebugOptionsAdapter.onOptionsUpdated = function(){
+    if (Copper.DebugOptionsAdapter.optionHolderUsed !== Copper.Session.options){
+        Copper.DebugOptionsAdapter.optionHolderUsed = Copper.Session.options;
+        Copper.DebugOptionsAdapter.updateDebugOptions(Copper.Session.options);
+    }
 };
 
 Copper.DebugOptionsAdapter.onChange = function(lastChangedElement){
@@ -62,7 +70,7 @@ Copper.DebugOptionsAdapter.onChange = function(lastChangedElement){
             Copper.DebugOptionsAdapter.optionFields.push(lastChangedElement);
         }
     }
-
+    
     let updateFunc = function(inputElement, value, update){
         let errorMsg = undefined;
         try {
@@ -73,13 +81,14 @@ Copper.DebugOptionsAdapter.onChange = function(lastChangedElement){
         Copper.DebugOptionsAdapter.setValue(inputElement, value, errorMsg);
     };
 
+    let options = new Copper.Options();
+    Copper.DebugOptionsAdapter.optionHolderUsed = options;
+
     let simpleUpdateFunc = function(inputElement, update){
         updateFunc(inputElement, Copper.DebugOptionsAdapter.getValue(inputElement), function(inputElement, value){
-            update(value);
-        })
+            update.apply(options, [value]);
+        });
     };
-
-    let options = new Copper.Options();
 
     simpleUpdateFunc(Copper.DebugOptionsAdapter.debugOptionsEnabledField.firstChild, options.setOptionsEnabled);
     simpleUpdateFunc(Copper.DebugOptionsAdapter.tokenInputField.firstChild, options.setToken);
@@ -109,10 +118,39 @@ Copper.DebugOptionsAdapter.onChange = function(lastChangedElement){
         }
     }
     Copper.DebugOptionsAdapter.organizeCustomOptions();
+    Copper.Session.updateOptions(options);
+};
+
+Copper.DebugOptionsAdapter.updateDebugOptions = function(options){
+    Copper.DebugOptionsAdapter.setValue(Copper.DebugOptionsAdapter.debugOptionsEnabledField.firstChild, options.optionsEnabled);
+    Copper.DebugOptionsAdapter.setValue(Copper.DebugOptionsAdapter.tokenInputField.firstChild, options.token);
+    Copper.DebugOptionsAdapter.setValue(Copper.DebugOptionsAdapter.blockwiseEnabledField.firstChild, options.blockwiseEnabled);
+    Copper.DebugOptionsAdapter.setValue(Copper.DebugOptionsAdapter.useProxySchemeField.firstChild, options.useProxyScheme);
+
+    Copper.DebugOptionsAdapter.removeCustomOptions();
+
+    for (let i=0; i<Copper.DebugOptionsAdapter.optionFields.length; i++){
+        let rootElement = Copper.DebugOptionsAdapter.optionFields[i];
+        let optionHeader = Copper.CoapMessage.OptionHeader.getOptionHeader(Number.parseInt(rootElement.dataset.optionnumber));
+        let valuesSet = options.options[optionHeader.number] !== undefined ? options.options[optionHeader.number] : [];
+        let newNodes = Copper.DebugOptionsAdapter.getInputFields(rootElement, (optionHeader.multipleValues ? (valuesSet.length + 1) : 1), Copper.DebugOptionsAdapter.optionFieldAppenders[optionHeader.number]);
+        for (j=0; j<newNodes.length; j++){
+            Copper.DebugOptionsAdapter.setValue(newNodes[j], (j<valuesSet.length ? valuesSet[j] : undefined));
+        }
+    }
+
+    let customOptionNos = Object.keys(options.customOptions);
+    for (let i=0; i<customOptionNos.length; i++){
+        let customValues = options.customOptions[customOptionNos[i]];
+        for (let j=0; j<customValues.length; j++){
+            Copper.DebugOptionsAdapter.addCustomOption(customOptionNos[i], customValues[j]);
+        }
+    }
+    Copper.DebugOptionsAdapter.addCustomOption(undefined, undefined);
 };
 
 Copper.DebugOptionsAdapter.onReset = function(lastChangedElement){
-
+    Copper.DebugOptionsAdapter.updateDebugOptions(new Copper.Options());
 };
 
 Copper.DebugOptionsAdapter.initOptionField = function(htmlId, optionHeader, placeholder, title){
@@ -171,13 +209,24 @@ Copper.DebugOptionsAdapter.organizeCustomOptions = function(){
             nodesToRemove.push(nodeList[i]);
         }
     }
+    Copper.DebugOptionsAdapter.removeCustomOptions(nodesToRemove);
+    if (Copper.DebugOptionsAdapter.customOptionsField.lastChild === null || Copper.DebugOptionsAdapter.getValue(Copper.DebugOptionsAdapter.customOptionsField.lastChild) !== undefined){
+        Copper.DebugOptionsAdapter.addCustomOption(undefined, undefined);
+    }
+};
+
+Copper.DebugOptionsAdapter.removeCustomOptions = function(nodesToRemove){
+    if (nodesToRemove === undefined){
+        let nodeList = Copper.DebugOptionsAdapter.customOptionsField.childNodes;
+        nodesToRemove = [];
+        for (let i=0; i<nodeList.length; i++){
+            nodesToRemove.push(nodeList[i]);
+        }
+    }
     for (let i=0; i<nodesToRemove.length; i++){
         let idx = Copper.DebugOptionsAdapter.optionFields.indexOf(nodesToRemove[i]);
         if (idx !== -1) Copper.DebugOptionsAdapter.optionFields.splice(idx, 1);
         Copper.DebugOptionsAdapter.customOptionsField.removeChild(nodesToRemove[i]);
-    }
-    if (Copper.DebugOptionsAdapter.customOptionsField.lastChild === null || Copper.DebugOptionsAdapter.getValue(Copper.DebugOptionsAdapter.customOptionsField.lastChild) !== undefined){
-        Copper.DebugOptionsAdapter.addCustomOption(undefined, undefined);
     }
 };
 
@@ -195,7 +244,7 @@ Copper.DebugOptionsAdapter.getValues = function(rootElement){
     else {
         for (let i=0; i<rootElement.childNodes.length; i++){
             let value = Copper.DebugOptionsAdapter.getValue(rootElement.childNodes[i]);
-            if (value) res.push(value);
+            if (value !== undefined) res.push(value);
         }
     }
     return res;
@@ -238,9 +287,9 @@ Copper.DebugOptionsAdapter.setValue = function(inputElement, value, errorMessage
     }
     else if (inputElement.classList.contains("debug-option-content-format")){
         let selectElement = inputElement.getElementsByTagName("SELECT")[0];
-        if (value){
+        if (value !== undefined){
             for (let i=0; i<selectElement.options.length; i++){
-                if (selectElement.options[i].dataset.number === value){
+                if (Number.parseInt(selectElement.options[i].dataset.number) === value){
                     selectElement.selectedIndex = i;
                     break;
                 }

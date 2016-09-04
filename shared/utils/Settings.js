@@ -33,6 +33,10 @@
 Copper.Settings = function() {
 };
 
+Copper.Settings.prototype.clone = function(){
+	return Copper.CopperUtils.cloneObject(this, new Copper.Settings());
+};
+
 // Message type to use. See Copper.CoapMessage.Type object for different values
 Copper.Settings.prototype.requests = 0;
 
@@ -64,5 +68,3 @@ Copper.Settings.prototype.observeToken = true;
 
 // Observe cancellation (get, rst, lazy)
 Copper.Settings.prototype.observeCancellation = "lazy";
-
-Copper.Settings.prototype.resources = new Object();

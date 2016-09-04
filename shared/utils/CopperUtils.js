@@ -28,44 +28,41 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
-QUnit.test("ExtensionJsonUtils: Options", function(assert) {
-	let data = new Copper.Options();
-	data.size1 = 2000;
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Options), true);
-});
 
-QUnit.test("ExtensionJsonUtils: Profile", function(assert) {
-	let data = new Copper.Profiles();
-	let settings = new Copper.Settings();
-	settings.blockSize = 0;
-	let options = new Copper.Options();
-	options.setToken("0x33");
-	options.addOption(8, "0x2");
-	data.addProfile("test", settings, options);
-	data.autoStore = false;
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Profiles), true);
-});
+Copper.CopperUtils = function() {
+};
 
-QUnit.test("ExtensionJsonUtils: Resources", function(assert) {
-	let data = new Copper.Resources();
-	data.resources["vs0.inf.ethz.ch"] = {"blah blah blah": "test"};
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Resources), true);
-});
+Copper.CopperUtils.cloneObject = function(objectToClone, newObject){
+	let keys = Object.keys(objectToClone);
+	for (let i=0; i<keys.length; i++){
+		newObject[keys[i]] = Copper.CopperUtils.cloneSimple(objectToClone[keys[i]]);
+	}
+	return newObject;
+};
 
-QUnit.test("ExtensionJsonUtils: Payload", function(assert) {
-	let data = new Copper.Payload();
-	data.payloadFileData = new ArrayBuffer(33);
-	data.payloadMode = "file";
-	data.payloadText = "blah blah";
-	data.payloadFileName = "temp.txt";
-	let json = Copper.JsonUtils.stringify(data);
-	assert.deepEqual(Copper.JsonUtils.parse(json), data);
-	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Payload), true);
-});
+Copper.CopperUtils.cloneSimple = function(value){
+	if (Array.isArray(value)){
+		let clone = [];
+		for (let i=0; i<value.length; i++){
+			clone.push(Copper.CopperUtils.cloneSimple(value[i]));
+		}
+		return clone;
+	}
+	else if (typeof(value) === "object"){
+		return Copper.CopperUtils.cloneObject(value, new Object());
+	}
+	else {
+		return value;
+	}
+};
+
+Copper.CopperUtils.splitOptionAndAddToCoapMessage = function(coapMessage, optionHeader, value, separator){
+    if (value !== undefined){
+        let valueParts = value.split(separator);
+        for (let i=0; i<valueParts.length; i++){
+            if (valueParts[i] !== undefined && valueParts[i] !== ""){
+                coapMessage.addOption(optionHeader, valueParts[i]);
+            }
+        }
+    }
+};

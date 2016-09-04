@@ -60,7 +60,6 @@ Copper.JsonUtils.parse = function(json){
 Copper.JsonUtils.replacer = function(key, value){
 	for (let i=0; i<Copper.JsonUtils.transformers.length; i++){
 		if (Copper.JsonUtils.transformers[i][0](value)){
-			if (Copper.JsonUtils.transformers[i])
 			return {
 				type: Copper.JsonUtils.transformers[i][1],
 				data: (Copper.JsonUtils.transformers[i][2] ? Copper.JsonUtils.transformers[i][2](value) : JSON.parse(JSON.stringify(value)))

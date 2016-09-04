@@ -10,7 +10,8 @@
 	<link rel="stylesheet" type="text/css" href="css/style.css"/>
 
 	<script src="shared/namespace.js"></script>
-	  
+	
+	<script src="shared/utils/CopperUtils.js"></script>
 	<script src="shared/utils/TimeUtils.js"></script>
 	<script src="shared/utils/StringUtils.js"></script>
 	<script src="shared/utils/ByteUtils.js"></script>
@@ -34,6 +35,15 @@
 
 	<script src="shared/endpoint/Port.js"></script>
 
+	<script src="utils/Storage.js"></script>
+	<script src="utils/StorageManager.js"></script>
+	<script src="utils/Options.js"></script>
+	<script src="utils/Payload.js"></script>
+	<script src="utils/Profiles.js"></script>
+	<script src="utils/Resources.js"></script>
+	<script src="utils/ExtensionJsonUtils.js"></script>
+	<script src="utils/Numeric.js"></script>
+
 	<script src="gui/OverlayAdapter.js"></script>
 	<script src="gui/MessageLogAdapter.js"></script>
 	<script src="gui/PacketHeaderAdapter.js"></script>
@@ -47,13 +57,6 @@
 	<script src="gui/StartupWindowAdapter.js"></script>
 	<script src="gui/StatusBarAdapter.js"></script>
 	<script src="gui/ErrorWindowAdapter.js"></script>
-
-	<script src="utils/Storage.js"></script>
-	<script src="utils/Options.js"></script>
-	<script src="utils/Payload.js"></script>
-	<script src="utils/Profiles.js"></script>
-	<script src="utils/ExtensionJsonUtils.js"></script>
-	<script src="utils/Numeric.js"></script>
 
 	<script src="endpoint/CoapResourceHandler.js"></script>
 	<script src="endpoint/ClientEndpoint.js"></script>
@@ -310,14 +313,7 @@
 
 				<div class="dropdown-content hbox hidden">
 					<div class="vbox flex-filler" style="width: 160px;">
-						<ul id="copper-toolbar-profiles-container" class="select-group vbox">
-							<li id="copper-toolbar-profiles-standard" class="dropdown-item hbox" title="Default profile - All changes are automatically stored to this profile if selected">
-								<div class="selection-icon hidden">
-									<span>&#8226;</span>
-								</div>
-								<p>Standard Profile</p>
-							</li>
-						</ul>
+						<ul id="copper-toolbar-profiles-container" class="select-group vbox"></ul>
 						<div class="separation-line"></div>
 						<ul class="single-element vbox">
 							<li id="copper-toolbar-profiles-auto-store" class="dropdown-item hbox" title="Automatically store changes made to the currently selected profile">
@@ -593,7 +589,6 @@
 					<legend>Profiles</legend>
 
 					<button id="copper-profile-manager-add-profile">Add Profile with current Settings</button>
-
 				</fieldset>
 
 				<div class="checkbox" style="margin-bottom: 6px">

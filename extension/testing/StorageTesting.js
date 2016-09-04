@@ -29,13 +29,13 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-// Stub for a storage API
+// Mock for storage API
 
 Copper.Storage = function(){
 	this.localStorage = {}
 };
 
-Copper.Storage.storeLocally = function(id, value, callback) {
+Copper.Storage.store = function(id, value, callback) {
 	if (value !== undefined){
 		localStorage[id] = value;
 	}
@@ -44,6 +44,13 @@ Copper.Storage.storeLocally = function(id, value, callback) {
 	}
 };
 
-Copper.Storage.retrieveLocally = function(id, callback) {
+Copper.Storage.load = function(id, callback) {
 	callback(id, localStorage[id]);
+};
+
+Copper.Storage.remove = function(id, callback) {
+	delete localStorage[id];
+	if (callback !== undefined) {
+		callback();
+	}	
 };

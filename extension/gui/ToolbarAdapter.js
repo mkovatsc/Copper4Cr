@@ -33,37 +33,11 @@ Copper.ToolbarAdapter = function(){
 };
 
 Copper.ToolbarAdapter.chooseFileDefaultString = "Choose File...";
-
 Copper.ToolbarAdapter.optionsWindowOpened = false;
-
 Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
 
-Copper.ToolbarAdapter.onEvent = function(event){
-    switch(event.type){
-        case Copper.Event.TYPE_COAP_MESSAGE_SENT:
-            let observeOption = event.data.coapMessage.getOption(Copper.CoapMessage.OptionHeader.OBSERVE);
-            if (observeOption.length > 0 && observeOption[0] === 0){
-                let rootElement = document.getElementById("copper-toolbar-observe");
-                if (rootElement.firstChild.src.endsWith("skin/tool_observe.png")) {
-                    rootElement.firstChild.src = "skin/tool_unobserve.png";
-                    rootElement.lastChild.textContent = " Cancel";
-                }
-            }
-            break;
-        case Copper.Event.TYPE_REQUEST_CANCELED:
-            let rootElement = document.getElementById("copper-toolbar-observe");
-            if (rootElement.firstChild.src.endsWith("skin/tool_unobserve.png")) {
-                rootElement.firstChild.src = "skin/tool_observe.png";
-                rootElement.lastChild.textContent = " Observe";
-            }
-            break;
-    }
-};
 
-Copper.ToolbarAdapter.beforeSendingCoapMessage = function(coapMessage) {
-};
-
-Copper.ToolbarAdapter.init = function(){
+Copper.ToolbarAdapter.beforeSessionInitialization = function(){
 	document.getElementById("copper-toolbar-ping").onclick = Copper.ToolbarAdapter.doPing;
 	document.getElementById("copper-toolbar-discover").onclick = Copper.ToolbarAdapter.doDiscover;
 	document.getElementById("copper-toolbar-get").onclick = Copper.ToolbarAdapter.doGet;
@@ -94,7 +68,6 @@ Copper.ToolbarAdapter.init = function(){
     document.getElementById("copper-toolbar-behavior-observe-lazy").onclick = Copper.ToolbarAdapter.behaviorObserveLazy;
     document.getElementById("copper-toolbar-behavior-observe-get").onclick = Copper.ToolbarAdapter.behaviorObserveGet;
     document.getElementById("copper-toolbar-behavior-observe-rst").onclick = Copper.ToolbarAdapter.behaviorObserveRst;
-    document.getElementById("copper-toolbar-profiles-standard").onclick = Copper.ToolbarAdapter.profilesStandardProfile;
     document.getElementById("copper-toolbar-profiles-auto-store").onclick = Copper.ToolbarAdapter.profilesAutoStore;
     document.getElementById("copper-toolbar-profiles-store-current").onclick = Copper.ToolbarAdapter.profilesStoreCurrent;
     document.getElementById("copper-toolbar-log-event-symbol").onclick = Copper.ToolbarAdapter.doLog;
@@ -138,47 +111,67 @@ Copper.ToolbarAdapter.initEventLogResizing = function() {
     resizer.addEventListener('mousedown', initEventLogDrag, false);
 }
 
-Copper.ToolbarAdapter.onProfileLoaded = function() {
-    let profiles = Copper.Session.profiles;
-    let settings = Copper.Session.settings;
+Copper.ToolbarAdapter.onPayloadUpdated = function(){
     let payload = Copper.Session.payload;
-
-    // Profiles
-    for (let profileKey in profiles.allProfiles) {
-
-        if (profileKey !== Copper.Profiles.defaultProfile) {
-            let element = document.getElementById("copper-toolbar-profiles-profile-" + profileKey.split(' ').join('-'));
-            if (element === null) {
-                Copper.ProfilesAdapter.addNewHTMLDropdownProfile(profileKey, profiles, profileKey === Copper.Profiles.selectedProfile);
-            }
-        }
-    }
-
-    if (Copper.Profiles.selectedProfile === Copper.Profiles.defaultProfile) {
-        let standardProfile = document.getElementById("copper-toolbar-profiles-standard");
-        standardProfile.firstElementChild.classList.remove("hidden");
-        standardProfile.firstElementChild.classList.add("selected");
-    }
-
-    Copper.ToolbarAdapter.loadCheckbox("copper-toolbar-profiles-auto-store", profiles.autoStore);
-
     if (payload.payloadMode === "text") {
         Copper.ToolbarAdapter.radioElement("copper-toolbar-payload-mode-text");
     } else {
         Copper.ToolbarAdapter.radioElement("copper-toolbar-payload-mode-file");
     }
 
-    if (payload.payloadFileName !== "") {
-        var chooseFile = document.getElementById("copper-toolbar-payload-choose-file");
-        chooseFile.getElementsByTagName('p')[0].innerHTML = payload.payloadFileName;
+    let chooseFileText = Copper.ToolbarAdapter.chooseFileDefaultString;
+    if (payload.payloadFileName !== undefined && payload.payloadFileName !== "") {
+        chooseFileText = payload.payloadFileName;
     }
+    document.getElementById("copper-toolbar-payload-choose-file").getElementsByTagName('p')[0].innerHTML = chooseFileText;
+};
+
+Copper.ToolbarAdapter.onProfilesUpdated = function(){
+    let profileList = document.getElementById("copper-toolbar-profiles-container");
+    while (profileList.firstChild !== null) profileList.removeChild(profileList.firstChild);
+
+    let profiles = Copper.Session.profiles.getAllProfileNames();
+    let selectedProfile = Copper.Session.profiles.selectedProfile;
+    for (let i=0; i<profiles.length; i++){
+        let li = document.createElement("li");
+        li.classList.add("dropdown-item");
+        li.classList.add("hbox");
+        li.classList.add("profile-dropdown-entry")
+        let div = document.createElement("div");
+        div.classList.add("selection-icon");
+        if (selectedProfile === profiles[i]) {
+            div.classList.add("selected");
+        } else {
+            div.classList.add("hidden");
+        }
+        let span = document.createElement("span");
+        span.textContent = "\u2022";
+        let p = document.createElement("p");
+        p.textContent = profiles[i] === Copper.Profiles.DEFAULT_PROFILE_KEY ? "Standard Profile" : profiles[i];
+        div.appendChild(span);
+        li.appendChild(div);
+        li.appendChild(p);
+        profileList.appendChild(li);
+
+        li.onclick = function() {
+            if (profiles[i] !== Copper.Session.profiles.selectedProfile){
+                Copper.Session.profiles.selectProfile(profiles[i]);
+                Copper.Session.updateProfilesSelection(Copper.Session.profiles);
+            }
+        }
+    }
+
+    Copper.ToolbarAdapter.loadCheckbox("copper-toolbar-profiles-auto-store", Copper.Session.profiles.autoStore);
+};
+
+Copper.ToolbarAdapter.onSettingsUpdated = function() {
+    let settings = Copper.Session.settings;
 
     if (settings.requests === Copper.CoapMessage.Type.CON.number) {
         Copper.ToolbarAdapter.radioElement("copper-toolbar-behavior-request-con");
     } else {
         Copper.ToolbarAdapter.radioElement("copper-toolbar-behavior-request-non");
     }
-
 
     // Checkboxes
     Copper.ToolbarAdapter.loadCheckbox("copper-toolbar-behavior-retransmissions", settings.retransmissions);
@@ -225,6 +218,36 @@ Copper.ToolbarAdapter.onProfileLoaded = function() {
             break;
         case "rst":
             Copper.ToolbarAdapter.radioElement("copper-toolbar-behavior-observe-rst");
+            break;
+    }
+};
+
+Copper.ToolbarAdapter.onEvent = function(event){
+    switch(event.type){
+        case Copper.Event.TYPE_COAP_MESSAGE_SENT:
+            let observeOption = event.data.coapMessage.getOption(Copper.CoapMessage.OptionHeader.OBSERVE);
+            if (observeOption.length > 0 && observeOption[0] === 0){
+                let rootElement = document.getElementById("copper-toolbar-observe");
+                if (rootElement.firstChild.src.endsWith("skin/tool_observe.png")) {
+                    rootElement.firstChild.src = "skin/tool_unobserve.png";
+                    rootElement.lastChild.textContent = " Cancel";
+                }
+            }
+            break;
+        case Copper.Event.TYPE_REQUEST_CANCELED:
+            let rootElement = document.getElementById("copper-toolbar-observe");
+            if (rootElement.firstChild.src.endsWith("skin/tool_unobserve.png")) {
+                rootElement.firstChild.src = "skin/tool_observe.png";
+                rootElement.lastChild.textContent = " Observe";
+            }
+        case Copper.Event.TYPE_REQUEST_COMPLETED:
+        case Copper.Event.TYPE_REQUEST_RECEIVE_ERROR:
+        case Copper.Event.TYPE_REQUEST_TIMEOUT:
+            if (Copper.ToolbarAdapter.ongoingDiscoverRequest) {
+                Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
+                let toolbarIcon = document.getElementById("copper-toolbar-discover").firstElementChild;
+                toolbarIcon.src = "skin/tool_discover.png";
+            }
             break;
     }
 };
@@ -346,165 +369,162 @@ Copper.ToolbarAdapter.openDropdown = function(){
 
 Copper.ToolbarAdapter.payloadModeText = function() {
     Copper.Session.payload.payloadMode = "text";
-    Copper.ToolbarAdapter.radioElement(this.id);
+    Copper.Session.updatePayload(Copper.Session.payload);
 };
 
 Copper.ToolbarAdapter.payloadModeFile = function() {
-    var chooseFile = document.getElementById("copper-toolbar-payload-choose-file");
+    let chooseFile = document.getElementById("copper-toolbar-payload-choose-file");
 
     if (chooseFile.getElementsByTagName('p')[0].innerHTML === Copper.ToolbarAdapter.chooseFileDefaultString) {
         Copper.ToolbarAdapter.chooseFile(this.id);
     } else {
         Copper.Session.payload.payloadMode = "file";
-        Copper.ToolbarAdapter.radioElement(this.id);
+        Copper.Session.updatePayload(Copper.Session.payload);
     }
-
 };
 
 Copper.ToolbarAdapter.behaviorRequestCon = function() {
     Copper.Session.settings.requests = Copper.CoapMessage.Type.CON.number;
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorRequestNon = function() {
     Copper.Session.settings.requests = Copper.CoapMessage.Type.NON.number;
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorRetransmissions = function() {
     Copper.Session.settings.retransmissions = !Copper.Session.settings.retransmissions;
     Copper.ToolbarAdapter.checkboxElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorDuplicates = function() {
     Copper.Session.settings.sendDuplicates = !Copper.Session.settings.sendDuplicates;
     Copper.ToolbarAdapter.checkboxElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorDisplayUnknown = function() {
     Copper.Session.settings.showUnknown = !Copper.Session.settings.showUnknown;
     Copper.ToolbarAdapter.checkboxElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorRejectUnknown = function() {
     Copper.Session.settings.rejectUnknown = !Copper.Session.settings.rejectUnknown;
     Copper.ToolbarAdapter.checkboxElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorUriHost = function() {
     Copper.Session.settings.sendUriHost = !Copper.Session.settings.sendUriHost;
     Copper.ToolbarAdapter.checkboxElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorSendSize1 = function() {
     Copper.Session.settings.sendSize1 = !Copper.Session.settings.sendSize1;
     Copper.ToolbarAdapter.checkboxElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorBlockSize0 = function() {
     Copper.Session.settings.blockSize = 0;
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorBlockSize16 = function() {
     Copper.Session.settings.blockSize = 4;
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorBlockSize32 = function() {
     Copper.Session.settings.blockSize = 5;
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorBlockSize64 = function() {
     Copper.Session.settings.blockSize = 6;
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorBlockSize128 = function() {
     Copper.Session.settings.blockSize = 7;
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorBlockSize256 = function() {
     Copper.Session.settings.blockSize = 8;
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorBlockSize512 = function() {
     Copper.Session.settings.blockSize = 9;
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorBlockSize1024 = function() {
     Copper.Session.settings.blockSize = 10;
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorObserveToken = function() {
     Copper.Session.settings.observeToken = !Copper.Session.settings.observeToken;
     Copper.ToolbarAdapter.checkboxElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorObserveLazy = function() {
     Copper.Session.settings.observeCancellation = "lazy";
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorObserveGet = function() {
     Copper.Session.settings.observeCancellation = "get";
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.behaviorObserveRst = function() {
     Copper.Session.settings.observeCancellation = "rst";
     Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
-};
-
-Copper.ToolbarAdapter.profilesStandardProfile = function() {
-    Copper.ToolbarAdapter.radioElement(this.id);
-    Copper.Session.profiles.changeProfile(Copper.Profiles.defaultProfile);
+    Copper.Session.updateSettings(Copper.Session.settings);
 };
 
 Copper.ToolbarAdapter.profilesAutoStore = function() {
-    Copper.ToolbarAdapter.checkboxElement(this.id);
-    Copper.Session.profiles.autoStore = !Copper.Session.profiles.autoStore;
-    Copper.Session.storeChange();
+    let checked = Copper.ToolbarAdapter.checkboxElement(this.id);
+    Copper.Session.profiles.autoStore = checked;
+    Copper.Session.updateProfiles(Copper.Session.profiles);
 };
 
 Copper.ToolbarAdapter.profilesStoreCurrent = function() {
+    Copper.Session.profiles.updateSelectedProfile(Copper.Session.settings, Copper.Session.options, true);
+    Copper.Session.updateProfiles(Copper.Session.profiles);
     alert("Stored current changes to the selected profile");
-    Copper.Session.profiles.updateCurrentProfile(true);
 };
 
 Copper.ToolbarAdapter.checkboxElement = function(id) {
-    var element = document.getElementById(id).firstElementChild;
+    let element = document.getElementById(id).firstElementChild;
     if (!element.classList.contains('hidden')) {
         element.classList.add('hidden');
         element.classList.remove('selected');
+        return false;
     } else {
         element.classList.remove('hidden');
         element.classList.add('selected');
+        return true;
     }
 };
 
@@ -532,8 +552,6 @@ Copper.ToolbarAdapter.radioElement = function(id) {
  * @param id If set => switch radio button to file, otherwise not
  */
 Copper.ToolbarAdapter.chooseFile = function(id) {
-    let chooseFile = document.getElementById("copper-toolbar-payload-choose-file");
-
     let input = document.createElement("input");
     input.type = "file";
     input.style.display = "none";
@@ -542,7 +560,6 @@ Copper.ToolbarAdapter.chooseFile = function(id) {
     input.onchange = function(event) {
         if (id !== undefined) {
             Copper.Session.payload.payloadMode = "file";
-            Copper.ToolbarAdapter.radioElement("copper-toolbar-payload-mode-file");
         }
         
         let file = event.target.files[0];
@@ -550,21 +567,15 @@ Copper.ToolbarAdapter.chooseFile = function(id) {
 
         reader.onload = function(event) {
             Copper.Session.payload.payloadFileData = reader.result;
+            Copper.Session.updatePayload(Copper.Session.payload);
         }
         reader.readAsArrayBuffer(file);
 
-
         let value = this.value.split('\\').pop().split('/').pop();
-        chooseFile.getElementsByTagName('p')[0].innerHTML = value;
-        Copper.Session.settings.payloadFileName = value;
+        Copper.Session.payload.payloadFileName = value;
+        Copper.Session.updatePayload(Copper.Session.payload);
     }
     input.click();
-};
-
-Copper.ToolbarAdapter.resetPayload = function() {
-    let chooseFile = document.getElementById("copper-toolbar-payload-choose-file");
-    chooseFile.getElementsByTagName('p')[0].innerHTML = Copper.ToolbarAdapter.chooseFileDefaultString;
-    Copper.ToolbarAdapter.radioElement("copper-toolbar-payload-mode-text");
 };
 
 Copper.ToolbarAdapter.doLog = function(event) {

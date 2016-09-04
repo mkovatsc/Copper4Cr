@@ -42,43 +42,54 @@ Copper.ExtensionJsonUtils.jsonToCopperOptions = function(data){
 	return res;
 };
 
+Copper.ExtensionJsonUtils.copperProfilesToJson = function(profiles){
+	if (!(profiles instanceof Copper.Profiles)){
+		throw new Error("Illegal Arguments");
+	}
+	return {
+		profiles: profiles.profiles,
+		autoStore: profiles.autoStore,
+		selectedProfile: profiles.selectedProfile
+	};
+};
+
+
 Copper.ExtensionJsonUtils.jsonToCopperProfiles = function(data){
 	let res = new Copper.Profiles();
-	let profiles = Object.keys(data);
+	res.profiles = data.profiles;
+	res.autoStore = data.autoStore;
+	res.selectedProfile = data.selectedProfile;
+	return res;
+};
 
-	for (let i=0; i<profiles.length; i++){
-		if (profiles[i] === "allProfiles") {
-			let profileNames = Object.keys(data[profiles[i]]);
-			for (let j=0; j<profileNames.length; j++){
-				let settings = new Copper.Settings();
-				let options = new Copper.Options();
-				let payload = new Copper.Payload();
-				let profileKeysSettings = Object.keys(data[profiles[i]][profileNames[j]]["settings"]);
-				let profileKeysOptions = Object.keys(data[profiles[i]][profileNames[j]]["options"]);
-				let profileKeysPayload = Object.keys(data[profiles[i]][profileNames[j]]["payload"]);
+Copper.ExtensionJsonUtils.jsonToCopperResources = function(data){
+	let res = new Copper.Resources();
+	res.resources = data.resources;
+	return res;
+};
 
-				for (let k=0; k<profileKeysSettings.length; k++){
-					settings[profileKeysSettings[k]] = data[profiles[i]][profileNames[j]]["settings"][profileKeysSettings[k]];
-				}
-				for (let k=0; k<profileKeysOptions.length; k++){
-					options[profileKeysOptions[k]] = data[profiles[i]][profileNames[j]]["options"][profileKeysOptions[k]];
-				}
-				for (let k=0; k<profileKeysPayload.length; k++){
-					payload[profileKeysPayload[k]] = data[profiles[i]][profileNames[j]]["payload"][profileKeysPayload[k]];
-				}
-
-				res[profiles[i]][profileNames[j]] = {settings: settings, options: options, payload: payload};
-
-
-			}
-		}
-		else {
-			res[profiles[i]] = data[profiles[i]];
-		}
-
+Copper.ExtensionJsonUtils.copperPayloadToJson = function(payload){
+	if (!(payload instanceof Copper.Payload)){
+		throw new Error("Illegal Arguments");
 	}
+	return {
+		payloadMode: payload.payloadMode,
+		payloadText: payload.payloadText,
+		payloadFileData: payload.payloadFileData,
+		payloadFileName: payload.payloadFileName
+	};
+};
+
+Copper.ExtensionJsonUtils.jsonToCopperPayload = function(data){
+	let res = new Copper.Payload();
+	res.payloadMode = data.payloadMode;
+	res.payloadText = data.payloadText;
+	res.payloadFileData = data.payloadFileData;
+	res.payloadFileName = data.payloadFileName;
 	return res;
 };
 
 Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Options}, "Copper.Options", undefined, Copper.ExtensionJsonUtils.jsonToCopperOptions]);
-Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Profiles}, "Copper.Profiles", undefined, Copper.ExtensionJsonUtils.jsonToCopperProfiles]);
+Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Profiles}, "Copper.Profiles", Copper.ExtensionJsonUtils.copperProfilesToJson, Copper.ExtensionJsonUtils.jsonToCopperProfiles]);
+Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Resources}, "Copper.Resources", undefined, Copper.ExtensionJsonUtils.jsonToCopperResources]);
+Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Payload}, "Copper.Payload", Copper.ExtensionJsonUtils.copperPayloadToJson, Copper.ExtensionJsonUtils.jsonToCopperPayload]);

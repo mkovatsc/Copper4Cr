@@ -35,4 +35,4 @@ Copper.Payload = function() {
 Copper.Payload.prototype.payloadMode = "text";
 Copper.Payload.prototype.payloadText = "";
 Copper.Payload.prototype.payloadFileData = new ArrayBuffer();
-Copper.Payload.prototype.payloadFileName = "";
+Copper.Payload.prototype.payloadFileName = undefined;

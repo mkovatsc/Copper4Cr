@@ -30,95 +30,103 @@
  ******************************************************************************/
  
 Copper.Profiles = function() {
-    this.allProfiles = {};
+    this.profiles = new Object();
+    this.profiles[Copper.Profiles.DEFAULT_PROFILE_KEY] = {
+        settings: new Copper.Settings(),
+        options: new Copper.Options()
+    };
+    this.selectedProfile = Copper.Profiles.DEFAULT_PROFILE_KEY;
 };
 
-Copper.Profiles.prototype.allProfiles = undefined;
+Copper.Profiles.DEFAULT_PROFILE_KEY = "";
+
+Copper.Profiles.prototype.profiles = undefined;
 Copper.Profiles.prototype.autoStore = true;
+Copper.Profiles.prototype.selectedProfile = undefined;
 
-Copper.Profiles.defaultProfile = "default_profile";
-
-Copper.Profiles.selectedProfile = "";
-
-
-Copper.Profiles.prototype.addNewProfile = function(name) {
-    if (!(name in this.allProfiles)) {
-        this.allProfiles[name] = {settings: Copper.Session.settings, options: Copper.Session.options, payload: Copper.Session.payload};
-        let newStorageObj = Copper.JsonUtils.stringify(Copper.Session.profiles);
-        Copper.Storage.storeLocally(Copper.Storage.keys.PROFILES_KEY, newStorageObj, function () {
-            Copper.Storage.retrieveLocally(Copper.Storage.keys.PROFILES_KEY, function (id, items) {
-                let profiles = items[id];
-                Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
-            });
-        });
+Copper.Profiles.prototype.addProfile = function(name, settings, options) {
+    if (typeof(name) !== "string" || name === Copper.Profiles.DEFAULT_PROFILE_KEY || !(settings instanceof Copper.Settings) || !(options instanceof Copper.Options)) {
+        throw new Error("Illegal arguments");
     }
+    if (this.profiles[name] !== undefined){
+        throw new Error("Profile " + name + " exists already");
+    }
+    this.profiles[name] = {
+        settings: settings.clone(),
+        options: options.clone()
+    };
+};
+
+Copper.Profiles.prototype.renameProfile = function(oldName, newName) {
+    if (typeof(oldName) !== "string" || oldName === Copper.Profiles.DEFAULT_PROFILE_KEY || typeof(newName) !== "string" || newName === Copper.Profiles.DEFAULT_PROFILE_KEY) {
+        throw new Error("Illegal arguments");
+    }
+    if (this.profiles[oldName] === undefined){
+        throw new Error("Old profile does not exist");
+    }
+    if (this.profiles[newName] !== undefined){
+        throw new Error("New profile does already exist");
+    }
+    if (this.selectedProfile === oldName) this.selectedProfile = newName;
+    this.profiles[newName] = this.profiles[oldName];
+    delete this.profiles[oldName];
 };
 
 Copper.Profiles.prototype.deleteProfile = function(name) {
-    if (name in this.allProfiles) {
-        if (Copper.Profiles.selectedProfile === name) {
-            Copper.Profiles.selectedProfile = Copper.Profiles.defaultProfile;
-        }
-        delete this.allProfiles[name];
-        let newStorageObj = Copper.JsonUtils.stringify(Copper.Session.profiles);
-        Copper.Storage.storeLocally(Copper.Storage.keys.PROFILES_KEY, newStorageObj);
+    if (typeof(name) !== "string" || name === Copper.Profiles.DEFAULT_PROFILE_KEY){
+        throw new Error("Illegal profile name");
     }
+    if (this.profiles[name] === undefined){
+        throw new Error("Profile does not exist");
+    }
+    if (name === this.selectedProfile){
+        throw new Error("Selected profile must not be deleted");
+    }
+    delete this.profiles[name];
 };
 
-Copper.Profiles.prototype.createAndSelectDefaultProfile = function() {
-    if (!(Copper.Profiles.defaultProfile in this.allProfiles)) {
-        this.allProfiles = {};
-        this.addNewProfile(Copper.Profiles.defaultProfile);
-        this.loadProfile(Copper.Profiles.defaultProfile);
-        Copper.Storage.storeLocally(Copper.Storage.keys.SELECTED_PROFILE, Copper.Profiles.defaultProfile);
+Copper.Profiles.prototype.getProfile = function(name) {
+    if (typeof(name) !== "string"){
+        throw new Error("Illegal profile name");
     }
+    return this.profiles[name];
 };
 
-
-Copper.Profiles.prototype.loadProfile = function(name) {
-    if (!(name in this.allProfiles)) {
-        return;
-    }
-
-    var thisRef = this;
-    Copper.Storage.retrieveLocally(Copper.Storage.keys.PROFILES_KEY, function(id, items) {
-        let profiles = items[id];
-
-        Copper.Session.profiles = Copper.JsonUtils.parse(profiles);
-
-        Copper.Profiles.selectedProfile = name;
-        let profile = Copper.Session.profiles.allProfiles[name];
-        Copper.Session.settings = profile.settings;
-        Copper.Session.options = profile.options;
-        Copper.Session.payload = profile.payload;
-
-        let guiAdapters = Copper.Session.guiAdapters;
-
-        // init
-        for (let i=0; i<guiAdapters.length; i++){
-            if (typeof(guiAdapters[i].onProfileLoaded) === "function"){
-                guiAdapters[i].onProfileLoaded();
-            }
-        }
-
-        Copper.Session.profiles.updateCurrentProfile();
-    });
+Copper.Profiles.prototype.getSelectedProfile = function() {
+    return this.getProfile(this.selectedProfile);
 };
 
-Copper.Profiles.prototype.changeProfile = function(name) {
-    var thisRef = this;
-    Copper.Storage.storeLocally(Copper.Storage.keys.SELECTED_PROFILE, name, function() {
-        thisRef.loadProfile(name);
-    });
-}
+Copper.Profiles.prototype.getAllProfileNames = function() {
+    let ret = [Copper.Profiles.DEFAULT_PROFILE_KEY];
+    let names = Object.keys(this.profiles);
+    for (let i=0; i<names.length; i++){
+        if (names[i] !== Copper.Profiles.DEFAULT_PROFILE_KEY) ret.push(names[i]);
+    }
+    return ret;
+};
 
-Copper.Profiles.prototype.updateCurrentProfile = function(forceUpdate) {
+Copper.Profiles.prototype.selectProfile = function(name) {
+    if (typeof(name) !== "string"){
+        throw new Error("Illegal profile name");
+    }
+    if (this.profiles[name] === undefined){
+        throw new Error("Profile does not exist");
+    }
+    this.selectedProfile = name;
+    return this.getSelectedProfile();
+};
+
+Copper.Profiles.prototype.updateSelectedProfile = function(newSettings, newOptions, forceUpdate) {
+    if (!(newSettings instanceof Copper.Settings) || !(newOptions instanceof Copper.Options)) {
+        throw new Error("Illegal arguments");
+    }
     if (forceUpdate || this.autoStore) {
-
-        let profileSettings = {settings: Copper.Session.settings, options: Copper.Session.options, payload: Copper.Session.payload};
-
-        this.allProfiles[Copper.Profiles.selectedProfile] = profileSettings;
-        let newStorageObj = Copper.JsonUtils.stringify(this);
-        Copper.Storage.storeLocally(Copper.Storage.keys.PROFILES_KEY, newStorageObj);
+        let profile = this.getSelectedProfile();
+        profile.settings = newSettings.clone();
+        profile.options = newOptions.clone();
+        return true;
+    }
+    else {
+        return false;
     }
 };

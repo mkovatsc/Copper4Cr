@@ -42,6 +42,10 @@ Copper.Options.prototype.useUtf8 = true;
 Copper.Options.prototype.options = undefined;
 Copper.Options.prototype.customOptions = undefined;
 
+Copper.Options.prototype.clone = function(){
+    return Copper.CopperUtils.cloneObject(this, new Copper.Options());
+};
+
 Copper.Options.prototype.setOptionsEnabled = function(optionsEnabled){
     this.optionsEnabled = optionsEnabled ? true : false;
 };
@@ -84,12 +88,29 @@ Copper.Options.prototype.addCustomOption = function(number, value){
     this.addOptionInternal(Number.parseInt(number), (value === undefined ? "0" : value), this.customOptions);
 };
 
+Copper.Options.prototype.addOptionsToCoapMessage = function(coapMessage, selectedBlockSize) {
+    if (!this.optionsEnabled) {
+        return;
+    }
+    if (this.token !== undefined) {
+        coapMessage.setToken(Copper.ByteUtils.convertToByteArray(this.token));
+    }
+    let optionNos = Object.keys(this.options);
+    for (let i=0; i<optionNos.length; i++){
+        this.addOptionToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.getOptionHeader(Number.parseInt(optionNos[i])), this.options[optionNos[i]]);
+    }
+    let customOptionNos = Object.keys(this.customOptions);
+    for (let i=0; i<customOptionNos.length; i++){
+        this.addOptionToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.getOptionHeader(Number.parseInt(customOptionNos[i])), this.customOptions[customOptionNos[i]]);
+    }
+};
+
 Copper.Options.prototype.addOptionInternal = function(number, value, optionHolder){
     if (value === undefined){
         return;
     }
     let optionHeader = Copper.CoapMessage.OptionHeader.getOptionHeader(number);
-    if (!optionHeader.multipleValues){
+    if (!optionHeader.multipleValues && this.isOptionSet(number)){
         throw new Error("Option " + optionHeader.name + " must not be set more than once");
     }
     new Copper.CoapMessage.Option(optionHeader).addValue(this.transformValue(value, optionHeader.type, 4));
@@ -111,6 +132,7 @@ Copper.Options.prototype.addOptionInternal = function(number, value, optionHolde
           number === Copper.CoapMessage.OptionHeader.URI_PATH.number || number === Copper.CoapMessage.OptionHeader.URI_QUERY.number)) {
         throw new Error("URI-* options must not be set if proxy-uri option is used");
     }
+    if (optionHolder[number] === undefined) optionHolder[number] = [];
     optionHolder[number].push(value);
 };
 
@@ -130,25 +152,7 @@ Copper.Options.prototype.transformValue = function(value, type, blockSize) {
     throw new Error("Illegal type");
 };
 
-Copper.Options.prototype.addUriPathOption = function(optionHeader, path){
-    if (path !== undefined){
-        let pathParts = path.split("/");
-        for (let i=0; i<pathParts.length; i++){
-            coapMessage.addOption(optionHeader, pathParts[i]);
-        }
-    }
-};
-
-Copper.Options.prototype.addUriQueryOption = function(optionHeader, query){
-    if (query !== undefined){
-        let queryParts = path.split("&");
-        for (let i=0; i<queryParts.length; i++){
-            coapMessage.addOption(optionHeader, queryParts[i]);
-        }
-    }
-};
-
-Copper.Options.prototype.addOptionToCoapMessage = function(optionHeader, values, selectedBlockSize){
+Copper.Options.prototype.addOptionToCoapMessage = function(coapMessage, optionHeader, values, selectedBlockSize){
     if (!this.blockwiseEnabled && (optionHeader.number === Copper.CoapMessage.OptionHeader.BLOCK1.number || optionHeader.number === Copper.CoapMessage.OptionHeader.BLOCK2.number)){
         return;
     }
@@ -167,72 +171,25 @@ Copper.Options.prototype.addOptionToCoapMessage = function(optionHeader, values,
                     throw new Error("Proxy URI is not a valid URI");
                 }
                 else {
-                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_SCHEME, uri.protocol ? uri.protocol : "coap", true);
+                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_SCHEME, uri.protocol ? uri.protocol : "coap");
                     coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_HOST, uri.address);
                     if (uri.port !== undefined) coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PORT, uri.port);
-                    this.addUriPathOption(Copper.CoapMessage.OptionHeader.URI_PATH, uri.path);
-                    this.addUriQueryOption(Copper.CoapMessage.OptionHeader.URI_QUERY, uri.query);
+                    Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_PATH, uri.path, "/");
+                    Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_QUERY, uri.query, "&");
                 }
             }
             else {
-                coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_URI, value, true);
+                coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_URI, value);
             }
         }
         else if (optionHeader.number === Copper.CoapMessage.OptionHeader.LOCATION_PATH.number){
-            this.addUriPathOption(Copper.CoapMessage.OptionHeader.LOCATION_PATH, value);
+            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.LOCATION_PATH, value, "/");
         }
         else if (optionHeader.number === Copper.CoapMessage.OptionHeader.LOCATION_QUERY.number){
-            this.addUriPathOption(Copper.CoapMessage.OptionHeader.LOCATION_QUERY, value);
+            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.LOCATION_QUERY, value, "&");
         }
         else {
-            coapMessage.addOption(optionHeader, value, true);
+            coapMessage.addOption(optionHeader, value);
         }
     }
-};
-
-Copper.Options.prototype.addOptionsToCoapMessage = function(coapMessage, selectedBlockSize) {
-    if (!this.optionsEnabled) {
-        return;
-    }
-    if (this.token !== undefined) {
-        coapMessage.setToken(Copper.ByteUtils.convertToByteArray(this.token));
-    }
-
-    let optionNos = Object.keys(this.options);
-    for (let i=0; i<optionNos.length; i++){
-        this.addOptionToCoapMessage(Copper.CoapMessage.OptionHeader.getOptionHeader(optionNos[i]), this.options[optionNos[i]]);
-    }
-    let customOptionNos = Object.keys(this.customOptions);
-    for (let i=0; i<customOptionNos.length; i++){
-        this.addOptionToCoapMessage(Copper.CoapMessage.OptionHeader.getOptionHeader(customOptionNos[i]), this.customOptions[customOptionNos[i]]);
-    }
-};
-
-Copper.Options.prototype.addMultipleOptions = function(options, tag, coapMessage) {
-    let newArray = [];
-    let hasEmptyValues = false;
-    for (let i = 0; i < options.length; i++) {
-        let next = options[i];
-        if (next === "" || next === undefined) {
-            hasEmptyValues = true;
-            continue;
-        }
-        newArray.push(next);
-        coapMessage.addOption(tag, next, false);
-    }
-    return (hasEmptyValues ? newArray : null);
-};
-
-Copper.Options.prototype.removeEmptyMultipleOptions = function(options) {
-    let newArray = [];
-    let hasEmptyValues = false;
-    for (let i = 0; i < options.length; i++) {
-        let next = options[i];
-        if (next === "" || next === undefined) {
-            hasEmptyValues = true;
-            continue;
-        }
-        newArray.push(next);
-    }
-    return (hasEmptyValues ? newArray : null);
 };

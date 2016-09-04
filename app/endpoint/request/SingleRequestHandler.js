@@ -55,6 +55,7 @@ Copper.SingleRequestHandler.prototype.endpointId = undefined;
 Copper.SingleRequestHandler.prototype.sender = undefined;
 Copper.SingleRequestHandler.prototype.receiveCallback = undefined;
 Copper.SingleRequestHandler.prototype.receiver = undefined;
+Copper.SingleRequestHandler.prototype.hasCompleted = false;
 
 
 Copper.SingleRequestHandler.prototype.start = function(){
@@ -133,7 +134,9 @@ Copper.SingleRequestHandler.prototype.unregisterReceiveCallback = function(){
 };
 
 Copper.SingleRequestHandler.prototype.cancel = function(){
-	this.sender.cancel();
+	if (!this.hasCompleted){
+		this.sender.cancel();
+	}
 };
 
 Copper.SingleRequestHandler.prototype.sendCoapMessage = function(coapMessage){
@@ -152,6 +155,7 @@ Copper.SingleRequestHandler.prototype.cancelReceiver = function(){
 
 Copper.SingleRequestHandler.prototype.onSenderFinished = function(){
 	this.transmissionHandler.unregisterToken(this.coapMessage.token, this);
+	this.hasCompleted = true;
 };
 
 // receiver callbacks
