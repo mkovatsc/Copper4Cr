@@ -29,44 +29,43 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 
-Copper.PopupWindowAdapter = function(){
+Copper.PreferenceWindowAdapter = function(){
 };
 
-Copper.PopupWindowAdapter.encode_utf_8 = true;
-
-Copper.PopupWindowAdapter.init = function()
+Copper.PreferenceWindowAdapter.init = function()
 {
     var closeButtons = document.getElementById("popup-windows").getElementsByClassName("close-button");
     for (let i = 0; i < closeButtons.length; i++) {
-        closeButtons[i].onclick = Copper.PopupWindowAdapter.closeWindow;
+        closeButtons[i].onclick = Copper.PreferenceWindowAdapter.closeWindow;
     }
     
-    document.getElementById("preferences-window-encode-utf-8").onclick = Copper.PopupWindowAdapter.checkEncode_utf_8;
-    document.getElementById("preferences-window-clear-resource-cache").onclick = Copper.PopupWindowAdapter.clearResourceCache;
-    document.getElementById("preferences-window-clear-payload-cache").onclick = Copper.PopupWindowAdapter.clearPayloadCache;
-    document.getElementById("preferences-window-clear-entire-cache").onclick = Copper.PopupWindowAdapter.clearEntireCache;
+    document.getElementById("preferences-window-encode-utf-8").onclick = Copper.PreferenceWindowAdapter.checkEncode_utf_8;
+    document.getElementById("preferences-window-clear-resource-cache").onclick = Copper.PreferenceWindowAdapter.clearResourceCache;
+    document.getElementById("preferences-window-clear-payload-cache").onclick = Copper.PreferenceWindowAdapter.clearPayloadCache;
+    document.getElementById("preferences-window-clear-entire-cache").onclick = Copper.PreferenceWindowAdapter.clearEntireCache;
 
 
     // Init default
-    var encode_utf_8 = document.getElementById("preferences-window-encode-utf-8");
-    encode_utf_8.checked = "checked"
-};
-
-
-Copper.PopupWindowAdapter.checkEncode_utf_8 = function(){
-    Copper.Session.settings.encode_utf_8 = this.checked;
-    Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
-};
-
-Copper.PopupWindowAdapter.checkPlugtest = function(){
-    if (this.checked) {
-        Copper.PopupWindowAdapter.plugtest = true;
-    } else {
-        Copper.PopupWindowAdapter.plugtest = false;
+    if (Copper.Session.options.useUtf8){
+        var encode_utf_8 = document.getElementById("preferences-window-encode-utf-8");
+        encode_utf_8.checked = "checked"
     }
 };
 
-Copper.PopupWindowAdapter.closeWindow = function(){
+
+Copper.PreferenceWindowAdapter.checkEncode_utf_8 = function(){
+    Copper.Session.options.useUtf8 = this.checked;
+};
+
+Copper.PreferenceWindowAdapter.checkPlugtest = function(){
+    if (this.checked) {
+        Copper.PreferenceWindowAdapter.plugtest = true;
+    } else {
+        Copper.PreferenceWindowAdapter.plugtest = false;
+    }
+};
+
+Copper.PreferenceWindowAdapter.closeWindow = function(){
     var blockScreens = document.getElementById("popup-windows").getElementsByClassName("block_screen");
     for (let i = 0; i < blockScreens.length; i++) {
         if (!blockScreens[i].classList.contains("hidden")){
@@ -75,14 +74,13 @@ Copper.PopupWindowAdapter.closeWindow = function(){
     }
 };
 
-Copper.PopupWindowAdapter.clearResourceCache = function(){
+Copper.PreferenceWindowAdapter.clearResourceCache = function(){
     if (confirm('This will delete the RESOURCE cache. Continue?')) {
-        Copper.Session.settings.resources = new Object();
-        Copper.Session.clientEndpoint.updateSettings(Copper.Session.settings);
+        Copper.Session.storageManager.removeResources();
     }
 };
 
-Copper.PopupWindowAdapter.clearPayloadCache = function(){
+Copper.PreferenceWindowAdapter.clearPayloadCache = function(){
     if (confirm('This will delete the PAYLOAD cache. Continue?')) {
         Copper.Session.payload.payloadFileData = new ArrayBuffer();
         Copper.Session.payload.payloadFileName = "";
@@ -93,12 +91,12 @@ Copper.PopupWindowAdapter.clearPayloadCache = function(){
     }
 };
 
-Copper.PopupWindowAdapter.clearEntireCache = function(){
+Copper.PreferenceWindowAdapter.clearEntireCache = function(){
     if (confirm('This will delete the ENTIRE cache. Continue?')) {
         Copper.Storage.clear(function() {
             Copper.ToolbarAdapter.resetPayload();
             Copper.PayloadAdapter.resetPayload();
-            Copper.DebugOptionsAdapter.resetAllDebugOptions();
+            Copper.DebugOptionsAdapter.onReset();
             Copper.Session.profiles.createAndSelectDefaultProfile();
         });
 

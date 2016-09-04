@@ -28,41 +28,28 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
-/* Settings object. Set a pref to override the default behavior */
-Copper.Settings = function() {
+
+Copper.StartupWindowAdapter = function(){
 };
 
-// Message type to use. See Copper.CoapMessage.Type object for different values
-Copper.Settings.prototype.requests = 0;
+Copper.StartupWindowAdapter.openStartupWindow = function(callback) {
+    document.getElementById("copper-overlay-startup").parentNode.classList.remove("hidden");
 
-// Retransmit messages after timeout (up to MAX_RETRANSMIT)
-Copper.Settings.prototype.retransmissions = true;
+    let buttonResource = document.getElementById("copper-startup-resource-confirm-button");
+    let inputResource = document.getElementById("copper-startup-resource-input");
+    inputResource.addEventListener("keyup", function(event) {
+        event.preventDefault();
+        if (event.keyCode == 13) {
+            buttonResource.click();
+        }
+    });
 
-// Do not increase MID to send duplicates
-// TODO: in FF-Copper not used...
-Copper.Settings.prototype.sendDuplicates = false;
+    inputResource.value = "coap://";
+    let index = inputResource.value.length;
+    inputResource.focus();
+    inputResource.setSelectionRange(index, index);
 
-// Show unknown messages in the message log
-Copper.Settings.prototype.showUnknown = true;
-
-// Reject unknown messages using a RST message
-Copper.Settings.prototype.rejectUnknown = true;
-
-// Send URI-Host Option
-Copper.Settings.prototype.sendUriHost = false;
-
-// Send size1 option
-Copper.Settings.prototype.sendSize1 = false;
-
-// Choose block size
-// 0 --> late block negotiation, otherwise 4 - 10 (32 - 1024)
-Copper.Settings.prototype.blockSize = 6;
-
-// Use token for observe
-Copper.Settings.prototype.observeToken = true;
-
-// Observe cancellation (get, rst, lazy)
-Copper.Settings.prototype.observeCancellation = "lazy";
-
-Copper.Settings.prototype.resources = new Object();
+    buttonResource.onclick = function() {
+        callback(inputResource.value);
+    };
+};

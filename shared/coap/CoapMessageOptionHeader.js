@@ -141,7 +141,7 @@ Copper.CoapMessage.OptionHeader.getUnknownOptionHeader = function(optionNo){
 */
 Copper.CoapMessage.OptionHeader.getOptionHeader = function(optionNo){
 	if (!Number.isInteger(optionNo) || optionNo < 0){
-		throw new Error("Illegal Arguments");
+		throw new Error("Illegal option number");
 	}
 	let reg = Copper.CoapMessage.OptionHeader.Registry;
 	for (let i = 0; i < reg.length; i++) {

@@ -29,40 +29,35 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-/* Settings object. Set a pref to override the default behavior */
-Copper.Settings = function() {
+Copper.ErrorWindowAdapter = function(){
 };
 
-// Message type to use. See Copper.CoapMessage.Type object for different values
-Copper.Settings.prototype.requests = 0;
+Copper.ErrorWindowAdapter.openErrorWindow = function(errorTitle, errorMsg) {
+    Copper.ErrorWindowAdapter.openPopupWindow(errorTitle, errorMsg, "skin/tool_delete.png");
+};
 
-// Retransmit messages after timeout (up to MAX_RETRANSMIT)
-Copper.Settings.prototype.retransmissions = true;
+Copper.ErrorWindowAdapter.openInfoWindow = function(title, msg) {
+    Copper.ErrorWindowAdapter.openPopupWindow(title, msg, "skin/tool_discover.png");
+};
 
-// Do not increase MID to send duplicates
-// TODO: in FF-Copper not used...
-Copper.Settings.prototype.sendDuplicates = false;
+Copper.ErrorWindowAdapter.openPopupWindow = function(title, msg, icon) {
+    let blockScreen = document.getElementById("copper-overlay-error").parentNode;
+    blockScreen.classList.remove("hidden");
+    let errorMsgTitleElement = document.getElementById("copper-overlay-error-title");
+    errorMsgTitleElement.innerHTML = "Copper (Cu) - " + title;
+    let errorMsgElement = document.getElementById("copper-error-msg");
+    errorMsgElement.innerHTML = msg;
+    let iconElement = document.getElementById("copper-overlay-icon");
+    iconElement.src = icon;
 
-// Show unknown messages in the message log
-Copper.Settings.prototype.showUnknown = true;
+    let exitButton = document.getElementById("copper-error-exit-button");
 
-// Reject unknown messages using a RST message
-Copper.Settings.prototype.rejectUnknown = true;
+    exitButton.onclick = function() {
+        blockScreen.classList.add("hidden");
+    };
+};
 
-// Send URI-Host Option
-Copper.Settings.prototype.sendUriHost = false;
-
-// Send size1 option
-Copper.Settings.prototype.sendSize1 = false;
-
-// Choose block size
-// 0 --> late block negotiation, otherwise 4 - 10 (32 - 1024)
-Copper.Settings.prototype.blockSize = 6;
-
-// Use token for observe
-Copper.Settings.prototype.observeToken = true;
-
-// Observe cancellation (get, rst, lazy)
-Copper.Settings.prototype.observeCancellation = "lazy";
-
-Copper.Settings.prototype.resources = new Object();
+Copper.ErrorWindowAdapter.closeInfoWindow = function(title, msg) {
+    let blockScreen = document.getElementById("copper-overlay-error").parentNode;
+    blockScreen.classList.add("hidden");
+};

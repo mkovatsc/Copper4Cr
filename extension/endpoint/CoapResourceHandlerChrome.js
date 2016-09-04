@@ -39,10 +39,11 @@ Copper.CoapResourceHandler.resolveCoapResource = function(callback){
         uri = Copper.StringUtils.parseUri(decodeURIComponent(search.substr(1)));
     }
     if (uri === undefined){
-        Copper.OverlayAdapter.addInputOverlay("Enter Endpoint", "Enter the URL of the Coap Endpoint", undefined, "coap://", "OK", function(value, errorCallback){
+        Copper.StartupWindowAdapter.openStartupWindow(function(value) {
             uri = Copper.StringUtils.parseUri(value);
             if (uri === undefined){
-                errorCallback("Please enter a valid URL");
+                // TODO
+                //errorCallback("Please enter a valid URL");
             }
             else {
                 Copper.CoapResourceHandler.changeCoapResource(uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query, true);
