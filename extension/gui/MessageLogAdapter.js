@@ -32,7 +32,7 @@
 Copper.MessageLogAdapter = function(){
 };
 
-Copper.MessageLogAdapter.init = function(){
+Copper.MessageLogAdapter.beforeSessionInitialization = function(){
 	let resizer = document.createElement("div");
 	resizer.id = "copper-coap-message-log-resizer";
 	

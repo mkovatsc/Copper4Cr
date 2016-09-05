@@ -93,7 +93,7 @@ Copper.ToolbarAdapter.initEventLogResizing = function() {
 
     var doEventLogDrag = function (e) {
         eventLog.style.width = (startWidth + startX - e.clientX) + 'px';
-        eventLog.style.width = (startWidth + startX - e.clientX) + 'px';
+        eventLog.style.height = (startHeight + e.clientY - startY) + 'px';
     };
 
     var stopEventLogDrag = function (e) {
@@ -103,7 +103,9 @@ Copper.ToolbarAdapter.initEventLogResizing = function() {
 
     var initEventLogDrag = function(e) {
         startX = e.clientX;
+        startY = e.clientY;
         startWidth = parseInt(document.defaultView.getComputedStyle(eventLog).width, 10);
+        startHeight = parseInt(document.defaultView.getComputedStyle(eventLog).height, 10);
         document.documentElement.addEventListener('mousemove', doEventLogDrag, false);
         document.documentElement.addEventListener('mouseup', stopEventLogDrag, false);
     };
@@ -264,12 +266,14 @@ Copper.ToolbarAdapter.loadCheckbox = function(id, checked) {
 };
 
 Copper.ToolbarAdapter.doPing = function(){
+    Copper.ToolbarLoggerAdapter.addLogEntry("Do Ping", true);
     let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.EMPTY);
 	Copper.Session.sendCoapMessage(coapMessage, true);
 };
 
 Copper.ToolbarAdapter.doDiscover = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.GET);
+    Copper.ToolbarLoggerAdapter.addLogEntry("Do Discover", true);
+    let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.GET);
 	coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, ".well-known");
 	coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PATH, "core");
     Copper.ToolbarAdapter.ongoingDiscoverRequest = true;
@@ -280,26 +284,31 @@ Copper.ToolbarAdapter.doDiscover = function(){
 };
 
 Copper.ToolbarAdapter.doGet = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.GET);
+    Copper.ToolbarLoggerAdapter.addLogEntry("Do GET", true);
+    let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.GET);
 	Copper.Session.sendCoapMessage(coapMessage);
 };
 
 Copper.ToolbarAdapter.doPost = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.POST);
+    Copper.ToolbarLoggerAdapter.addLogEntry("Do POST", true);
+    let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.POST);
 	Copper.Session.sendCoapMessage(coapMessage);
 };
 
 Copper.ToolbarAdapter.doPut = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.PUT);
+    Copper.ToolbarLoggerAdapter.addLogEntry("Do PUT", true);
+    let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.PUT);
 	Copper.Session.sendCoapMessage(coapMessage);
 };
 
 Copper.ToolbarAdapter.doDelete = function(){
-	let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.DELETE);
+    Copper.ToolbarLoggerAdapter.addLogEntry("Do DELETE", true);
+    let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.DELETE);
 	Copper.Session.sendCoapMessage(coapMessage);
 };
 
 Copper.ToolbarAdapter.doObserve = function(){
+    Copper.ToolbarLoggerAdapter.addLogEntry("Do Observe", true);
     let rootElement = document.getElementById("copper-toolbar-observe");
     if (rootElement.firstChild.src.endsWith("skin/tool_unobserve.png")) {
         // stop observing
@@ -512,7 +521,8 @@ Copper.ToolbarAdapter.profilesAutoStore = function() {
 Copper.ToolbarAdapter.profilesStoreCurrent = function() {
     Copper.Session.profiles.updateSelectedProfile(Copper.Session.settings, Copper.Session.options, true);
     Copper.Session.updateProfiles(Copper.Session.profiles);
-    alert("Stored current changes to the selected profile");
+    Copper.ErrorWindowAdapter.openInfoWindow("Stored Changes", 'Stored current changes to the selected profile ("'
+        + (Copper.Profiles.DEFAULT_PROFILE_KEY === Copper.Session.profiles.selectedProfile ? "Standard Profile" : Copper.Session.profiles.selectedProfile) + '")');
 };
 
 Copper.ToolbarAdapter.checkboxElement = function(id) {

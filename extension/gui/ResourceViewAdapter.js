@@ -42,6 +42,7 @@ Copper.ResourceViewAdapter.onEvent = function(event){
             if (responseCoapMessage.code.equals(Copper.CoapMessage.Code.CONTENT) && 
                   contentFormatOption.length === 1 && contentFormatOption[0] === Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_LINK_FORMAT.number){
                 Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ByteUtils.convertBytesToString(responseCoapMessage.payload)));
+                let selectedResource = document.getElementById("resource_tree").getElementsByClassName("selected");
             }
         }
     }
@@ -149,7 +150,7 @@ Copper.ResourceViewAdapter.addTreeResource = function(segments, attributes, addr
 
             // Add uri as data attribute
             p.dataset.uri = segments.slice(1,i+1).join('/');
-            if (p.dataset.uri === selectedPath) p.classList.add("selected");
+            if (p.dataset.uri === selectedPath || Copper.Session.path === undefined && p.dataset.uri === "") p.classList.add("selected");
             p.onclick = Copper.ResourceViewAdapter.onClickResource;
 
             // special icon

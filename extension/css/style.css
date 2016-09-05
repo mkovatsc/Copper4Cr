@@ -1027,7 +1027,10 @@ button
 
 #popup-windows .copper-error img {
 	width: 30px;
-	margin-right: 30px;
+}
+
+#popup-windows #copper-error-msg {
+	margin-left: 30px;
 }
 
 #popup-windows .copper-error #copper-error-exit-button {

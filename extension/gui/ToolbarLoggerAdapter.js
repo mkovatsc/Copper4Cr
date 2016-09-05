@@ -29,34 +29,31 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 
-Copper.ClientPort = function(){
+Copper.ToolbarLoggerAdapter = function(){
 };
 
-Copper.ClientPort.connect = function(clientId, finalDisconnectHandler, callback){
-	let appId = "kdgfcijijlbhfondicahdjhchebnnmei";
-	let port = new Copper.Port(chrome.runtime.connect(appId), clientId);
-
-	let connectedCallback = function(){
-        if (port !== undefined){
-            port.registerDisconnectCallback(finalDisconnectHandler);
-        }
-        callback(port);
-	};
-    let firstTimeout = Copper.TimeUtils.setTimeout(connectedCallback, 400);
-
-    port.registerDisconnectCallback(function(){
-        // app not started
-        Copper.Log.logFine("Starting application");
-        Copper.TimeUtils.clearTimeout(firstTimeout);
-        let secondTimeout = Copper.TimeUtils.setTimeout(connectedCallback, 750)
-        Copper.ErrorWindowAdapter.openInfoWindow("Starting...", "Try to start the Copper Application");
-        chrome.management.launchApp(appId, function(){
-            port = new Copper.Port(chrome.runtime.connect(appId), clientId);
-            port.registerDisconnectCallback(function(){
-                // app was not started
-                Copper.TimeUtils.clearTimeout(secondTimeout);
-                Copper.ErrorWindowAdapter.openErrorWindow("Copper App not installed", "This extension needs the Copper application to send Coap-Messages. Please install the app and reload.");
-            });
-        });
-    });
+Copper.ToolbarLoggerAdapter.addLogEntry = function(log, onCurrent) {
+    let logger = document.getElementById("copper-toolbar-log-event-log");
+    let newEntry = document.createElement("p");
+    newEntry.style.fontFamily = "lucida console";
+    let time = "[" + Copper.StringUtils.getTime() + "] ";
+    if (onCurrent) {
+        newEntry.innerHTML = time + '<i><strong>' + log + '</strong></i>';
+    } else {
+        newEntry.textContent = time + log;
+    }
+    logger.appendChild(newEntry);
 };
+
+Copper.ToolbarLoggerAdapter.onEvent = function(event) {
+
+    switch (event.type) {
+        case Copper.Event.TYPE_COAP_MESSAGE_SENT:
+            Copper.ToolbarLoggerAdapter.addLogEntry("Sent " + event.data.bytesSent + " bytes to " + Copper.Session.remoteAddress + ":" + Copper.Session.remotePort);
+            break;
+        case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
+            Copper.ToolbarLoggerAdapter.addLogEntry("Received " + event.data.byteLength + " bytes from " + Copper.Session.remoteAddress + ":" + Copper.Session.remotePort);
+            break;
+    }
+};
+

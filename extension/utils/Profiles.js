@@ -113,6 +113,8 @@ Copper.Profiles.prototype.selectProfile = function(name) {
         throw new Error("Profile does not exist");
     }
     this.selectedProfile = name;
+    Copper.StatusBarAdapter.setText('Loaded profile "'
+        + (Copper.Profiles.DEFAULT_PROFILE_KEY === Copper.Session.profiles.selectedProfile ? "Standard Profile" : Copper.Session.profiles.selectedProfile) + '"');
     return this.getSelectedProfile();
 };
 

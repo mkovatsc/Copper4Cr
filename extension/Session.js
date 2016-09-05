@@ -82,7 +82,8 @@ Copper.Session.eventListeners = [
         Copper.ProfilesAdapter,
         Copper.StartupWindowAdapter,
         Copper.StatusBarAdapter,
-        Copper.ErrorWindowAdapter
+        Copper.ErrorWindowAdapter,
+        Copper.ToolbarLoggerAdapter
     ];
 
 Copper.Session.informListeners = function(funcName, args){
@@ -145,11 +146,9 @@ Copper.Session.registerClient = function(port){
 
                 break;
             case Copper.Event.TYPE_ERROR_ON_SERVER: 
-                //Copper.OverlayAdapter.addTitleTextOverlay("Error", "Error " + event.data.errorType + ": " + event.data.errorMessage);
                 Copper.ErrorWindowAdapter.openErrorWindow("Error", "Error " + event.data.errorType + ": " + event.data.errorMessage);
                 break;
             default:
-                //Copper.OverlayAdapter.addTitleTextOverlay("Error: Invalid Event", "Received invalid event(" + event.type + ") from app. Please restart the extension.");
                 Copper.ErrorWindowAdapter.openErrorWindow("Error: Invalid Event", "Error: Invalid Event", "Received invalid event(" + event.type + ") from app. Please restart the extension.");
                 break;
         }
@@ -178,7 +177,6 @@ Copper.Session.showErrorMessage = function(errorNo, errorMessage){
     if (!Number.isInteger(errorNo) || typeof(errorMessage) !== "string"){
         throw new Error("Illegal Arguments");
     }
-    //Copper.OverlayAdapter.addErrorMsgOverlay("Error " + errorNo, errorMessage);
     Copper.ErrorWindowAdapter.openErrorWindow("Error " + errorNo, errorMessage);
 };
 
@@ -213,7 +211,6 @@ Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
 Copper.Session.onPortDisconnect = function(){
     Copper.Session.clientEndpoint = undefined;
     Copper.Session.localPort = undefined;
-    //Copper.OverlayAdapter.addTitleTextOverlay("Connection lost...", "Connection to Copper app lost. Please restart the extension.");
     Copper.ErrorWindowAdapter.openErrorWindow("Connection lost...", "Connection to Copper app lost. Please restart the extension.");
 };
 
