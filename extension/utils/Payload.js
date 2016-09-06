@@ -34,5 +34,19 @@ Copper.Payload = function() {
 
 Copper.Payload.prototype.payloadMode = "text";
 Copper.Payload.prototype.payloadText = "";
-Copper.Payload.prototype.payloadFileData = new ArrayBuffer();
+Copper.Payload.prototype.payloadFileData = new ArrayBuffer(0);
 Copper.Payload.prototype.payloadFileName = undefined;
+
+Copper.Payload.prototype.addPayloadToCoapMessage = function(coapMessage){
+	if (Copper.CoapMessage.Code.POST.equals(coapMessage.code) || Copper.CoapMessage.Code.PUT.equals(coapMessage.code)){
+		if (this.payloadMode === "text"){
+			if (!coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT)){
+				coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_PLAIN.number);
+			}
+			coapMessage.setPayload(Copper.ByteUtils.convertStringToBytes(document.getElementById("copper-payload-tab-out").value));
+		}
+		else {
+			coapMessage.setPayload(this.payloadFileData);
+		}
+	} 
+};

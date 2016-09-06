@@ -159,6 +159,17 @@ Copper.CoapMessage.prototype.removeOption = function(optionHeader){
 };
 
 /*
+* @arg optionHeader: header of the option of which should be checked
+* @return whether the option is set
+*/
+Copper.CoapMessage.prototype.isOptionSet = function(optionHeader){
+	if (!(optionHeader instanceof Copper.CoapMessage.OptionHeader)){
+		throw new Error("Illegal argument");
+	}
+	return this.options[optionHeader.number] !== undefined;
+};
+
+/*
 * @arg optionHeader: header of the option of which the values should be retrieved
 * @return if option is not set: default value (which may be undefined)
 *         array containing the converted option values. Empty array if option contains no value
@@ -167,7 +178,7 @@ Copper.CoapMessage.prototype.getOption = function(optionHeader){
 	if (!(optionHeader instanceof Copper.CoapMessage.OptionHeader)){
 		throw new Error("Illegal argument");
 	}
-	if (this.options[optionHeader.number]){
+	if (this.options[optionHeader.number] !== undefined){
 		return this.options[optionHeader.number].getValue();
 	}
 	else if (optionHeader.defaultValue !== undefined) {
