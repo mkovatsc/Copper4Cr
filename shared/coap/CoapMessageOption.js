@@ -113,7 +113,7 @@ Copper.CoapMessage.Option.prototype.addValue = function(val, opts) {
 			}
 			throw new Error("Illegal Argument for " + this.header.name + " - Expected Empty Type");
 		case Types.TYPE_OPAQUE:
-			this.addByteValue(Copper.ByteUtils.convertToByteArray(val));
+			this.addByteValue(Copper.ByteUtils.convertToByteArray(val, ascii, strict));
 			break;
 		case Types.TYPE_UINT:
 			if (Number.isInteger(val) && val >= 0){

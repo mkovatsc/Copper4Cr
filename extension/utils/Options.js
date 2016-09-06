@@ -56,7 +56,7 @@ Copper.Options.prototype.setToken = function(token){
     }
     else {
         // validate token
-        new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.GET).setToken(Copper.ByteUtils.convertToByteArray(token));
+        new Copper.CoapMessage(Copper.CoapMessage.Type.CON, Copper.CoapMessage.Code.GET).setToken(Copper.ByteUtils.convertToByteArray(token, !this.useUtf8));
         this.token = token;
     }
 };
@@ -93,7 +93,7 @@ Copper.Options.prototype.addOptionsToCoapMessage = function(coapMessage, selecte
         return;
     }
     if (this.token !== undefined) {
-        coapMessage.setToken(Copper.ByteUtils.convertToByteArray(this.token));
+        coapMessage.setToken(Copper.ByteUtils.convertToByteArray(this.token, !this.useUtf8));
     }
     let optionNos = Object.keys(this.options);
     for (let i=0; i<optionNos.length; i++){
@@ -113,7 +113,7 @@ Copper.Options.prototype.addOptionInternal = function(number, value, optionHolde
     if (!optionHeader.multipleValues && this.isOptionSet(number)){
         throw new Error("Option " + optionHeader.name + " must not be set more than once");
     }
-    new Copper.CoapMessage.Option(optionHeader).addValue(this.transformValue(value, optionHeader.type, 4));
+    new Copper.CoapMessage.Option(optionHeader).addValue(this.transformValue(value, optionHeader.type, 4), {useUtf8: this.useUtf8});
     // check proxy-options / uri-options
     if (number === Copper.CoapMessage.OptionHeader.PROXY_URI.number){
         if (this.isOptionSet(Copper.CoapMessage.OptionHeader.URI_HOST.number) || this.isOptionSet(Copper.CoapMessage.OptionHeader.URI_PORT.number) ||
@@ -171,25 +171,25 @@ Copper.Options.prototype.addOptionToCoapMessage = function(coapMessage, optionHe
                     throw new Error("Proxy URI is not a valid URI");
                 }
                 else {
-                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_SCHEME, uri.protocol ? uri.protocol : "coap");
-                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_HOST, uri.address);
+                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_SCHEME, uri.protocol ? uri.protocol : "coap", false, {useUtf8: this.useUtf8});
+                    coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_HOST, uri.address, false, {useUtf8: this.useUtf8});
                     if (uri.port !== undefined) coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PORT, uri.port);
-                    Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_PATH, uri.path, "/");
-                    Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_QUERY, uri.query, "&");
+                    Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_PATH, uri.path, "/", {useUtf8: this.useUtf8});
+                    Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_QUERY, uri.query, "&", {useUtf8: this.useUtf8});
                 }
             }
             else {
-                coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_URI, value);
+                coapMessage.addOption(Copper.CoapMessage.OptionHeader.PROXY_URI, value, false, {useUtf8: this.useUtf8});
             }
         }
         else if (optionHeader.number === Copper.CoapMessage.OptionHeader.LOCATION_PATH.number){
-            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.LOCATION_PATH, value, "/");
+            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.LOCATION_PATH, value, "/", {useUtf8: this.useUtf8});
         }
         else if (optionHeader.number === Copper.CoapMessage.OptionHeader.LOCATION_QUERY.number){
-            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.LOCATION_QUERY, value, "&");
+            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.LOCATION_QUERY, value, "&", {useUtf8: this.useUtf8});
         }
         else {
-            coapMessage.addOption(optionHeader, value);
+            coapMessage.addOption(optionHeader, value, false, {useUtf8: this.useUtf8});
         }
     }
 };

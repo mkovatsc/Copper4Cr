@@ -56,7 +56,18 @@ Copper.CopperUtils.cloneSimple = function(value){
 	}
 };
 
-Copper.CopperUtils.splitOptionAndAddToCoapMessage = function(coapMessage, optionHeader, value, separator){
+
+/*
+* Splits a value (e.g. a path) according to a selector and adds these to the coapMessage
+* @arg coapMessage: message
+* @arg optionHeader: header of the option to be set
+* @arg val: value of the option
+* @arg separator
+* @arg opts: object with optional options. The following can be set:
+*             useUtf8 --> set to false if ascii encoding should be used
+*             strict --> set to true in order to throw errors instead of skipping error parts
+*/
+Copper.CopperUtils.splitOptionAndAddToCoapMessage = function(coapMessage, optionHeader, value, separator, opts){
     if (value !== undefined){
         let valueParts = value.split(separator);
         for (let i=0; i<valueParts.length; i++){

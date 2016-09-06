@@ -33,7 +33,7 @@ Copper.ClientPort = function(){
 };
 
 Copper.ClientPort.connect = function(clientId, finalDisconnectHandler, callback){
-	let appId = "kdgfcijijlbhfondicahdjhchebnnmei";
+	let appId = "mbighlecbopknoggoappifafoffcnocc";
 	let port = new Copper.Port(chrome.runtime.connect(appId), clientId);
 
 	let connectedCallback = function(){
