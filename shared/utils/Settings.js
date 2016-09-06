@@ -44,7 +44,6 @@ Copper.Settings.prototype.requests = 0;
 Copper.Settings.prototype.retransmissions = true;
 
 // Do not increase MID to send duplicates
-// TODO: in FF-Copper not used...
 Copper.Settings.prototype.sendDuplicates = false;
 
 // Show unknown messages in the message log

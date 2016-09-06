@@ -62,6 +62,11 @@ QUnit.test("MessagesInTransmissionSet: General", function(assert) {
 	messagesInTransmissionSet.addNewTransmission(resTransmission);
 
 	assert.deepEqual(messagesInTransmissionSet.getTransmissionCount(), 3);
+	messagesInTransmissionSet.removeTransmission(nonTransmission);
+	assert.deepEqual(messagesInTransmissionSet.getTransmissionCount(), 2);
+	messagesInTransmissionSet.removeTransmission(nonTransmission);
+	assert.deepEqual(messagesInTransmissionSet.getTransmissionCount(), 2);
+	messagesInTransmissionSet.addNewTransmission(nonTransmission);
 
 	assert.throws(function(){
 		// MID must not exist
