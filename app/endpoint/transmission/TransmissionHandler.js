@@ -61,8 +61,8 @@ Copper.TransmissionHandler = function(udpClient, remoteAddress, remotePort, sett
 													function(transmission){ thisRef.onEndOfLife(transmission); });
 	
 	let midStart = parseInt(Math.random()*0x10000);
-	this.midGenerator = function(){
-		midStart = (midStart + 1) % 0x10000;
+	this.midGenerator = function(returnLastMid){
+		if (!returnLastMid) midStart = (midStart + 1) % 0x10000;
 		return midStart;
 	};
 
@@ -233,10 +233,14 @@ Copper.TransmissionHandler.prototype.sendCoapMessage = function(coapMessage, req
 		throw new Error("Request Handler must match token");
 	}
 	else {
-		coapMessage.setMid(this.midGenerator());
-		let transmission = new Copper.RequestMessageTransmission(coapMessage, requestHandler, this.settings.retransmission);
+		coapMessage.setMid(this.midGenerator(this.settings.sendDuplicates));
+		let transmission = new Copper.RequestMessageTransmission(coapMessage, requestHandler, this.settings.retransmissions);
 		if (requestHandler !== undefined){
 			this.setRequestMessageTransmissionForToken(coapMessage.token, transmission);
+		}
+		if (this.settings.sendDuplicates){
+			let activeTransmission = this.messagesInTransmissionSet.getRequestMessageTransmission(coapMessage.mid);
+			if (activeTransmission !== undefined) this.messagesInTransmissionSet.removeTransmission(activeTransmission);
 		}
 		this.messagesInTransmissionSet.addNewTransmission(transmission);
 

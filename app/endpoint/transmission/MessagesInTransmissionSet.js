@@ -138,6 +138,26 @@ Copper.MessagesInTransmissionSet.prototype.addNewTransmission = function(transmi
 };
 
 /**
+* Removes a transmission from the set if found
+* @arg transmission: Transmission which should be removed
+*/
+Copper.MessagesInTransmissionSet.prototype.removeTransmission = function(transmission){
+	if (!(transmission instanceof Copper.RequestMessageTransmission) && !(transmission instanceof Copper.ResponseMessageTransmission)){
+		throw new Error("Illegal Argument");
+	}
+	if (transmission instanceof Copper.RequestMessageTransmission){
+		let idx = this.activeRequestMessageTransmissions.indexOf(transmission);
+		if (idx !== -1) this.activeRequestMessageTransmissions.splice(idx, 1);
+		idx = this.timeoutedRequestMessageTransmissions.indexOf(transmission);
+		if (idx !== -1) this.timeoutedRequestMessageTransmissions.splice(idx, 1);
+	}
+	else {
+		let idx = this.responseMessageTransmissions.indexOf(transmission);
+		if (idx !== -1) this.responseMessageTransmissions.splice(idx, 1);
+	}
+};
+
+/**
 * @arg mid: message id
 * @arg token: token as an ArrayBuffer (optional)
 * @return: first transmission that matches mid and token.
