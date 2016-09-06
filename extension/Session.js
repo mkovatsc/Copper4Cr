@@ -191,14 +191,14 @@ Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
         let blockwiseEnabled = true;
         if (!withoutModification){
             // add URI-PATH and URI-QUERY
-            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_PATH, Copper.Session.path, "/");
-            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_QUERY, Copper.Session.query, "&");
+            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_PATH, Copper.Session.path, "/", {useUtf8: Copper.Session.options.useUtf8});
+            Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.URI_QUERY, Copper.Session.query, "&", {useUtf8: Copper.Session.options.useUtf8});
 
             if (Copper.Session.options.optionsEnabled){
                 blockwiseEnabled = Copper.Session.options.blockwiseEnabled;
                 Copper.Session.options.addOptionsToCoapMessage(coapMessage, Copper.Session.settings.blockSize);
             }
-            Copper.Session.payload.addPayloadToCoapMessage(coapMessage);
+            Copper.Session.payload.addPayloadToCoapMessage(coapMessage, Copper.Session.options.useUtf8);
             Copper.Session.informListeners("beforeSendingCoapMessage", [coapMessage]);
         }
         Copper.Session.clientEndpoint.sendCoapMessage(coapMessage, blockwiseEnabled);

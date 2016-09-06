@@ -9,6 +9,7 @@ Copper.DebugOptionsAdapter.customOptionsField = undefined;
 Copper.DebugOptionsAdapter.optionFieldAppenders = new Object();
 Copper.DebugOptionsAdapter.optionFields = [];
 Copper.DebugOptionsAdapter.optionHolderUsed = undefined;
+Copper.DebugOptionsAdapter.validatedUsingUtf8 = true;
 
 Copper.DebugOptionsAdapter.beforeSessionInitialization = function() {
     let opaquePlaceholder = "use hex (0x..) or string";
@@ -58,6 +59,10 @@ Copper.DebugOptionsAdapter.onOptionsUpdated = function(){
         Copper.DebugOptionsAdapter.optionHolderUsed = Copper.Session.options;
         Copper.DebugOptionsAdapter.updateDebugOptions(Copper.Session.options);
     }
+    if (Copper.DebugOptionsAdapter.validatedUsingUtf8 !== Copper.Session.options.useUtf8){
+        Copper.DebugOptionsAdapter.validatedUsingUtf8 = Copper.Session.options.useUtf8;
+        Copper.DebugOptionsAdapter.onChange(undefined);
+    }
 };
 
 Copper.DebugOptionsAdapter.handleBlockOption = function(optionHeader, blockwiseEnabled, inputElements){
@@ -96,6 +101,7 @@ Copper.DebugOptionsAdapter.onChange = function(lastChangedElement){
     };
 
     let options = new Copper.Options();
+    options.useUtf8 = Copper.Session.options.useUtf8;
     Copper.DebugOptionsAdapter.optionHolderUsed = options;
 
     let simpleUpdateFunc = function(inputElement, update){

@@ -37,13 +37,13 @@ Copper.Payload.prototype.payloadText = "";
 Copper.Payload.prototype.payloadFileData = new ArrayBuffer(0);
 Copper.Payload.prototype.payloadFileName = undefined;
 
-Copper.Payload.prototype.addPayloadToCoapMessage = function(coapMessage){
+Copper.Payload.prototype.addPayloadToCoapMessage = function(coapMessage, useUtf8){
 	if (Copper.CoapMessage.Code.POST.equals(coapMessage.code) || Copper.CoapMessage.Code.PUT.equals(coapMessage.code)){
 		if (this.payloadMode === "text"){
 			if (!coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT)){
 				coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_PLAIN.number);
 			}
-			coapMessage.setPayload(Copper.ByteUtils.convertStringToBytes(document.getElementById("copper-payload-tab-out").value));
+			coapMessage.setPayload(Copper.ByteUtils.convertStringToBytes(document.getElementById("copper-payload-tab-out").value, !useUtf8));
 		}
 		else {
 			coapMessage.setPayload(this.payloadFileData);
