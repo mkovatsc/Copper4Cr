@@ -35,33 +35,39 @@ Copper.PayloadAdapter = function(){
 Copper.PayloadAdapter.visiblePane = undefined;
 Copper.PayloadAdapter.currentBlockNumber = undefined;
 
-Copper.PayloadAdapter.setVisiblePane = function(element){
-	if (Copper.PayloadAdapter.visiblePane !== element){
-		Copper.PayloadAdapter.visiblePane.classList.add("hidden");
-		Copper.PayloadAdapter.visiblePane.classList.remove("visible");
-		element.classList.add("visible");
-		element.classList.remove("hidden");
-		Copper.PayloadAdapter.visiblePane = element;
+Copper.PayloadAdapter.setVisiblePane = function(selectedPane, button){
+	if (Copper.PayloadAdapter.visiblePane !== selectedPane){
+		if (Copper.PayloadAdapter.visiblePane !== undefined){
+			Copper.PayloadAdapter.visiblePane.classList.add("hidden");
+			Copper.PayloadAdapter.visiblePane.classList.remove("visible");
+		}
+		selectedPane.classList.add("visible");
+		selectedPane.classList.remove("hidden");
+		Copper.PayloadAdapter.visiblePane = selectedPane;
+
+		if (!button.classList.contains("selected")) {
+			let selectedButtons = button.parentNode.getElementsByClassName("selected");
+			for (let i=0; i<selectedButtons.length; i++){
+				selectedButtons[i].classList.remove("selected");
+			}
+			button.classList.add("selected");	
+		}
 	}
 };
 
 Copper.PayloadAdapter.beforeSessionInitialization = function() {
-	Copper.PayloadAdapter.visiblePane = document.getElementById("copper-payload-tab-in");
-
 	document.getElementById("copper-payload-btn-in").onclick = function () {
-		Copper.PayloadAdapter.toggleHighlight(this);
-		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-in"));
+		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-in"), document.getElementById("copper-payload-btn-in"));
 	};
 	document.getElementById("copper-payload-btn-rendered").onclick = function () {
-		Copper.PayloadAdapter.toggleHighlight(this);
-		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-rendered"));
+		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-rendered"), document.getElementById("copper-payload-btn-rendered"));
 	};
 	document.getElementById("copper-payload-btn-out").onclick = function () {
-		Copper.PayloadAdapter.toggleHighlight(this);
-		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-out"));
+		Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-out"), document.getElementById("copper-payload-btn-out"));
 		document.getElementById("copper-payload-tab-out").focus();
 		document.getElementById("copper-payload-tab-out").onchange = Copper.PayloadAdapter.onOutgoingChange;
 	};
+	document.getElementById("copper-payload-btn-in").onclick();
 };
 
 Copper.PayloadAdapter.onPayloadUpdated = function() {
@@ -74,15 +80,6 @@ Copper.PayloadAdapter.onOutgoingChange = function() {
 	Copper.Session.updatePayload(Copper.Session.payload);
 };
 
-Copper.PayloadAdapter.toggleHighlight = function(element) {
-	if (element.classList.contains("selected")) {
-		return;
-	}
-
-	element.parentNode.getElementsByClassName("selected")[0].classList.remove("selected");
-	element.classList.add("selected");
-};
-
 Copper.PayloadAdapter.onEvent = function(event){
 	switch(event.type){
 		case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
@@ -90,16 +87,8 @@ Copper.PayloadAdapter.onEvent = function(event){
 	}
 };
 
-Copper.PayloadAdapter.beforeSendingCoapMessage = function(coapMessage){
-	if (Copper.CoapMessage.Code.POST.equals(coapMessage.code) || Copper.CoapMessage.Code.PUT.equals(coapMessage.code)){
-		//coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, 0);
-		coapMessage.setPayload(Copper.ByteUtils.convertStringToBytes(document.getElementById("copper-payload-tab-out").value));
-	} 
-};
-
 Copper.PayloadAdapter.updateIncomingPayload = function(coapMessage){
-	Copper.PayloadAdapter.setVisiblePane(document.getElementById("copper-payload-tab-in"));
-	
+	document.getElementById("copper-payload-btn-in").onclick();	
 	let append = false;
 
 	let block2Option = coapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2);

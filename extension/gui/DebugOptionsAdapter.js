@@ -51,7 +51,6 @@ Copper.DebugOptionsAdapter.beforeSessionInitialization = function() {
 
     Copper.DebugOptionsAdapter.customOptionsField = document.getElementById("copper-debug-options-custom-options");
     Copper.DebugOptionsAdapter.customOptionsField.classList.add("debug-option-custom-options");
-    Copper.DebugOptionsAdapter.onReset();
 };
 
 Copper.DebugOptionsAdapter.onOptionsUpdated = function(){
@@ -61,8 +60,23 @@ Copper.DebugOptionsAdapter.onOptionsUpdated = function(){
     }
 };
 
+Copper.DebugOptionsAdapter.handleBlockOption = function(optionHeader, blockwiseEnabled, inputElements){
+    if (optionHeader.number === Copper.CoapMessage.OptionHeader.BLOCK1.number ||
+            optionHeader.number === Copper.CoapMessage.OptionHeader.BLOCK2.number){
+        for (let i=0; i<inputElements.length; i++){
+            if (blockwiseEnabled){
+                inputElements[i].classList.add("disabled");
+            }
+            else {
+                inputElements[i].classList.remove("disabled");
+            }
+        }
+    }  
+};
+
 Copper.DebugOptionsAdapter.onChange = function(lastChangedElement){
     // move changed element to the tail
+    // ensures that error message is displayed on the right field
     if (lastChangedElement !== undefined){
         let idx = Copper.DebugOptionsAdapter.optionFields.indexOf(lastChangedElement);
         if (idx !== -1){
@@ -108,6 +122,7 @@ Copper.DebugOptionsAdapter.onChange = function(lastChangedElement){
             let optionHeader = Copper.CoapMessage.OptionHeader.getOptionHeader(Number.parseInt(rootElement.dataset.optionnumber));
             let valuesSet = Copper.DebugOptionsAdapter.getValues(rootElement);
             let newNodes = Copper.DebugOptionsAdapter.getInputFields(rootElement, (optionHeader.multipleValues ? (valuesSet.length + 1) : 1), Copper.DebugOptionsAdapter.optionFieldAppenders[optionHeader.number]);
+            Copper.DebugOptionsAdapter.handleBlockOption(optionHeader, options.blockwiseEnabled, newNodes);
             for (j=0; j<newNodes.length; j++){
                 updateFunc(newNodes[j], (j<valuesSet.length ? valuesSet[j] : undefined), function(inputElement, value){
                     if (value !== undefined){
@@ -119,6 +134,12 @@ Copper.DebugOptionsAdapter.onChange = function(lastChangedElement){
     }
     Copper.DebugOptionsAdapter.organizeCustomOptions();
     Copper.Session.updateOptions(options);
+};
+
+Copper.DebugOptionsAdapter.onInput = function(rootElement){
+    let optionHeader = Copper.CoapMessage.OptionHeader.getOptionHeader(Number.parseInt(rootElement.dataset.optionnumber));
+    let valuesSet = Copper.DebugOptionsAdapter.getValues(rootElement);
+    let newNodes = Copper.DebugOptionsAdapter.getInputFields(rootElement, (optionHeader.multipleValues ? (valuesSet.length + 1) : 1), Copper.DebugOptionsAdapter.optionFieldAppenders[optionHeader.number]);        
 };
 
 Copper.DebugOptionsAdapter.updateDebugOptions = function(options){
@@ -134,6 +155,7 @@ Copper.DebugOptionsAdapter.updateDebugOptions = function(options){
         let optionHeader = Copper.CoapMessage.OptionHeader.getOptionHeader(Number.parseInt(rootElement.dataset.optionnumber));
         let valuesSet = options.options[optionHeader.number] !== undefined ? options.options[optionHeader.number] : [];
         let newNodes = Copper.DebugOptionsAdapter.getInputFields(rootElement, (optionHeader.multipleValues ? (valuesSet.length + 1) : 1), Copper.DebugOptionsAdapter.optionFieldAppenders[optionHeader.number]);
+        Copper.DebugOptionsAdapter.handleBlockOption(optionHeader, options.blockwiseEnabled, newNodes);
         for (j=0; j<newNodes.length; j++){
             Copper.DebugOptionsAdapter.setValue(newNodes[j], (j<valuesSet.length ? valuesSet[j] : undefined));
         }
@@ -150,7 +172,7 @@ Copper.DebugOptionsAdapter.updateDebugOptions = function(options){
 };
 
 Copper.DebugOptionsAdapter.onReset = function(lastChangedElement){
-    Copper.DebugOptionsAdapter.updateDebugOptions(new Copper.Options());
+    Copper.Session.updateOptions(new Copper.Options());
 };
 
 Copper.DebugOptionsAdapter.initOptionField = function(htmlId, optionHeader, placeholder, title){
@@ -159,6 +181,9 @@ Copper.DebugOptionsAdapter.initOptionField = function(htmlId, optionHeader, plac
     Copper.DebugOptionsAdapter.optionFields.push(rootElement);
     let changeCallback = function(){
         Copper.DebugOptionsAdapter.onChange(rootElement);
+    };
+    let inputCallback = function(){
+        Copper.DebugOptionsAdapter.onInput(rootElement);
     };
     let fieldAppender = undefined;
     if (optionHeader.number === Copper.CoapMessage.OptionHeader.ACCEPT.number || optionHeader.number === Copper.CoapMessage.OptionHeader.CONTENT_FORMAT.number){
@@ -173,7 +198,7 @@ Copper.DebugOptionsAdapter.initOptionField = function(htmlId, optionHeader, plac
     }
     else {
         fieldAppender = function(){
-            Copper.DebugOptionsAdapter.appendInputField(rootElement, placeholder, title, changeCallback);
+            Copper.DebugOptionsAdapter.appendInputField(rootElement, placeholder, title, changeCallback, inputCallback);
         };
     }
     Copper.DebugOptionsAdapter.optionFieldAppenders[optionHeader.number] = fieldAppender;
@@ -201,12 +226,12 @@ Copper.DebugOptionsAdapter.getInputFields = function(rootElement, inputFieldCoun
     return res;
 };
 
-Copper.DebugOptionsAdapter.organizeCustomOptions = function(){
+Copper.DebugOptionsAdapter.organizeCustomOptions = function(nodeOnFocus){
     let nodeList = Copper.DebugOptionsAdapter.customOptionsField.childNodes;
     let nodesToRemove = [];
     for (let i=0; i<nodeList.length-1; i++){
         if (Copper.DebugOptionsAdapter.getValue(nodeList[i]) === undefined){
-            nodesToRemove.push(nodeList[i]);
+            if (nodeList[i] !== nodeOnFocus) nodesToRemove.push(nodeList[i]);
         }
     }
     Copper.DebugOptionsAdapter.removeCustomOptions(nodesToRemove);
@@ -232,6 +257,7 @@ Copper.DebugOptionsAdapter.removeCustomOptions = function(nodesToRemove){
 
 Copper.DebugOptionsAdapter.addCustomOption = function(number, value){
     let customOption = Copper.DebugOptionsAdapter.createCustomOptionField();
+    Copper.DebugOptionsAdapter.setValue(customOption, {number: number, value: value});
     Copper.DebugOptionsAdapter.optionFields.push(customOption);
     Copper.DebugOptionsAdapter.customOptionsField.appendChild(customOption);
 };
@@ -341,7 +367,7 @@ Copper.DebugOptionsAdapter.setErrorInformationOnInputElement = function(inputEle
     }
 };
 
-Copper.DebugOptionsAdapter.appendInputField = function(rootElement, placeholder, title, onChangeCallback, customClass, customStyle){
+Copper.DebugOptionsAdapter.appendInputField = function(rootElement, placeholder, title, onChangeCallback, onInputCallback, customClass, customStyle){
     rootElement.classList.add("debug-option-input-fields");
 
     let span = document.createElement("span");
@@ -358,6 +384,7 @@ Copper.DebugOptionsAdapter.appendInputField = function(rootElement, placeholder,
     input.type = "text";
     input.placeholder = placeholder;
     input.onchange = onChangeCallback;
+    if (onInputCallback !== undefined) input.oninput = onInputCallback;
     span.appendChild(input);
 
     let spanReset = document.createElement("span");
@@ -437,7 +464,10 @@ Copper.DebugOptionsAdapter.createCustomOptionField = function(){
     let changeCallback = function(){
         Copper.DebugOptionsAdapter.onChange(container);
     };
-    Copper.DebugOptionsAdapter.appendInputField(container, "not set", undefined, changeCallback, "debug-option-custom-option-number", "flex: 1;");
-    Copper.DebugOptionsAdapter.appendInputField(container, "hex (0x..) or string", undefined, changeCallback, "debug-option-custom-option-value", "margin-left: 6px; flex: 2;");
+    let inputCallback = function(){
+        Copper.DebugOptionsAdapter.organizeCustomOptions(container);
+    };
+    Copper.DebugOptionsAdapter.appendInputField(container, "not set", undefined, changeCallback, inputCallback, "debug-option-custom-option-number", "flex: 1;");
+    Copper.DebugOptionsAdapter.appendInputField(container, "hex (0x..) or string", undefined, changeCallback, inputCallback, "debug-option-custom-option-value", "margin-left: 6px; flex: 2;");
     return container;
 };

@@ -98,6 +98,7 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
         }
 
         let lastNewlyCreatedProfile = undefined;
+        let profileSelectionChanged = false;
         for (let i=0; i<managerProfiles.length; i++) {
             let managerProfileName = managerProfiles[i].firstElementChild.firstElementChild;
             let oldName = managerProfiles[i].dataset.name;
@@ -107,6 +108,7 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
                 if (oldName !== undefined){
                     if (Copper.Session.profiles.selectedProfile === oldName){
                         Copper.Session.profiles.selectProfile(Copper.Profiles.DEFAULT_PROFILE_KEY);
+                        profileSelectionChanged = true;
                     }
                     Copper.Session.profiles.deleteProfile(oldName);
                 }
@@ -124,6 +126,9 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
 
         if (Copper.ProfilesAdapter.loadNewestCreatedProfile && lastNewlyCreatedProfile !== undefined) {
             Copper.Session.profiles.selectProfile(lastNewlyCreatedProfile);
+            profileSelectionChanged = true;
+        }
+        if (profileSelectionChanged){
             Copper.Session.updateProfilesSelection(Copper.Session.profiles);
         }
         else {

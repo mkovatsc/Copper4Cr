@@ -198,7 +198,7 @@ Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
                 blockwiseEnabled = Copper.Session.options.blockwiseEnabled;
                 Copper.Session.options.addOptionsToCoapMessage(coapMessage, Copper.Session.settings.blockSize);
             }
-
+            Copper.Session.payload.addPayloadToCoapMessage(coapMessage);
             Copper.Session.informListeners("beforeSendingCoapMessage", [coapMessage]);
         }
         Copper.Session.clientEndpoint.sendCoapMessage(coapMessage, blockwiseEnabled);
