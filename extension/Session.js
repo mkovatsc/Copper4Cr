@@ -197,7 +197,7 @@ Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
                 blockwiseEnabled = Copper.Session.options.blockwiseEnabled;
                 Copper.Session.options.addOptionsToCoapMessage(coapMessage, Copper.Session.settings.blockSize);
             }
-            Copper.Session.payload.addPayloadToCoapMessage(coapMessage, Copper.Session.options.useUtf8);
+            Copper.Session.payload.addPayloadToCoapMessage(coapMessage, Copper.Session.options.useUtf8, Copper.Session.settings.sendContentType);
             Copper.Session.informListeners("beforeSendingCoapMessage", [coapMessage]);
         }
         if (!Copper.CoapMessage.Code.EMPTY.equals(coapMessage.code) && Copper.Session.settings.sendUriHost && !coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.PROXY_URI) && 

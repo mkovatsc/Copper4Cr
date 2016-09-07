@@ -73,7 +73,7 @@ Copper.StatusBarAdapter.onEvent = function(event) {
                     break;
 
                 default:
-                    Copper.StatusBarAdapter.appendText("(RTT " + event.data.requestDuration + " ms)");
+                    Copper.StatusBarAdapter.appendText("(" + event.data.requestDuration + " ms)");
                     break;
             }
             break;

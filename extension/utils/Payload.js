@@ -41,16 +41,23 @@ Copper.Payload.prototype.clone = function(){
     return Copper.CopperUtils.cloneObject(this, new Copper.Payload());
 };
 
-Copper.Payload.prototype.addPayloadToCoapMessage = function(coapMessage, useUtf8){
+Copper.Payload.prototype.addPayloadToCoapMessage = function(coapMessage, useUtf8, setContentType){
 	if (Copper.CoapMessage.Code.POST.equals(coapMessage.code) || Copper.CoapMessage.Code.PUT.equals(coapMessage.code)){
 		if (this.payloadMode === "text"){
-			if (!coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT)){
+			if (setContentType && !coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT)){
 				coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_PLAIN.number);
 			}
 			coapMessage.setPayload(Copper.ByteUtils.convertStringToBytes(document.getElementById("copper-payload-tab-out").value, !useUtf8));
 		}
-		else {
+		else if (this.payloadFileData.byteLength > 0) {
 			coapMessage.setPayload(this.payloadFileData);
+			if (setContentType && !coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT)){
+				let match = /\.([a-zA-Z]+)$/g.exec(this.payloadFileName.trim());
+				if (match) {
+					let contentFormat = Copper.CoapMessage.ContentFormat.getContentFormatForExtension(match[1]);
+					if (contentFormat) coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, contentFormat.number);
+				}
+			}
 		}
 	} 
 };
