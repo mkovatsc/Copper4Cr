@@ -199,6 +199,13 @@ Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
             }
             Copper.Session.payload.addPayloadToCoapMessage(coapMessage, Copper.Session.options.useUtf8, Copper.Session.settings.sendContentType);
             Copper.Session.informListeners("beforeSendingCoapMessage", [coapMessage]);
+            if (!blockwiseEnabled && coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.BLOCK1)){
+                let block1 = coapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK1)[0];
+                let size = block1.getSize();
+                let more = coapMessage.payload.byteLength > (block1.num + 1)*size;
+                if (more) coapMessage.addOption(Copper.CoapMessage.OptionHeader.BLOCK1, new Copper.CoapMessage.BlockOption(block1.num, block1.szExp, true), true);
+                coapMessage = coapMessage.clone(block1.num*size, size);
+            }
         }
         if (!Copper.CoapMessage.Code.EMPTY.equals(coapMessage.code) && Copper.Session.settings.sendUriHost && !coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.PROXY_URI) && 
                 !coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.URI_HOST) && !coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.URI_PORT)) {
