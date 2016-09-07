@@ -34,6 +34,11 @@ Copper.StatusBarAdapter = function(){
 
 Copper.StatusBarAdapter.blockUpdates = undefined;
 
+Copper.StatusBarAdapter.onSelectedProfileUpdated = function(){
+    Copper.StatusBarAdapter.setText('Loaded profile "'
+        + (Copper.Profiles.DEFAULT_PROFILE_KEY === Copper.Session.profiles.selectedProfile ? "Standard Profile" : Copper.Session.profiles.selectedProfile) + '"');
+};
+
 Copper.StatusBarAdapter.onEvent = function(event) {
 
     switch(event.type){

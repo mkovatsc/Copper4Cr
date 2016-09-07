@@ -39,11 +39,13 @@
 	<script src="utils/StorageManager.js"></script>
 	<script src="utils/Options.js"></script>
 	<script src="utils/Payload.js"></script>
+	<script src="utils/Layout.js"></script>
 	<script src="utils/Profiles.js"></script>
 	<script src="utils/Resources.js"></script>
 	<script src="utils/ExtensionJsonUtils.js"></script>
 	<script src="utils/Numeric.js"></script>
 
+	<script src="gui/Resizer.js"></script>
 	<script src="gui/MessageLogAdapter.js"></script>
 	<script src="gui/PacketHeaderAdapter.js"></script>
 	<script src="gui/PacketOptionsAdapter.js"></script>
@@ -342,7 +344,6 @@
 						</ul>
 					</div>
 				</div>
-
 			</div>
 		</div>
 
@@ -351,7 +352,10 @@
 		<div style="display: flex; cursor: pointer;">
 			<div id="copper-toolbar-log">
 				<span id="copper-toolbar-log-event-symbol" style="font-size: 350%">&#x25A1</span>
-				<div id="copper-toolbar-log-event-log" class="hidden">
+				<div id="copper-toolbar-log-event-container" class="hidden">
+					<div style="overflow-y: auto; max-height: 100%; max-width: 100%;">
+						<div id="copper-toolbar-log-event-log"></div>
+					</div>
 				</div>
 			</div>
 
@@ -569,9 +573,11 @@
 						<label><input id="preferences-window-encode-utf-8" type="checkbox">
 							Use UTF-8 encoding</label>
 					</div>
+					<button id="preferences-window-reset-behavior">Reset behavior</button>
+					<button id="preferences-window-reset-payload">Reset payload</button>
+					<button id="preferences-window-reset-layout">Reset layout</button>
+					<button id="preferences-window-clear-profiles-cache">Clear profiles cache</button>
 					<button id="preferences-window-clear-resource-cache">Clear resource cache</button>
-					<button id="preferences-window-clear-payload-cache">Clear payload cache</button>
-					<button id="preferences-window-clear-entire-cache">Clear entire cache</button>
 				</fieldset>
 			<button class="close-button">OK</button>
 			</div>

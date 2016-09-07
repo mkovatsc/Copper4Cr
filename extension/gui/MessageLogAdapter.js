@@ -32,35 +32,22 @@
 Copper.MessageLogAdapter = function(){
 };
 
+Copper.MessageLogAdapter.resizer = undefined;
+
 Copper.MessageLogAdapter.beforeSessionInitialization = function(){
-	let resizer = document.createElement("div");
-	resizer.id = "copper-coap-message-log-resizer";
-	
-	let messageLog = document.getElementsByClassName("main-content-bottom-box")[0];
-	messageLog.appendChild(resizer);
+	Copper.MessageLogAdapter.resizer = Copper.Resizer.installResizer(document.getElementsByClassName("main-content-bottom-box")[0], function(newWidth, newHeight){
+		Copper.Session.layout.messageLogHeight = newHeight;
+		Copper.Session.updateLayout(Copper.Session.layout);
+	}, false, true, false);
+};
 
-	var startY, startHeight;
-
-	var doMessageLogDrag = function (e) {
-		messageLog.style.height = (startHeight + startY - e.clientY) + 'px';
-	};
-
-	var stopMessageLogDrag = function (e) {
-		document.documentElement.removeEventListener('mousemove', doMessageLogDrag, false);
-		document.documentElement.removeEventListener('mouseup', stopMessageLogDrag, false);
-	};
-
-	var initMessageLogDrag = function(e) {
-		startY = e.clientY;
-		startHeight = parseInt(document.defaultView.getComputedStyle(messageLog).height, 10);
-
-		document.documentElement.addEventListener('mousemove', doMessageLogDrag, false);
-		document.documentElement.addEventListener('mouseup', stopMessageLogDrag, false);
-	};
-
-	resizer.addEventListener('mousedown', initMessageLogDrag, false);
-
-
+Copper.MessageLogAdapter.onLayoutUpdated = function(){
+	if (Copper.Session.layout.messageLogHeight !== undefined){
+		Copper.MessageLogAdapter.resizer.setHeight(Copper.Session.layout.messageLogHeight);
+	}
+	else {
+		Copper.MessageLogAdapter.resizer.reset();	
+	}
 };
 
 Copper.MessageLogAdapter.onEvent = function(event){

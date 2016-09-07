@@ -33,7 +33,9 @@ Copper.Profiles = function() {
     this.profiles = new Object();
     this.profiles[Copper.Profiles.DEFAULT_PROFILE_KEY] = {
         settings: new Copper.Settings(),
-        options: new Copper.Options()
+        options: new Copper.Options(),
+        payload: new Copper.Payload(),
+        layout: new Copper.Layout()
     };
     this.selectedProfile = Copper.Profiles.DEFAULT_PROFILE_KEY;
 };
@@ -44,8 +46,9 @@ Copper.Profiles.prototype.profiles = undefined;
 Copper.Profiles.prototype.autoStore = true;
 Copper.Profiles.prototype.selectedProfile = undefined;
 
-Copper.Profiles.prototype.addProfile = function(name, settings, options) {
-    if (typeof(name) !== "string" || name === Copper.Profiles.DEFAULT_PROFILE_KEY || !(settings instanceof Copper.Settings) || !(options instanceof Copper.Options)) {
+Copper.Profiles.prototype.addProfile = function(name, settings, options, payload, layout) {
+    if (typeof(name) !== "string" || name === Copper.Profiles.DEFAULT_PROFILE_KEY || !(settings instanceof Copper.Settings) ||
+          !(options instanceof Copper.Options) || !(payload instanceof Copper.Payload) || !(layout instanceof Copper.Layout)) {
         throw new Error("Illegal arguments");
     }
     if (this.profiles[name] !== undefined){
@@ -53,7 +56,9 @@ Copper.Profiles.prototype.addProfile = function(name, settings, options) {
     }
     this.profiles[name] = {
         settings: settings.clone(),
-        options: options.clone()
+        options: options.clone(),
+        payload: payload.clone(),
+        layout: layout.clone()
     };
 };
 
@@ -113,19 +118,19 @@ Copper.Profiles.prototype.selectProfile = function(name) {
         throw new Error("Profile does not exist");
     }
     this.selectedProfile = name;
-    Copper.StatusBarAdapter.setText('Loaded profile "'
-        + (Copper.Profiles.DEFAULT_PROFILE_KEY === Copper.Session.profiles.selectedProfile ? "Standard Profile" : Copper.Session.profiles.selectedProfile) + '"');
     return this.getSelectedProfile();
 };
 
-Copper.Profiles.prototype.updateSelectedProfile = function(newSettings, newOptions, forceUpdate) {
-    if (!(newSettings instanceof Copper.Settings) || !(newOptions instanceof Copper.Options)) {
+Copper.Profiles.prototype.updateSelectedProfile = function(newSettings, newOptions, newPayload, newLayout, forceUpdate) {
+    if (!(newSettings instanceof Copper.Settings) || !(newOptions instanceof Copper.Options) || !(newPayload instanceof Copper.Payload) || !(newLayout instanceof Copper.Layout)) {
         throw new Error("Illegal arguments");
     }
     if (forceUpdate || this.autoStore) {
         let profile = this.getSelectedProfile();
         profile.settings = newSettings.clone();
         profile.options = newOptions.clone();
+        profile.payload = newPayload.clone();
+        profile.layout = newLayout.clone();
         return true;
     }
     else {

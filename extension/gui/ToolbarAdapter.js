@@ -33,9 +33,8 @@ Copper.ToolbarAdapter = function(){
 };
 
 Copper.ToolbarAdapter.chooseFileDefaultString = "Choose File...";
-Copper.ToolbarAdapter.optionsWindowOpened = false;
 Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
-
+Copper.ToolbarAdapter.resizer = undefined;
 
 Copper.ToolbarAdapter.beforeSessionInitialization = function(){
 	document.getElementById("copper-toolbar-ping").onclick = Copper.ToolbarAdapter.doPing;
@@ -79,39 +78,22 @@ Copper.ToolbarAdapter.beforeSessionInitialization = function(){
         dropdowns[i].onclick = Copper.ToolbarAdapter.openDropdown;
     }
     
-    Copper.ToolbarAdapter.initEventLogResizing()
+    Copper.ToolbarAdapter.resizer = Copper.Resizer.installResizer(document.getElementById("copper-toolbar-log-event-container"), function(newWidth, newHeight){
+        Copper.Session.layout.eventLogWidth = newWidth;
+        Copper.Session.layout.eventLogHeight = newHeight;
+        Copper.Session.updateLayout(Copper.Session.layout);
+    }, false, false, true);
 };
 
-Copper.ToolbarAdapter.initEventLogResizing = function() {
-    let resizer = document.createElement("div");
-    resizer.id = "copper-toolbar-log-resizer";
-
-    let eventLog = document.getElementById("copper-toolbar-log-event-log");
-    eventLog.appendChild(resizer);
-
-    var startX, startY, startWidth, startHeight;
-
-    var doEventLogDrag = function (e) {
-        eventLog.style.width = (startWidth + startX - e.clientX) + 'px';
-        eventLog.style.height = (startHeight + e.clientY - startY) + 'px';
-    };
-
-    var stopEventLogDrag = function (e) {
-        document.documentElement.removeEventListener('mousemove', doEventLogDrag, false);
-        document.documentElement.removeEventListener('mouseup', stopEventLogDrag, false);
-    };
-
-    var initEventLogDrag = function(e) {
-        startX = e.clientX;
-        startY = e.clientY;
-        startWidth = parseInt(document.defaultView.getComputedStyle(eventLog).width, 10);
-        startHeight = parseInt(document.defaultView.getComputedStyle(eventLog).height, 10);
-        document.documentElement.addEventListener('mousemove', doEventLogDrag, false);
-        document.documentElement.addEventListener('mouseup', stopEventLogDrag, false);
-    };
-
-    resizer.addEventListener('mousedown', initEventLogDrag, false);
-}
+Copper.ToolbarAdapter.onLayoutUpdated = function(){
+    if (Copper.Session.layout.eventLogWidth !== undefined && Copper.Session.layout.eventLogHeight !== undefined){
+        Copper.ToolbarAdapter.resizer.setWidth(Copper.Session.layout.eventLogWidth);
+        Copper.ToolbarAdapter.resizer.setHeight(Copper.Session.layout.eventLogHeight);
+    }
+    else {
+        Copper.ToolbarAdapter.resizer.reset();   
+    }
+};
 
 Copper.ToolbarAdapter.onPayloadUpdated = function(){
     let payload = Copper.Session.payload;
@@ -519,7 +501,7 @@ Copper.ToolbarAdapter.profilesAutoStore = function() {
 };
 
 Copper.ToolbarAdapter.profilesStoreCurrent = function() {
-    Copper.Session.profiles.updateSelectedProfile(Copper.Session.settings, Copper.Session.options, true);
+    Copper.Session.profiles.updateSelectedProfile(Copper.Session.settings, Copper.Session.options, Copper.Session.payload, Copper.Session.layout, true);
     Copper.Session.updateProfiles(Copper.Session.profiles);
     Copper.ErrorWindowAdapter.openInfoWindow("Stored Changes", 'Stored current changes to the selected profile ("'
         + (Copper.Profiles.DEFAULT_PROFILE_KEY === Copper.Session.profiles.selectedProfile ? "Standard Profile" : Copper.Session.profiles.selectedProfile) + '")');
@@ -589,7 +571,7 @@ Copper.ToolbarAdapter.chooseFile = function(id) {
 };
 
 Copper.ToolbarAdapter.doLog = function(event) {
-    var log = document.getElementById("copper-toolbar-log-event-log");
+    let log = document.getElementById("copper-toolbar-log-event-container");
     if (log.classList.contains("hidden")) {
         log.classList.remove("hidden");
     } else {

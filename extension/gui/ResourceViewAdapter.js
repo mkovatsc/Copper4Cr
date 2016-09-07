@@ -1,33 +1,22 @@
 Copper.ResourceViewAdapter = function(){
 };
 
+Copper.ResourceViewAdapter.resizer = undefined;
+
 Copper.ResourceViewAdapter.beforeSessionInitialization = function(){
-    let resizer = document.createElement("div");
-    resizer.id = "resource-tree-resizer";
+    Copper.ResourceViewAdapter.resizer = Copper.Resizer.installResizer(document.getElementsByClassName("sidebar-left")[0], function(newWidth, newHeight){
+        Copper.Session.layout.resourceTreeWidth = newWidth;
+        Copper.Session.updateLayout(Copper.Session.layout);
+    }, true, false, false);
+};
 
-    let sidebarLeft = document.getElementsByClassName("sidebar-left")[0];
-    sidebarLeft.appendChild(resizer);
-
-    var startX, startWidth;
-
-    var doResourceDrag = function (e) {
-        sidebarLeft.style.width = (startWidth + e.clientX - startX) + 'px';
-    };
-
-    var stopResourceDrag = function (e) {
-        document.documentElement.removeEventListener('mousemove', doResourceDrag, false);
-        document.documentElement.removeEventListener('mouseup', stopResourceDrag, false);
-    };
-
-    var initResourceDrag = function(e) {
-        startX = e.clientX;
-        startWidth = parseInt(document.defaultView.getComputedStyle(sidebarLeft).width, 10);
-
-        document.documentElement.addEventListener('mousemove', doResourceDrag, false);
-        document.documentElement.addEventListener('mouseup', stopResourceDrag, false);
-    };
-
-    resizer.addEventListener('mousedown', initResourceDrag, false);
+Copper.ResourceViewAdapter.onLayoutUpdated = function(){
+    if (Copper.Session.layout.resourceTreeWidth !== undefined){
+        Copper.ResourceViewAdapter.resizer.setWidth(Copper.Session.layout.resourceTreeWidth);
+    }
+    else {
+        Copper.ResourceViewAdapter.resizer.reset();
+    }
 };
 
 Copper.ResourceViewAdapter.onEvent = function(event){

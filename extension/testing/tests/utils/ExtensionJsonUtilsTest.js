@@ -44,11 +44,16 @@ QUnit.test("ExtensionJsonUtils: Profile", function(assert) {
 	let options = new Copper.Options();
 	options.setToken("0x33");
 	options.addOption(8, "0x2");
-	data.addProfile("test", settings, options);
+	let payload = new Copper.Payload();
+	payload.payloadFileData = new ArrayBuffer(4);
+	let layout = new Copper.Layout();
+	data.addProfile("test", settings, options, payload, layout);
+	data.selectProfile("test");
 	data.autoStore = false;
 	let json = Copper.JsonUtils.stringify(data);
 	assert.deepEqual(Copper.JsonUtils.parse(json), data);
 	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Profiles), true);
+	assert.deepEqual(Copper.JsonUtils.parse(json).getSelectedProfile().payload.payloadFileData.byteLength, 4);
 });
 
 QUnit.test("ExtensionJsonUtils: Resources", function(assert) {
@@ -67,5 +72,14 @@ QUnit.test("ExtensionJsonUtils: Payload", function(assert) {
 	data.payloadFileName = "temp.txt";
 	let json = Copper.JsonUtils.stringify(data);
 	assert.deepEqual(Copper.JsonUtils.parse(json), data);
+	assert.deepEqual(Copper.JsonUtils.parse(json).payloadFileData.byteLength, 33);
 	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Payload), true);
+});
+
+QUnit.test("ExtensionJsonUtils: Layout", function(assert) {
+	let data = new Copper.Layout();
+	data.resourceTreeWidth = 22;
+	let json = Copper.JsonUtils.stringify(data);
+	assert.deepEqual(Copper.JsonUtils.parse(json), data);
+	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Layout), true);
 });
