@@ -115,7 +115,7 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
             }
             else if (oldName === undefined){
                 // New Profile
-                Copper.Session.profiles.addProfile(managerProfileName.value, Copper.Session.settings, Copper.Session.options);
+                Copper.Session.profiles.addProfile(managerProfileName.value, Copper.Session.settings, Copper.Session.options, Copper.Session.payload, Copper.Session.layout);
                 lastNewlyCreatedProfile = managerProfileName.value;
             }
             else if (managerProfileName.value !== oldName){

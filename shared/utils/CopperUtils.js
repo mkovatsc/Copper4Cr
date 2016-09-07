@@ -48,6 +48,9 @@ Copper.CopperUtils.cloneSimple = function(value){
 		}
 		return clone;
 	}
+	else if (value instanceof ArrayBuffer){
+		return value;
+	}
 	else if (typeof(value) === "object"){
 		return Copper.CopperUtils.cloneObject(value, new Object());
 	}

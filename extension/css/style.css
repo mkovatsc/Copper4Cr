@@ -167,6 +167,32 @@ button
 	white-space: nowrap;
 }
 
+/* Resizing */
+.x-right-resizer {
+	position: absolute;
+	right: -5px;
+	width: 10px;
+	height: 100%;
+	cursor: e-resize;
+}
+
+.y-top-resizer {
+	position: absolute;
+	top: -5px;
+	width: 100%;
+	height: 10px;
+	cursor: n-resize;
+}
+
+.xy-bottom-left {
+	position: relative;
+	left: -10px;
+	bottom: -10px;
+	width: 20px;
+	height: 20px;
+	cursor: sw-resize;
+}
+
 /* Container */
 .main-container
 {
@@ -298,14 +324,6 @@ button
     -moz-user-select: none;
 }
 
-#copper-toolbar-log-resizer {
-	position: absolute;
-	left: -4px;
-	bottom: -4px;
-	width: 14px;
-	height: 14px;
-	cursor: sw-resize;
-}
 
 #copper-toolbar-log p {
 	-webkit-user-select: text;
@@ -316,7 +334,7 @@ button
     background-color: #ddd;
 }
 
-#copper-toolbar-log-event-log {
+#copper-toolbar-log-event-container {
 	position: absolute;
 	width: 600px;
 	height: 69%;
@@ -327,10 +345,12 @@ button
 	border: 1px solid white;
 	z-index: 5;
 	right: 20px;
-	padding: 4px;
-	overflow-y: auto;
 	box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
 	cursor: text;
+}
+
+#copper-toolbar-log-event-log {
+	margin: 2px;
 }
 
 #copper-toolbar-preferences {
@@ -713,14 +733,6 @@ button
 	background-color: #FCC;
 }
 
-#copper-coap-message-log-resizer {
-	position: absolute;
-	top: -4px;
-	width: 100%;
-	height: 8px;
-	cursor: n-resize;
-}
-
 #copper-overlay{
 	position: fixed; 
 	top: 0; 
@@ -767,15 +779,6 @@ button
     overflow-x: hidden;
     overflow-y: auto;
 }
-
-#resource-tree-resizer {
-	position: absolute;
-	right: -4px;
-	width: 8px;
-	height: 100%;
-	cursor: e-resize;
-}
-
 
 .tree ul{
     list-style-type: none;

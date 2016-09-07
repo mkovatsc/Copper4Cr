@@ -89,7 +89,29 @@ Copper.ExtensionJsonUtils.jsonToCopperPayload = function(data){
 	return res;
 };
 
+Copper.ExtensionJsonUtils.copperLayoutToJson = function(layout){
+	if (!(layout instanceof Copper.Layout)){
+		throw new Error("Illegal Arguments");
+	}
+	return {
+		resourceTreeWidth: layout.resourceTreeWidth,
+		messageLogHeight: layout.messageLogHeight,
+		eventLogWidth: layout.eventLogWidth,
+		eventLogHeight: layout.eventLogHeight
+	};
+};
+
+Copper.ExtensionJsonUtils.jsonToCopperLayout = function(data){
+	let res = new Copper.Layout();
+	res.resourceTreeWidth = data.resourceTreeWidth;
+	res.messageLogHeight = data.messageLogHeight;
+	res.eventLogWidth = data.eventLogWidth;
+	res.eventLogHeight = data.eventLogHeight;
+	return res;
+};
+
 Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Options}, "Copper.Options", undefined, Copper.ExtensionJsonUtils.jsonToCopperOptions]);
 Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Profiles}, "Copper.Profiles", Copper.ExtensionJsonUtils.copperProfilesToJson, Copper.ExtensionJsonUtils.jsonToCopperProfiles]);
 Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Resources}, "Copper.Resources", undefined, Copper.ExtensionJsonUtils.jsonToCopperResources]);
 Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Payload}, "Copper.Payload", Copper.ExtensionJsonUtils.copperPayloadToJson, Copper.ExtensionJsonUtils.jsonToCopperPayload]);
+Copper.JsonUtils.transformers.push([function(value){return value instanceof Copper.Layout}, "Copper.Layout", Copper.ExtensionJsonUtils.copperLayoutToJson, Copper.ExtensionJsonUtils.jsonToCopperLayout]);
