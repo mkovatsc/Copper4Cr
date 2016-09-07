@@ -219,11 +219,6 @@ Copper.ToolbarAdapter.onEvent = function(event){
             }
             break;
         case Copper.Event.TYPE_REQUEST_CANCELED:
-            let rootElement = document.getElementById("copper-toolbar-observe");
-            if (rootElement.firstChild.src.endsWith("skin/tool_unobserve.png")) {
-                rootElement.firstChild.src = "skin/tool_observe.png";
-                rootElement.lastChild.textContent = " Observe";
-            }
         case Copper.Event.TYPE_REQUEST_COMPLETED:
         case Copper.Event.TYPE_REQUEST_RECEIVE_ERROR:
         case Copper.Event.TYPE_REQUEST_TIMEOUT:
@@ -231,6 +226,11 @@ Copper.ToolbarAdapter.onEvent = function(event){
                 Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
                 let toolbarIcon = document.getElementById("copper-toolbar-discover").firstElementChild;
                 toolbarIcon.src = "skin/tool_discover.png";
+            }
+            let rootElement = document.getElementById("copper-toolbar-observe");
+            if (rootElement.firstChild.src.endsWith("skin/tool_unobserve.png")) {
+                rootElement.firstChild.src = "skin/tool_observe.png";
+                rootElement.lastChild.textContent = " Observe";
             }
             break;
     }

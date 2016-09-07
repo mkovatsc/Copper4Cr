@@ -38,7 +38,7 @@ Copper.BlockwiseSender = function(coapMessage, blockwiseEnabled, requestHandler,
 	this.requestHandler = requestHandler;
 	this.onComplete = onComplete;
 
-	if (this.requestHandler.settings.sendSize1){
+	if (this.requestHandler.settings.sendSize1 && !Copper.CoapMessage.Code.EMPTY.equals(this.coapMessage.code) && !this.coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.SIZE1)){
 		this.coapMessage.addOption(Copper.CoapMessage.OptionHeader.SIZE1, this.coapMessage.payload.byteLength, true);
 	}
 	this.blockSizeExp = this.requestHandler.blockwiseEnabled ? (this.requestHandler.settings.blockSize === 0 ? 10 : this.requestHandler.settings.blockSize) : undefined;
