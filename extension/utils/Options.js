@@ -97,11 +97,11 @@ Copper.Options.prototype.addOptionsToCoapMessage = function(coapMessage, selecte
     }
     let optionNos = Object.keys(this.options);
     for (let i=0; i<optionNos.length; i++){
-        this.addOptionToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.getOptionHeader(Number.parseInt(optionNos[i])), this.options[optionNos[i]]);
+        this.addOptionToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.getOptionHeader(Number.parseInt(optionNos[i])), this.options[optionNos[i]], selectedBlockSize);
     }
     let customOptionNos = Object.keys(this.customOptions);
     for (let i=0; i<customOptionNos.length; i++){
-        this.addOptionToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.getOptionHeader(Number.parseInt(customOptionNos[i])), this.customOptions[customOptionNos[i]]);
+        this.addOptionToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.getOptionHeader(Number.parseInt(customOptionNos[i])), this.customOptions[customOptionNos[i]], selectedBlockSize);
     }
 };
 
@@ -153,7 +153,7 @@ Copper.Options.prototype.transformValue = function(value, type, blockSize) {
 };
 
 Copper.Options.prototype.addOptionToCoapMessage = function(coapMessage, optionHeader, values, selectedBlockSize){
-    if (!this.blockwiseEnabled && (optionHeader.number === Copper.CoapMessage.OptionHeader.BLOCK1.number || optionHeader.number === Copper.CoapMessage.OptionHeader.BLOCK2.number)){
+    if (this.blockwiseEnabled && (optionHeader.number === Copper.CoapMessage.OptionHeader.BLOCK1.number || optionHeader.number === Copper.CoapMessage.OptionHeader.BLOCK2.number)){
         return;
     }
     for (let i=0; i<values.length; i++){

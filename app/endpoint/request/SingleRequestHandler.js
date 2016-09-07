@@ -84,6 +84,14 @@ Copper.SingleRequestHandler.prototype.start = function(){
 	this.transmissionHandler.registerToken(token, this);
 	this.coapMessage.setToken(token);
 	
+	if (this.settings.sendSize1 && this.coapMessage.payload.byteLength > 0 && 
+		   !Copper.CoapMessage.Code.EMPTY.equals(this.coapMessage.code) && !this.coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.SIZE1)){
+		this.coapMessage.addOption(Copper.CoapMessage.OptionHeader.SIZE1, this.coapMessage.payload.byteLength);
+	}
+	if (this.settings.blockSize !== 0 && !Copper.CoapMessage.Code.EMPTY.equals(this.coapMessage.code) && !this.coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.BLOCK2)){
+		this.coapMessage.addOption(Copper.CoapMessage.OptionHeader.BLOCK2, new Copper.CoapMessage.BlockOption(0, this.settings.blockSize, false));
+	}
+
 	// create sender and start it
 	if (observing) {
 		this.sender = new Copper.ObserveSender(this.coapMessage, this, function(){ thisRef.onSenderFinished(); });

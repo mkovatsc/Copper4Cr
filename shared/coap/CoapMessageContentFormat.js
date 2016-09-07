@@ -32,40 +32,45 @@
 /**
  * Creates a new content format object.
  */
-Copper.CoapMessage.ContentFormat = function(number, name) {
-	if (!Number.isInteger(number) || number < 0 || typeof(name) !== 'string'){
+Copper.CoapMessage.ContentFormat = function(number, name, fileExtensions) {
+	if (!Number.isInteger(number) || number < 0 || typeof(name) !== "string" || (fileExtensions !== undefined && !Array.isArray(fileExtensions))){
 		throw new Error("Illegal argument");
 	}
 	this.number = number;
 	this.name = name;
+	this.fileExtensions = fileExtensions;
 };
 
 Copper.CoapMessage.ContentFormat.prototype.equals = function(other){
 	return (other instanceof Copper.CoapMessage.ContentFormat) && this.number === other.number && this.name === other.name;
 };
 
+Copper.CoapMessage.ContentFormat.prototype.clone = function() {
+	return new Copper.CoapMessage.ContentFormat(this.number, this.name, this.fileExtensions);
+};
+
 /* Content Format Codes */
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_PLAIN = new Copper.CoapMessage.ContentFormat(0, "text/plain");
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_PLAIN = new Copper.CoapMessage.ContentFormat(0, "text/plain", ["txt"]);
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_XML = new Copper.CoapMessage.ContentFormat(1, "text/xml");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_CSV = new Copper.CoapMessage.ContentFormat(2, "text/csv");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_HTML = new Copper.CoapMessage.ContentFormat(3, "text/html");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_GIF = new Copper.CoapMessage.ContentFormat(21, "image/gif");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_JPEG = new Copper.CoapMessage.ContentFormat(22, "image/jpeg");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_PNG = new Copper.CoapMessage.ContentFormat(23, "image/png");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_TIFF = new Copper.CoapMessage.ContentFormat(24, "image/tiff");
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_CSV = new Copper.CoapMessage.ContentFormat(2, "text/csv", ["csv"]);
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_HTML = new Copper.CoapMessage.ContentFormat(3, "text/html", ["html"]);
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_GIF = new Copper.CoapMessage.ContentFormat(21, "image/gif", ["gif"]);
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_JPEG = new Copper.CoapMessage.ContentFormat(22, "image/jpeg", ["jpg", "jpeg"]);
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_PNG = new Copper.CoapMessage.ContentFormat(23, "image/png", ["png"]);
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_TIFF = new Copper.CoapMessage.ContentFormat(24, "image/tiff", ["tiff"]);
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_AUDIO_RAW = new Copper.CoapMessage.ContentFormat(25, "audio/raw");
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_VIDEO_RAW = new Copper.CoapMessage.ContentFormat(26, "video/raw");
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_LINK_FORMAT = new Copper.CoapMessage.ContentFormat(40, "application/link-format");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_XML = new Copper.CoapMessage.ContentFormat(41, "application/xml");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_OCTET_STREAM = new Copper.CoapMessage.ContentFormat(42, "application/octet-stream");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_RDF_XML = new Copper.CoapMessage.ContentFormat(43, "application/rdf+xml");
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_XML = new Copper.CoapMessage.ContentFormat(41, "application/xml", ["xml"]);
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_OCTET_STREAM = new Copper.CoapMessage.ContentFormat(42, "application/octet-stream", ["bin"]);
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_RDF_XML = new Copper.CoapMessage.ContentFormat(43, "application/rdf+xml", ["rdf"]);
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_SOAP_XML = new Copper.CoapMessage.ContentFormat(44, "application/soap+xml");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_ATOM_XML = new Copper.CoapMessage.ContentFormat(45, "application/atom+xml");
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_ATOM_XML = new Copper.CoapMessage.ContentFormat(45, "application/atom+xml", ["atom"]);
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_XMPP_XML = new Copper.CoapMessage.ContentFormat(46, "application/xmpp+xml");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_EXI = new Copper.CoapMessage.ContentFormat(47, "application/exi");
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_EXI = new Copper.CoapMessage.ContentFormat(47, "application/exi", ["exi"]);
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_FASTINFOSET = new Copper.CoapMessage.ContentFormat(48, "application/fastinfoset");
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_SOAP_FASTINFOSET = new Copper.CoapMessage.ContentFormat(49, "application/soap+fastinfoset");
-Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_JSON = new Copper.CoapMessage.ContentFormat(50, "application/json");
+Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_JSON = new Copper.CoapMessage.ContentFormat(50, "application/json", ["json"]);
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_X_OBIX_BINARY = new Copper.CoapMessage.ContentFormat(51, "application/x-obix-binary");
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_CBOR = new Copper.CoapMessage.ContentFormat(60, "application/cbor");
 Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_TEXT = new Copper.CoapMessage.ContentFormat(1541, "application/vnd.oma.lwm2m+text");
@@ -102,3 +107,40 @@ Copper.CoapMessage.ContentFormat.Registry = [
 	Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_JSON,
 	Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_VND_OMA_LWM2M_OPAQUE
 ];
+
+/*
+* @return ContentFormat for a given number
+*/
+Copper.CoapMessage.ContentFormat.getContentFormat = function(number){
+	if (!Number.isInteger(number) || number < 0){
+		throw new Error("Illegal argument");
+	}
+	let reg = Copper.CoapMessage.ContentFormat.Registry;
+	for (let i = 0; i < reg.length; i++) {
+		if (reg[i].number === number){
+			return reg[i].clone();
+		}
+	}
+	throw new Error("No matching message code");
+};
+
+/*
+* @return ContentFormat for a given file extension
+*/
+Copper.CoapMessage.ContentFormat.getContentFormatForExtension = function(fileExtension){
+	if (typeof(fileExtension) !== "string"){
+		throw new Error("Illegal argument");
+	}
+	let ext = fileExtension.trim().toLowerCase();
+	let reg = Copper.CoapMessage.ContentFormat.Registry;
+	for (let i = 0; i < reg.length; i++) {
+		if (reg[i].fileExtensions !== undefined){
+			for (let j=0; j<reg[i].fileExtensions.length; j++){
+				if (reg[i].fileExtensions[j] === ext){
+					return reg[i];
+				}
+			}
+		}
+	}
+	return undefined;
+};

@@ -55,6 +55,7 @@ Copper.ToolbarAdapter.beforeSessionInitialization = function(){
     document.getElementById("copper-toolbar-behavior-reject-unknown").onclick = Copper.ToolbarAdapter.behaviorRejectUnknown;
     document.getElementById("copper-toolbar-behavior-send-uri-host").onclick = Copper.ToolbarAdapter.behaviorUriHost;
     document.getElementById("copper-toolbar-behavior-send-size1").onclick = Copper.ToolbarAdapter.behaviorSendSize1;
+    document.getElementById("copper-toolbar-behavior-send-content-type").onclick = Copper.ToolbarAdapter.behaviorSendContentType;
     document.getElementById("copper-toolbar-behavior-block-size-0").onclick = Copper.ToolbarAdapter.behaviorBlockSize0;
     document.getElementById("copper-toolbar-behavior-block-size-16").onclick = Copper.ToolbarAdapter.behaviorBlockSize16;
     document.getElementById("copper-toolbar-behavior-block-size-32").onclick = Copper.ToolbarAdapter.behaviorBlockSize32;
@@ -164,6 +165,7 @@ Copper.ToolbarAdapter.onSettingsUpdated = function() {
     Copper.ToolbarAdapter.loadCheckbox("copper-toolbar-behavior-reject-unknown", settings.rejectUnknown);
     Copper.ToolbarAdapter.loadCheckbox("copper-toolbar-behavior-send-uri-host", settings.sendUriHost);
     Copper.ToolbarAdapter.loadCheckbox("copper-toolbar-behavior-send-size1", settings.sendSize1);
+    Copper.ToolbarAdapter.loadCheckbox("copper-toolbar-behavior-send-content-type", settings.sendContentType);
     Copper.ToolbarAdapter.loadCheckbox("copper-toolbar-behavior-token-observe", settings.observeToken);
 
     switch(settings.blockSize) {
@@ -418,6 +420,12 @@ Copper.ToolbarAdapter.behaviorUriHost = function() {
 
 Copper.ToolbarAdapter.behaviorSendSize1 = function() {
     Copper.Session.settings.sendSize1 = !Copper.Session.settings.sendSize1;
+    Copper.ToolbarAdapter.checkboxElement(this.id);
+    Copper.Session.updateSettings(Copper.Session.settings);
+};
+
+Copper.ToolbarAdapter.behaviorSendContentType = function() {
+    Copper.Session.settings.sendContentType = !Copper.Session.settings.sendContentType;
     Copper.ToolbarAdapter.checkboxElement(this.id);
     Copper.Session.updateSettings(Copper.Session.settings);
 };

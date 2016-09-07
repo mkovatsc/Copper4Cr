@@ -56,6 +56,11 @@ Copper.StatusBarAdapter.onEvent = function(event) {
                 Copper.StatusBarAdapter.setText(event.data.coapMessage.code.getName());
             }
             break;
+        case Copper.Event.TYPE_MESSAGE_TRANSMISSION_CONFIRMED:
+            if (Copper.StatusBarAdapter.blockUpdates === undefined) {
+                Copper.StatusBarAdapter.appendText("(RTT " + event.data.rtt + " ms)");
+            }
+            break;
         case Copper.Event.TYPE_REQUEST_COMPLETED:
         case Copper.Event.TYPE_REQUEST_CANCELED:
             if (Copper.StatusBarAdapter.blockUpdates !== undefined) {
@@ -73,7 +78,7 @@ Copper.StatusBarAdapter.onEvent = function(event) {
                     break;
 
                 default:
-                    Copper.StatusBarAdapter.appendText("(RTT " + event.data.requestDuration + " ms)");
+                    Copper.StatusBarAdapter.appendText("(Total " + event.data.requestDuration + " ms)");
                     break;
             }
             break;

@@ -58,6 +58,9 @@ Copper.Settings.prototype.sendUriHost = false;
 // Send size1 option
 Copper.Settings.prototype.sendSize1 = false;
 
+// Send content type if known
+Copper.Settings.prototype.sendContentType = true;
+
 // Choose block size
 // 0 --> late block negotiation, otherwise 4 - 10 (32 - 1024)
 Copper.Settings.prototype.blockSize = 6;
