@@ -200,6 +200,11 @@ Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
             Copper.Session.payload.addPayloadToCoapMessage(coapMessage, Copper.Session.options.useUtf8);
             Copper.Session.informListeners("beforeSendingCoapMessage", [coapMessage]);
         }
+        if (!Copper.CoapMessage.Code.EMPTY.equals(coapMessage.code) && Copper.Session.settings.sendUriHost && !coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.PROXY_URI) && 
+                !coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.URI_HOST) && !coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.URI_PORT)) {
+            coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_HOST, Copper.Session.remoteAddress, false, {useUtf8: Copper.Session.options.useUtf8});
+            coapMessage.addOption(Copper.CoapMessage.OptionHeader.URI_PORT, Copper.Session.remotePort);
+        }
         Copper.Session.clientEndpoint.sendCoapMessage(coapMessage, blockwiseEnabled);
     } catch (exception){
         Copper.Log.logError(exception.stack);

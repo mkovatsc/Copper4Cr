@@ -59,7 +59,9 @@ Copper.MessageLogAdapter.onEvent = function(event){
 			Copper.MessageLogAdapter.addLogEntry(event.data.coapMessage, true);
 			break;
 		case Copper.Event.TYPE_UNKNOWN_COAP_MESSAGE_RECEIVED:
-			Copper.MessageLogAdapter.addLogEntry(event.data.coapMessage, true, undefined, true);
+			if (Copper.Session.settings.showUnknown){
+				Copper.MessageLogAdapter.addLogEntry(event.data.coapMessage, true, undefined, true);
+			}
 			break;
 		case Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED:
 			Copper.MessageLogAdapter.addLogEntry(event.data.coapMessage, true, undefined, true);
