@@ -110,3 +110,59 @@ Copper.Resizer.installResizer = function(elementToResize, onResizedCallback, ena
     	}
     };
 };
+
+Copper.Resizer.installCollapser = function(elementToCollapse, position) {
+	let collapser = document.createElement("div");
+	collapser.classList.add("striped-background");
+	let p = document.createElement("p");
+	switch(position) {
+		case "left":
+			collapser.classList.add("x-collapser");
+			p.textContent = '▸<br><br>▸';
+			break;
+		case "right":
+			collapser.classList.add("x-collapser");
+			p.textContent = '◂<br><br>◂';
+			break;
+		case "top":
+			collapser.classList.add("y-collapser");
+			p.innerHTML = '▾&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;▾';
+			break;
+		case "bottom":
+			collapser.classList.add("y-collapser");
+			p.innerHTML = "▴&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp▴";
+			break;
+	}
+	collapser.onclick = function() {
+		let newStateCollapsed;
+		if (elementToCollapse.classList.contains("hidden")) {
+			elementToCollapse.classList.remove("hidden");
+			collapser.classList.remove("y-collapsed"); // TODO (only for msg log here)
+			newStateCollapsed = newStateCollapsed = false;
+		} else {
+			elementToCollapse.classList.add("hidden");
+			collapser.classList.add("y-collapsed");
+			newStateCollapsed = true;
+		}
+		switch(position) {
+			case "left":
+				collapser.classList.add("x-collapser");
+				p.textContent = (newStateCollapsed ? '◂<br><br>◂' : '▸<br><br>▸');
+				break;
+			case "right":
+				collapser.classList.add("x-collapser");
+				p.textContent = (newStateCollapsed ? '▸<br><br>▸' : '◂<br><br>◂');
+				break;
+			case "top":
+				collapser.classList.add("y-collapser");
+				p.innerHTML = (newStateCollapsed ? '▴&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp▴' : '▾&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp▾');
+				break;
+			case "bottom":
+				collapser.classList.add("y-collapser");
+				p.innerHTML = (newStateCollapsed ? '▾&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp▾' : '▴&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp▴');
+				break;
+		}
+	}
+	collapser.appendChild(p);
+	elementToCollapse.parentNode.appendChild(collapser);
+};

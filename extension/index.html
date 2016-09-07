@@ -57,7 +57,7 @@
 	<script src="gui/ProfilesAdapter.js"></script>
 	<script src="gui/StartupWindowAdapter.js"></script>
 	<script src="gui/StatusBarAdapter.js"></script>
-	<script src="gui/ErrorWindowAdapter.js"></script>
+	<script src="gui/PopupWindowAdapter.js"></script>
 	<script src="gui/ToolbarLoggerAdapter.js"></script>
 
 	<script src="endpoint/CoapResourceHandler.js"></script>
@@ -454,115 +454,119 @@
 				</div>
 			
 			</div>
-			<div id="copper-debug-options" class="sidebar-right vbox">
-				<div style="padding: 0px 10px 0px 10px; min-height: 35px; height: 35px;">
-					<div>
-						<span id="copper-debug-options-enabled"></span>
-						<button id="copper-debug-options-reset">Reset</button>
+			<div class="container-for-collapser" style="position: relative; overflow-y: auto;">
+				<div id="copper-debug-options" class="sidebar-right vbox">
+
+					<div style="padding: 0px 10px 0px 10px; min-height: 35px; height: 35px;">
+						<div>
+							<span id="copper-debug-options-enabled"></span>
+							<button id="copper-debug-options-reset">Reset</button>
+						</div>
 					</div>
-				</div>
-				
-				<div style="display: block; padding: 0 4px 0 10px; overflow-y: auto;">
-					<div style="padding: 4px;">
-						<div style="text-align: center;"><label>Token</label></div>
-						<div id="copper-debug-options-token" class="flex vbox"></div>
-						
-						<div style="text-align: center;"><label style="padding-top: 2px; margin-bottom: 2px;">Request Options</label></div>
-						<p>Accept</p>
-						<div id="copper-debug-options-accept" class="flex vbox dropdown"></div>
-						
-						<p>Content-Format</p>
-						<div id="copper-debug-options-content-format" class="flex vbox dropdown"></div>
-						
-						<div id="copper-debug-options-block-options" class="hbox">
-							<div class="vbox" style="flex: 3; margin-left: 0;">
-								<p>Block1 (Req.)</p>
-								<div id="copper-debug-options-block1" class="flex vbox"></div>
-								<p>Size1</p>
-								<div id="copper-debug-options-size1" class="flex vbox"></div>
+
+					<div style="display: block; padding: 0 4px 0 10px; overflow-y: auto;">
+						<div style="padding: 4px;">
+							<div style="text-align: center;"><label>Token</label></div>
+							<div id="copper-debug-options-token" class="flex vbox"></div>
+
+							<div style="text-align: center;"><label style="padding-top: 2px; margin-bottom: 2px;">Request Options</label></div>
+							<p>Accept</p>
+							<div id="copper-debug-options-accept" class="flex vbox dropdown"></div>
+
+							<p>Content-Format</p>
+							<div id="copper-debug-options-content-format" class="flex vbox dropdown"></div>
+
+							<div id="copper-debug-options-block-options" class="hbox">
+								<div class="vbox" style="flex: 3; margin-left: 0;">
+									<p>Block1 (Req.)</p>
+									<div id="copper-debug-options-block1" class="flex vbox"></div>
+									<p>Size1</p>
+									<div id="copper-debug-options-size1" class="flex vbox"></div>
+								</div>
+
+								<div class="vbox" style="flex: 3;">
+									<p>Block2 (Res.)</p>
+									<div id="copper-debug-options-block2" class="flex vbox"></div>
+									<p>Size2</p>
+									<div id="copper-debug-options-size2" class="flex vbox"></div>
+								</div>
+
+								<div id="copper-debug-options-blockwise-enabled" class="flex vbox"></div>
 							</div>
-							
-							<div class="vbox" style="flex: 3;">
-								<p>Block2 (Res.)</p>
-								<div id="copper-debug-options-block2" class="flex vbox"></div>
-								<p>Size2</p>
-								<div id="copper-debug-options-size2" class="flex vbox"></div>
-							</div>
-							
-							<div id="copper-debug-options-blockwise-enabled" class="flex vbox"></div>
-						</div>
-						
-						<p>Observe</p>
-						<div id="copper-debug-options-observe" class="flex vbox"></div>
-						
-						<p>ETag(s)</p>
-						<div id="copper-debug-options-etags" class="flex vbox"></div>
 
-						<p>If-Match(s)</p>
-						<div id="copper-debug-options-ifmatches" class="flex vbox"></div>
+							<p>Observe</p>
+							<div id="copper-debug-options-observe" class="flex vbox"></div>
 
-						<div id="copper-debug-options-if-none-match"></div>
-						
-						<div class="hbox">
-							<div class="flex">
-								<p>Uri-Host</p>
-								<div id="copper-debug-options-uri-host" class="vbox"></div>
-							</div>
-							
-							<div style="margin-left: 6px; width: 4em;">
-								<p>Uri-Port</p>
-								<div id="copper-debug-options-uri-port" class="vbox"></div>	
-							</div>
-						</div>
-						
-						<p>Proxy-Uri</p>
-						<div id="copper-debug-options-proxy-uri" class="flex vbox"></div>
-						
-						<div id="copper-debug-options-proxy-scheme"></div>
-						
-						<div style="text-align: center;"><label>Response Options</label></div>
-						
-						<p>Max-Age</p>
-						<div id="copper-debug-options-max-age" class="flex vbox"></div>
+							<p>ETag(s)</p>
+							<div id="copper-debug-options-etags" class="flex vbox"></div>
 
-						<p>Location-Path</p>
-						<div id="copper-debug-options-location-path" class="flex vbox"></div>
+							<p>If-Match(s)</p>
+							<div id="copper-debug-options-ifmatches" class="flex vbox"></div>
 
-						<p>Location-Query</p>
-						<div id="copper-debug-options-location-query" class="flex vbox"></div>
-						
-						<div style="text-align: center;"><label>Custom Options</label></div>
+							<div id="copper-debug-options-if-none-match"></div>
 
-						<div class="vbox">
 							<div class="hbox">
-								<div style="flex: 1;">
-									<p>Number</p>	
+								<div class="flex">
+									<p>Uri-Host</p>
+									<div id="copper-debug-options-uri-host" class="vbox"></div>
 								</div>
-								<div style="margin-left: 6px; flex: 2;">
-									<p>Value</p>	
+
+								<div style="margin-left: 6px; width: 4em;">
+									<p>Uri-Port</p>
+									<div id="copper-debug-options-uri-port" class="vbox"></div>
 								</div>
 							</div>
-							<div class="vbox" id="copper-debug-options-custom-options"></div>
+
+							<p>Proxy-Uri</p>
+							<div id="copper-debug-options-proxy-uri" class="flex vbox"></div>
+
+							<div id="copper-debug-options-proxy-scheme"></div>
+
+							<div style="text-align: center;"><label>Response Options</label></div>
+
+							<p>Max-Age</p>
+							<div id="copper-debug-options-max-age" class="flex vbox"></div>
+
+							<p>Location-Path</p>
+							<div id="copper-debug-options-location-path" class="flex vbox"></div>
+
+							<p>Location-Query</p>
+							<div id="copper-debug-options-location-query" class="flex vbox"></div>
+
+							<div style="text-align: center;"><label>Custom Options</label></div>
+
+							<div class="vbox">
+								<div class="hbox">
+									<div style="flex: 1;">
+										<p>Number</p>
+									</div>
+									<div style="margin-left: 6px; flex: 2;">
+										<p>Value</p>
+									</div>
+								</div>
+								<div class="vbox" id="copper-debug-options-custom-options"></div>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-
-		<div class="main-content-bottom-box">
-			<h2>CoAP Message Log</h2>
-			<div id="copper-coap-message-log" class="table vbox">
-				<div class="table-head">
-					<span class="coap-message-time">Time</span>
-					<span class="coap-message-type">Type</span>
-					<span class="coap-message-code">Code</span>
-					<span class="coap-message-mid">MID</span>
-					<span class="coap-message-token">Token</span>
-					<span class="coap-message-options">Options</span>
-					<span class="coap-message-payload">Payload</span>
+		<div class="container-for-collapser" style="position: relative;">
+			<div class="main-content-bottom-box">
+				<h2>CoAP Message Log</h2>
+				<div id="copper-coap-message-log" class="table vbox">
+					<div class="table-head">
+						<span class="coap-message-time">Time</span>
+						<span class="coap-message-type">Type</span>
+						<span class="coap-message-code">Code</span>
+						<span class="coap-message-mid">MID</span>
+						<span class="coap-message-token">Token</span>
+						<span class="coap-message-options">Options</span>
+						<span class="coap-message-payload">Payload</span>
+					</div>
+					<div class="table-head-scrollbar"></div>
+					<div id="copper-coap-message-log-table" class="table-body"></div>
 				</div>
-				<div class="table-head-scrollbar"></div>
-				<div id="copper-coap-message-log-table" class="table-body"></div>
 			</div>
 		</div>
 	</div>
@@ -656,7 +660,6 @@
 				</div>
 				<p id="copper-error-msg">
 				</p>
-				<button id="copper-error-exit-button">OK</button>
 			</div>
 		</div>
 	</div>

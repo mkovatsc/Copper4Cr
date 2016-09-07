@@ -39,6 +39,7 @@ Copper.MessageLogAdapter.beforeSessionInitialization = function(){
 		Copper.Session.layout.messageLogHeight = newHeight;
 		Copper.Session.updateLayout(Copper.Session.layout);
 	}, false, true, false);
+	Copper.Resizer.installCollapser(document.getElementsByClassName("main-content-bottom-box")[0], "top");
 };
 
 Copper.MessageLogAdapter.onLayoutUpdated = function(){
