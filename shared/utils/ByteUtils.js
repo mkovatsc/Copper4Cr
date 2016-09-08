@@ -300,4 +300,25 @@ Copper.ByteUtils.convertHexStringToBytes = function(hexString) {
 		res.push(n !== 0 ? Copper.ByteUtils.convertUintToBytes(n) : new ArrayBuffer(1));
 	}
 	return Copper.ByteUtils.mergeByteArrays(res);
-}
+};
+
+/**
+ * @arg val: hex number in string format
+ * @return: byte representation of val
+ */
+Copper.ByteUtils.convertBytesToBase64 = function(buf, offset, length){
+	if (!(buf instanceof ArrayBuffer) || (offset && (!Number.isInteger(offset) || offset < 0)) || (length && (!Number.isInteger(length) || length < 0))){
+		throw new Error("Illegal Arguments");
+	}
+	if (buf.byteLength === 0 || length === 0){
+		return "";
+	}
+	offset = offset ? offset : 0;
+	length = length ? length : (buf.byteLength - offset);
+	let bufView = new Uint8Array(buf, offset, length);
+	let res = [];
+	for (let i=0; i<bufView.byteLength; i++){
+		res.push(String.fromCharCode(bufView[i]));
+	}
+	return btoa(res.join(""));
+};

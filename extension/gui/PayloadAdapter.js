@@ -88,8 +88,10 @@ Copper.PayloadAdapter.onEvent = function(event){
 			Copper.PayloadAdapter.updateIncomingPayload(event.data.coapMessage);
 			break;
 		case Copper.Event.TYPE_REQUEST_COMPLETED:
+			Copper.PayloadAdapter.updateRenderedPayload(event.data.responseCoapMessage);
+			break;
 		case Copper.Event.TYPE_OBSERVE_REQUEST_FRESH:
-			Copper.PayloadAdapter.updateRenderedPayload(event.data.receivedCoapMessage);
+			Copper.PayloadAdapter.updateRenderedPayload(event.data.freshCoapMessage);
 			break;
 	}
 };
@@ -123,8 +125,8 @@ Copper.PayloadAdapter.updateIncomingPayload = function(coapMessage){
 		return;
 	}
 
-	// render Text or Binary
 	if (contentFormat !== undefined && contentFormat.isText){
+		// render Text
 		let payloadString = Copper.ByteUtils.convertBytesToString(coapMessage.payload, undefined, undefined, !Copper.Session.options.useUtf8);
 		if (payloadString !== undefined && payloadString !== ""){
 			let texts = payloadString.split(/\r\n|\n/);
@@ -136,6 +138,7 @@ Copper.PayloadAdapter.updateIncomingPayload = function(coapMessage){
 		}
 	}
 	else {
+		// render Binary
 		let bufView = new Uint8Array(coapMessage.payload);
 		let firstLine = true;
 		let currentBytes = "";
@@ -160,9 +163,32 @@ Copper.PayloadAdapter.updateIncomingPayload = function(coapMessage){
 		}
 		Copper.PayloadAdapter.currentByteOffset += bufView.byteLength;
 	}
-	document.getElementById("copper-payload-btn-in").onclick();	
+	document.getElementById("copper-payload-btn-in").onclick();
 };
 
 Copper.PayloadAdapter.updateRenderedPayload = function(coapMessage){
+	let contentFormat = coapMessage.getOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT);
+	let renderedPane = document.getElementById("copper-payload-tab-rendered");
+	while (renderedPane.firstChild) renderedPane.removeChild(renderedPane.firstChild);
 
+	if (coapMessage.payload.byteLength === 0){
+		return;
+	}
+
+	contentFormat = contentFormat.length > 0 ? Copper.CoapMessage.ContentFormat.getContentFormat(contentFormat[0]) : undefined;
+	if (Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_GIF.equals(contentFormat) || Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_JPEG.equals(contentFormat) ||
+	      Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_PNG.equals(contentFormat) || Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_TIFF.equals(contentFormat)) {
+		let rootElement = document.createElement("div");
+		rootElement.style = "display: flex; height: 100%; align-items: center;";
+		
+		let imgElement = document.createElement("img");
+		imgElement.src = "data:" + contentFormat.name + ";base64," + Copper.ByteUtils.convertBytesToBase64(coapMessage.payload);
+		imgElement.style = "margin: auto;";
+		rootElement.appendChild(imgElement);
+		renderedPane.appendChild(rootElement);
+	}
+
+	if (renderedPane.firstChild){
+		document.getElementById("copper-payload-btn-rendered").onclick();
+	}
 };
