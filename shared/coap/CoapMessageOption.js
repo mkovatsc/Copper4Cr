@@ -180,7 +180,7 @@ Copper.CoapMessage.Option.prototype.getValue = function(opts) {
 					res.push(Copper.ByteUtils.convertBytesToHexString(val[i]));
 					break;
 				case Types.TYPE_STRING:
-					res.push(Copper.ByteUtils.convertBytesToString(val[i], ascii, strict));
+					res.push(Copper.ByteUtils.convertBytesToString(val[i], undefined, undefined, ascii, strict));
 					break;
 				case Types.TYPE_UINT:
 					res.push(Copper.ByteUtils.convertBytesToUint(val[i]));

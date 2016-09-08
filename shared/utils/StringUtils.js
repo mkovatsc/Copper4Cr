@@ -123,6 +123,10 @@ Copper.StringUtils.parseUri = function(rawUri){
 	}
 };
 
+/*
+* Parses a link format
+* @return: object representing the resources 
+*/
 Copper.StringUtils.parseLinkFormat = function(data) {
 
 	var links = new Object();
@@ -130,7 +134,6 @@ Copper.StringUtils.parseLinkFormat = function(data) {
 	// totally complicated but supports ',' and '\n' to separate links and ',' as well as '\"' within quoted strings
 	var format = data.match(/(<[^>]+>\s*(;\s*\w+\s*(=\s*(\w+|"([^"\\]*(\\.[^"\\]*)*)")\s*)?)*)/g);
 	for (var i in format) {
-		//Copper.logEvent(links[i]+'\n');
 		var elems = format[i].match(/^<([^>\?]+)[^>]*>\s*(;.+)?\s*$/);
 
 		var uri = elems[1];
@@ -149,12 +152,8 @@ Copper.StringUtils.parseLinkFormat = function(data) {
 			var tokens = elems[2].match(/(;\s*\w+\s*(=\s*(\w+|"([^\\"]*(\\.[^"\\]*)*)"))?)/g);
 
 			for (var j in tokens) {
-				//Copper.logEvent('  '+tokens[j]+'\n');
 				var keyVal = tokens[j].match(/;\s*([^<"\s;,=]+)\s*(=\s*(([^<"\s;,]+)|"([^"\\]*(\\.[^"\\]*)*)"))?/);
 				if (keyVal) {
-					//Copper.logEvent(keyVal[0]+'\n');
-					//Copper.logEvent('   '+keyVal[1] + (keyVal[2] ? (': '+ (keyVal[4] ? keyVal[4] : keyVal[5].replace(/\\/g,''))) : ''));
-
 					if (links[uri][keyVal[1]]!=null) {
 
 						if (!Array.isArray(links[uri][keyVal[1]])) {

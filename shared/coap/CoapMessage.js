@@ -171,15 +171,18 @@ Copper.CoapMessage.prototype.isOptionSet = function(optionHeader){
 
 /*
 * @arg optionHeader: header of the option of which the values should be retrieved
+* @arg opts: object with optional options. The following can be set:
+*             useUtf8 --> set to false if ascii encoding should be used
+*             strict --> set to true in order to throw errors instead of skipping error parts
 * @return if option is not set: default value (which may be undefined)
 *         array containing the converted option values. Empty array if option contains no value
 */
-Copper.CoapMessage.prototype.getOption = function(optionHeader){
+Copper.CoapMessage.prototype.getOption = function(optionHeader, opts){
 	if (!(optionHeader instanceof Copper.CoapMessage.OptionHeader)){
 		throw new Error("Illegal argument");
 	}
 	if (this.options[optionHeader.number] !== undefined){
-		return this.options[optionHeader.number].getValue();
+		return this.options[optionHeader.number].getValue(opts);
 	}
 	else if (optionHeader.defaultValue !== undefined) {
 		return [optionHeader.defaultValue];

@@ -30,13 +30,13 @@ Copper.ResourceViewAdapter.onEvent = function(event){
         let requestCoapMessage = event.data.requestCoapMessage;
         let responseCoapMessage = event.data.responseCoapMessage;
 
-        let uriPathOption = requestCoapMessage.getOption(Copper.CoapMessage.OptionHeader.URI_PATH);
+        let uriPathOption = requestCoapMessage.getOption(Copper.CoapMessage.OptionHeader.URI_PATH, {useUtf8: Copper.Session.options.useUtf8});
         let block2Option = responseCoapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2)
         let contentFormatOption = responseCoapMessage.getOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT);
         if (uriPathOption.length === 2 && uriPathOption[0] === ".well-known" && uriPathOption[1] === "core" && block2Option.length === 0){
             if (responseCoapMessage.code.equals(Copper.CoapMessage.Code.CONTENT) && 
                   contentFormatOption.length === 1 && contentFormatOption[0] === Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_LINK_FORMAT.number){
-                Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ByteUtils.convertBytesToString(responseCoapMessage.payload)));
+                Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ByteUtils.convertBytesToString(responseCoapMessage.payload, undefined, undefined, !Copper.Session.options.useUtf8)));
                 let selectedResource = document.getElementById("copper-resource-tree").getElementsByClassName("selected");
             }
         }
