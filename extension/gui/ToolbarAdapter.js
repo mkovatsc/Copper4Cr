@@ -511,8 +511,8 @@ Copper.ToolbarAdapter.profilesAutoStore = function() {
 Copper.ToolbarAdapter.profilesStoreCurrent = function() {
     Copper.Session.profiles.updateSelectedProfile(Copper.Session.settings, Copper.Session.options, Copper.Session.payload, Copper.Session.layout, true);
     Copper.Session.updateProfiles(Copper.Session.profiles);
-    Copper.ErrorWindowAdapter.openInfoWindow("Stored Changes", 'Stored current changes to the selected profile ("'
-        + (Copper.Profiles.DEFAULT_PROFILE_KEY === Copper.Session.profiles.selectedProfile ? "Standard Profile" : Copper.Session.profiles.selectedProfile) + '")');
+    Copper.PopupWindowAdapter.openInfoWindow("Stored Changes", 'Stored current changes to the selected profile ("'
+        + (Copper.Profiles.DEFAULT_PROFILE_KEY === Copper.Session.profiles.selectedProfile ? "Standard Profile" : Copper.Session.profiles.selectedProfile) + '")', true);
 };
 
 Copper.ToolbarAdapter.checkboxElement = function(id) {

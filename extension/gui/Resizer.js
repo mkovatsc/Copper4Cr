@@ -110,3 +110,56 @@ Copper.Resizer.installResizer = function(elementToResize, onResizedCallback, ena
     	}
     };
 };
+
+Copper.Resizer.installCollapser = function(elementToCollapse, position, onChangedCallback) {
+	let collapser = document.createElement("div");
+	collapser.classList.add("striped-background");
+	collapser.appendChild(document.createElement("span"));
+	elementToCollapse.parentNode.appendChild(collapser)
+	let collapsed = false;
+	let changeCollapsedState = function(newCollapsed) {
+		collapsed = newCollapsed;
+		Copper.Resizer.updateCollapser(elementToCollapse, collapser, position, newCollapsed);
+	};
+	changeCollapsedState(collapsed);
+	collapser.onclick = function() {
+		changeCollapsedState(!collapsed);
+		onChangedCallback(collapsed);
+	};
+	return {
+		changeCollapsedState: changeCollapsedState
+	};
+};
+
+Copper.Resizer.updateCollapser = function(elementToCollapse, collapserElement, originalPosition, collapsed){
+	if (collapsed){
+		elementToCollapse.classList.add("hidden");
+	}
+	else {
+		elementToCollapse.classList.remove("hidden");
+	}
+	if ((originalPosition === "left" && collapsed) || (originalPosition === "right" && !collapsed)){
+		collapserElement.classList.add("x-collapser");
+		collapserElement.classList.remove("x-collapser-left");
+		collapserElement.classList.add("x-collapser-right");
+		collapserElement.firstChild.innerHTML = "◂<br/><br/>◂";
+	}
+	else if ((originalPosition === "right" && collapsed) || (originalPosition === "left" && !collapsed)){
+		collapserElement.classList.add("x-collapser");
+		collapserElement.classList.remove("x-collapser-right");
+		collapserElement.classList.add("x-collapser-left");
+		collapserElement.firstChild.innerHTML = "▸<br/><br/>▸";
+	}
+	else if ((originalPosition === "top" && collapsed) || (originalPosition === "bottom" && !collapsed)){
+		collapserElement.classList.add("y-collapser");
+		collapserElement.classList.remove("y-collapser-top");
+		collapserElement.classList.add("y-collapser-bottom");
+		collapserElement.firstChild.innerHTML = "▴&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp▴";
+	}
+	else if ((originalPosition === "bottom" && collapsed) || (originalPosition === "top" && !collapsed)){
+		collapserElement.classList.add("y-collapser");
+		collapserElement.classList.remove("y-collapser-bottom");
+		collapserElement.classList.add("y-collapser-top");
+		collapserElement.firstChild.innerHTML = "▾&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp▾";
+	}
+};

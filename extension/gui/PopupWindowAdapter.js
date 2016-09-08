@@ -29,18 +29,18 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-Copper.ErrorWindowAdapter = function(){
+Copper.PopupWindowAdapter = function(){
 };
 
-Copper.ErrorWindowAdapter.openErrorWindow = function(errorTitle, errorMsg) {
-    Copper.ErrorWindowAdapter.openPopupWindow(errorTitle, errorMsg, "skin/tool_delete.png");
+Copper.PopupWindowAdapter.openErrorWindow = function(errorTitle, errorMsg, closable) {
+    Copper.PopupWindowAdapter.openPopupWindow(errorTitle, errorMsg, closable, "skin/tool_delete.png");
 };
 
-Copper.ErrorWindowAdapter.openInfoWindow = function(title, msg) {
-    Copper.ErrorWindowAdapter.openPopupWindow(title, msg, "skin/tool_discover.png");
+Copper.PopupWindowAdapter.openInfoWindow = function(title, msg, closable) {
+    Copper.PopupWindowAdapter.openPopupWindow(title, msg, closable, "skin/tool_discover.png");
 };
 
-Copper.ErrorWindowAdapter.openPopupWindow = function(title, msg, icon) {
+Copper.PopupWindowAdapter.openPopupWindow = function(title, msg, closable, icon) {
     let blockScreen = document.getElementById("copper-overlay-error").parentNode;
     blockScreen.classList.remove("hidden");
     let errorMsgTitleElement = document.getElementById("copper-overlay-error-title");
@@ -50,14 +50,18 @@ Copper.ErrorWindowAdapter.openPopupWindow = function(title, msg, icon) {
     let iconElement = document.getElementById("copper-overlay-icon");
     iconElement.src = icon;
 
-    let exitButton = document.getElementById("copper-error-exit-button");
-
-    exitButton.onclick = function() {
-        blockScreen.classList.add("hidden");
-    };
+    if (closable) {
+        let exitButton = document.createElement("BUTTON");
+        exitButton.textContent = "OK";
+        exitButton.classList.add("copper-error-exit-button");
+        document.getElementById("copper-overlay-error").lastElementChild.appendChild(exitButton);
+        exitButton.onclick = function() {
+            blockScreen.classList.add("hidden");
+        };
+    }
 };
 
-Copper.ErrorWindowAdapter.closeInfoWindow = function(title, msg) {
+Copper.PopupWindowAdapter.closeInfoWindow = function(title, msg) {
     let blockScreen = document.getElementById("copper-overlay-error").parentNode;
     blockScreen.classList.add("hidden");
 };

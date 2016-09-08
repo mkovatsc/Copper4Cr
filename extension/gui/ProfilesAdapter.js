@@ -93,7 +93,7 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
         }
 
         if (hasFormError) {
-            Copper.ErrorWindowAdapter.openErrorWindow("Illegal profile input", "One or more profile names are either empty, contain an illegal character (use letters and numbers only) or have a non-unique name!");
+            Copper.PopupWindowAdapter.openErrorWindow("Illegal profile input", "One or more profile names are either empty, contain an illegal character (use letters and numbers only) or have a non-unique name!", true);
             return;
         }
 

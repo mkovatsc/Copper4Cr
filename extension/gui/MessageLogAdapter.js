@@ -33,12 +33,17 @@ Copper.MessageLogAdapter = function(){
 };
 
 Copper.MessageLogAdapter.resizer = undefined;
+Copper.MessageLogAdapter.collapser = undefined;
 
 Copper.MessageLogAdapter.beforeSessionInitialization = function(){
 	Copper.MessageLogAdapter.resizer = Copper.Resizer.installResizer(document.getElementsByClassName("main-content-bottom-box")[0], function(newWidth, newHeight){
 		Copper.Session.layout.messageLogHeight = newHeight;
 		Copper.Session.updateLayout(Copper.Session.layout);
 	}, false, true, false);
+	Copper.MessageLogAdapter.collapser = Copper.Resizer.installCollapser(document.getElementsByClassName("main-content-bottom-box")[0], "top", function(collapsed){
+        Copper.Session.layout.messageLogCollapsed = collapsed;
+		Copper.Session.updateLayout(Copper.Session.layout);
+    });
 };
 
 Copper.MessageLogAdapter.onLayoutUpdated = function(){
@@ -48,6 +53,7 @@ Copper.MessageLogAdapter.onLayoutUpdated = function(){
 	else {
 		Copper.MessageLogAdapter.resizer.reset();	
 	}
+	Copper.MessageLogAdapter.collapser.changeCollapsedState(Copper.Session.layout.messageLogCollapsed);
 };
 
 Copper.MessageLogAdapter.onEvent = function(event){

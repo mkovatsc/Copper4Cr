@@ -97,7 +97,10 @@ Copper.ExtensionJsonUtils.copperLayoutToJson = function(layout){
 		resourceTreeWidth: layout.resourceTreeWidth,
 		messageLogHeight: layout.messageLogHeight,
 		eventLogWidth: layout.eventLogWidth,
-		eventLogHeight: layout.eventLogHeight
+		eventLogHeight: layout.eventLogHeight,
+		resourceViewCollapsed: layout.resourceViewCollapsed,
+		messageLogCollapsed: layout.messageLogCollapsed,
+		debugOptionsCollapsed: layout.debugOptionsCollapsed
 	};
 };
 
@@ -107,6 +110,9 @@ Copper.ExtensionJsonUtils.jsonToCopperLayout = function(data){
 	res.messageLogHeight = data.messageLogHeight;
 	res.eventLogWidth = data.eventLogWidth;
 	res.eventLogHeight = data.eventLogHeight;
+	res.resourceViewCollapsed = data.resourceViewCollapsed;
+	res.messageLogCollapsed = data.messageLogCollapsed;
+	res.debugOptionsCollapsed = data.debugOptionsCollapsed;
 	return res;
 };
 

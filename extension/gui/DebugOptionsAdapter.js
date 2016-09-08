@@ -32,6 +32,7 @@
 Copper.DebugOptionsAdapter = function(){
 };
 
+Copper.DebugOptionsAdapter.collapser = undefined;
 Copper.DebugOptionsAdapter.debugOptionsEnabledField = undefined;
 Copper.DebugOptionsAdapter.tokenInputField = undefined;
 Copper.DebugOptionsAdapter.blockwiseEnabledField = undefined;
@@ -83,6 +84,15 @@ Copper.DebugOptionsAdapter.beforeSessionInitialization = function() {
 
     Copper.DebugOptionsAdapter.customOptionsField = document.getElementById("copper-debug-options-custom-options");
     Copper.DebugOptionsAdapter.customOptionsField.classList.add("debug-option-custom-options");
+
+    Copper.DebugOptionsAdapter.collapser = Copper.Resizer.installCollapser(document.getElementById("copper-debug-options"), "left", function(collapsed){
+        Copper.Session.layout.debugOptionsCollapsed = collapsed;
+        Copper.Session.updateLayout(Copper.Session.layout);
+    });
+};
+
+Copper.DebugOptionsAdapter.onLayoutUpdated = function(){
+    Copper.DebugOptionsAdapter.collapser.changeCollapsedState(Copper.Session.layout.debugOptionsCollapsed);
 };
 
 Copper.DebugOptionsAdapter.onOptionsUpdated = function(){
