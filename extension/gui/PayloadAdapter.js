@@ -34,6 +34,8 @@ Copper.PayloadAdapter = function(){
 
 Copper.PayloadAdapter.visiblePane = undefined;
 Copper.PayloadAdapter.currentBlockNumber = undefined;
+Copper.PayloadAdapter.currentContentFormat = undefined;
+Copper.PayloadAdapter.currentByteOffset = 0;
 
 Copper.PayloadAdapter.setVisiblePane = function(selectedPane, button){
 	if (Copper.PayloadAdapter.visiblePane !== selectedPane){
@@ -84,36 +86,83 @@ Copper.PayloadAdapter.onEvent = function(event){
 	switch(event.type){
 		case Copper.Event.TYPE_COAP_MESSAGE_RECEIVED:
 			Copper.PayloadAdapter.updateIncomingPayload(event.data.coapMessage);
+			break;
+		case Copper.Event.TYPE_REQUEST_COMPLETED:
+		case Copper.Event.TYPE_OBSERVE_REQUEST_FRESH:
+			Copper.PayloadAdapter.updateRenderedPayload(event.data.receivedCoapMessage);
+			break;
 	}
 };
 
 Copper.PayloadAdapter.updateIncomingPayload = function(coapMessage){
-	document.getElementById("copper-payload-btn-in").onclick();	
 	let append = false;
+	let contentFormat = coapMessage.getOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT);
+	contentFormat = contentFormat.length > 0 ? Copper.CoapMessage.ContentFormat.getContentFormat(contentFormat[0]) : undefined;
 
 	let block2Option = coapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2);
 	if (block2Option.length === 1){
 		if (Copper.PayloadAdapter.currentBlockNumber === block2Option[0].num && block2Option[0].num > 0){
 			append = true;
+			contentFormat = Copper.PayloadAdapter.currentContentFormat;
 		}
 		Copper.PayloadAdapter.currentBlockNumber = block2Option[0].num + 1;
+		Copper.PayloadAdapter.currentContentFormat = contentFormat;
+	}
+	else {
+		Copper.PayloadAdapter.currentBlockNumber = 0;
+		Copper.PayloadAdapter.currentContentFormat = undefined;
 	}
 
 	let incomingTextElement = document.getElementById("copper-payload-tab-in");
 	if (!append){
-		while (incomingTextElement.firstChild) {
-		    incomingTextElement.removeChild(incomingTextElement.firstChild);
-		}
+		Copper.PayloadAdapter.currentByteOffset = 0;
+		while (incomingTextElement.firstChild) incomingTextElement.removeChild(incomingTextElement.firstChild);
 	}
 
-	let payloadString = Copper.ByteUtils.convertBytesToString(coapMessage.payload);
-	Copper.Log.logFine(payloadString);
-	if (payloadString !== undefined && payloadString !== ""){
-		let texts = payloadString.split(/\r\n|\n/);
-		incomingTextElement.appendChild(document.createTextNode(texts[0]));
-		for (let i=1; i<texts.length; i++){
-			incomingTextElement.appendChild(document.createElement("br"));
-			incomingTextElement.appendChild(document.createTextNode(texts[i]));
+	if (coapMessage.payload.byteLength === 0){
+		return;
+	}
+
+	// render Text or Binary
+	if (contentFormat !== undefined && contentFormat.isText){
+		let payloadString = Copper.ByteUtils.convertBytesToString(coapMessage.payload, undefined, undefined, !Copper.Session.options.useUtf8);
+		if (payloadString !== undefined && payloadString !== ""){
+			let texts = payloadString.split(/\r\n|\n/);
+			incomingTextElement.appendChild(document.createTextNode(texts[0]));
+			for (let i=1; i<texts.length; i++){
+				incomingTextElement.appendChild(document.createElement("br"));
+				incomingTextElement.appendChild(document.createTextNode(texts[i]));
+			}
 		}
 	}
+	else {
+		let bufView = new Uint8Array(coapMessage.payload);
+		let firstLine = true;
+		let currentBytes = "";
+		let currentStringRep = "";
+		for (let i=0; i<bufView.byteLength; i++){
+			let num = bufView[i];
+			
+			currentBytes += Copper.StringUtils.lpad(num.toString(16).toUpperCase(), 2, "0");
+			if (i%2 === 1) currentBytes += " ";
+			
+			currentStringRep += (num < 32 || num >= 127) ? "·" : String.fromCharCode(num);
+			if (i%8 === 7) currentStringRep += " ";
+			
+			if (i%16 === 15 || i+1 >= bufView.byteLength) {
+				if (i >= 16 || incomingTextElement.lastChild) incomingTextElement.appendChild(document.createElement("br"));
+				while (currentBytes.length < 40) currentBytes += " ";
+				incomingTextElement.appendChild(document.createTextNode(
+					Copper.StringUtils.lpad((Copper.PayloadAdapter.currentByteOffset + i - 15).toString(10), 10, " ") + " | " + currentBytes + " | " + currentStringRep));
+				currentBytes = "";
+				currentStringRep = "";
+			}
+		}
+		Copper.PayloadAdapter.currentByteOffset += bufView.byteLength;
+	}
+	document.getElementById("copper-payload-btn-in").onclick();	
+};
+
+Copper.PayloadAdapter.updateRenderedPayload = function(coapMessage){
+
 };

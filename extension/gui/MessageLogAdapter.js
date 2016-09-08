@@ -116,7 +116,7 @@ Copper.MessageLogAdapter.addLogEntry = function(coapMessage, isReceived, retrans
 	let options = coapMessage.getOptions();
 	for (let i=0; i<options.length; i++){
 		let optionHeader = options[i].header;
-		let value = options[i].getValue();
+		let value = options[i].getValue({useUtf8: Copper.Session.options.useUtf8});
 		for (let j=0; j<value.length; j++){
 			let optionElement = document.createElement("span");
 			optionElement.classList.add("no-wrap");
@@ -132,7 +132,16 @@ Copper.MessageLogAdapter.addLogEntry = function(coapMessage, isReceived, retrans
 
 	let payloadElement = document.createElement("span");
 	payloadElement.classList.add("coap-message-payload");
-	payloadElement.textContent = Copper.ByteUtils.convertBytesToString(coapMessage.payload);
+	if (coapMessage.payload.byteLength > 0){
+		let contentFormat = coapMessage.getOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT);
+		contentFormat = contentFormat.length > 0 ? Copper.CoapMessage.ContentFormat.getContentFormat(contentFormat[0]) : undefined;
+		if (contentFormat !== undefined && contentFormat.isText){
+			payloadElement.textContent = Copper.ByteUtils.convertBytesToString(coapMessage.payload, undefined, undefined, !Copper.Session.options.useUtf8);
+		}
+		else {
+			payloadElement.textContent = "[non-textual payload]";
+		}
+	}
 	logElement.appendChild(payloadElement);
 
 	rootElement.insertBefore(logElement, rootElement.firstChild);
