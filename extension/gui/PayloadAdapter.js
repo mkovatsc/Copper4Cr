@@ -178,6 +178,7 @@ Copper.PayloadAdapter.updateRenderedPayload = function(coapMessage){
 	contentFormat = contentFormat.length > 0 ? Copper.CoapMessage.ContentFormat.getContentFormat(contentFormat[0]) : undefined;
 	if (Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_GIF.equals(contentFormat) || Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_JPEG.equals(contentFormat) ||
 	      Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_PNG.equals(contentFormat) || Copper.CoapMessage.ContentFormat.CONTENT_TYPE_IMAGE_TIFF.equals(contentFormat)) {
+		// render image
 		let rootElement = document.createElement("div");
 		rootElement.style = "display: flex; height: 100%; align-items: center;";
 		
@@ -187,8 +188,88 @@ Copper.PayloadAdapter.updateRenderedPayload = function(coapMessage){
 		rootElement.appendChild(imgElement);
 		renderedPane.appendChild(rootElement);
 	}
+	else if (Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_LINK_FORMAT.equals(contentFormat)){
+        let linkFormat = Copper.StringUtils.parseLinkFormat(Copper.ByteUtils.convertBytesToString(coapMessage.payload, undefined, undefined, !Copper.Session.options.useUtf8));
+        if (linkFormat !== undefined){
+        	let uris = Object.keys(linkFormat);
+        	if (uris.length > 0){
+        		let container = document.createElement("div");
+        		container.style = "padding: 10px 25px;";
+        		let links = document.createElement("ul");
+        		links.style = "list-style-type: none; margin-left: 20%;";
+        		for (let i=0; i<uris.length; i++){
+        			Copper.PayloadAdapter.appendAndStyleLinkResource(links, linkFormat[uris[i]], uris[i]);
+        		}
+        		container.appendChild(links);
+        		renderedPane.appendChild(container);
+        	}
+        }
+    }
 
 	if (renderedPane.firstChild){
 		document.getElementById("copper-payload-btn-rendered").onclick();
 	}
+};
+
+Copper.PayloadAdapter.appendAndStyleLinkResource = function(rootElement, attributes, uri){
+	let linkResource = document.createElement("li");
+	let label = document.createElement("label");
+	label.textContent = uri;
+	label.style = "font-size: 16px; font-weight: bold; margin-left: -20px;";
+	linkResource.appendChild(label);
+	Copper.PayloadAdapter.appendAndStyleLinkAttributes(linkResource, attributes);
+	rootElement.appendChild(linkResource);
+};
+
+Copper.PayloadAdapter.appendAndStyleLinkAttributes = function(rootElement, attributes){
+	if (typeof(attributes) !== "object" || attributes === null){
+		return;
+	}
+	let attributesList = document.createElement("ul");
+	if (Array.isArray(attributes)){
+		attributesList.style = "list-style-type: circle; padding-left: 20px; margin: 5px 0px 5px 0px; color: black;";
+		for (let i=0; i<attributes.length; i++){
+			Copper.PayloadAdapter.appendAndStyleLinkAttribute(attributesList, attributes[i]);
+		}
+	}
+	else {
+		attributesList.style = "list-style-type: square; padding-left: 20px; margin: 5px 0px 5px 0px;";
+		let attributeNames = Object.keys(attributes);
+		for (let i=0; i<attributeNames.length; i++){
+			Copper.PayloadAdapter.appendAndStyleLinkAttribute(attributesList, attributes[attributeNames[i]], attributeNames[i]);
+		}
+	}
+	rootElement.appendChild(attributesList);
+};
+
+Copper.PayloadAdapter.appendAndStyleLinkAttribute = function(rootElement, attribute, attributeName){
+	let attributeElement = document.createElement("li");
+	if (attributeName !== undefined){
+		let nameLabel = document.createElement("label");
+		nameLabel.style = "margin-right: 10px; font-weight: bold;";
+		nameLabel.textContent = attributeName + ":";
+		attributeElement.appendChild(nameLabel);
+	}
+	if (typeof(attribute) === "object"){
+		Copper.PayloadAdapter.appendAndStyleLinkAttributes(attributeElement, attribute);
+	}
+	else {
+		let span = document.createElement("span");
+		switch (typeof(attribute)){
+			case "string":
+				span.textContent = attribute;
+				span.style = "color: green; white-space: pre;";
+				break;
+			case "number":
+				span.textContent = "" + attribute;
+				span.style = Number.isInteger(attribute) ? "color: red;" : "color: purple;";
+				break;
+			case "boolean":
+				span.textContent = attribute ? "true" : "false";
+				span.style = "color: blue;";
+				break;
+		}
+		attributeElement.appendChild(span);
+	}
+	rootElement.appendChild(attributeElement);
 };
