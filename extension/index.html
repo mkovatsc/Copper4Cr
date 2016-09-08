@@ -386,9 +386,10 @@
 					</fieldset>
 				</div>
 				<div class="hbox flex-filler">
-				
-					<div class="sidebar-left hbox">
-						<div id="resource_tree" class="tree border_solid white flex-filler"></div>
+					<div class="container-for-collapser" style="position: relative; min-width: 4px; height: 100%;">
+						<div class="sidebar-left hbox" style="height: 100%;">
+							<div id="copper-resource-tree" class="tree border_solid white flex-filler"></div>
+						</div>
 					</div>
 					
 					<div class="vbox flex-filler" style="min-width: 380px;">
@@ -454,8 +455,8 @@
 				</div>
 			
 			</div>
-			<div class="container-for-collapser" style="position: relative; overflow-y: auto;">
-				<div id="copper-debug-options" class="sidebar-right vbox">
+			<div class="container-for-collapser" style="position: relative; min-width: 4px;">
+				<div id="copper-debug-options" class="sidebar-right vbox" style="height: 100%; overflow-y: auto;">
 
 					<div style="padding: 0px 10px 0px 10px; min-height: 35px; height: 35px;">
 						<div>
@@ -464,7 +465,7 @@
 						</div>
 					</div>
 
-					<div style="display: block; padding: 0 4px 0 10px; overflow-y: auto;">
+					<div style="display: block; padding: 0 4px 0 10px;">
 						<div style="padding: 4px;">
 							<div style="text-align: center;"><label>Token</label></div>
 							<div id="copper-debug-options-token" class="flex vbox"></div>

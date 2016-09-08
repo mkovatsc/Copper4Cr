@@ -2,12 +2,17 @@ Copper.ResourceViewAdapter = function(){
 };
 
 Copper.ResourceViewAdapter.resizer = undefined;
+Copper.ResourceViewAdapter.collapser = undefined;
 
 Copper.ResourceViewAdapter.beforeSessionInitialization = function(){
     Copper.ResourceViewAdapter.resizer = Copper.Resizer.installResizer(document.getElementsByClassName("sidebar-left")[0], function(newWidth, newHeight){
         Copper.Session.layout.resourceTreeWidth = newWidth;
         Copper.Session.updateLayout(Copper.Session.layout);
     }, true, false, false);
+    Copper.ResourceViewAdapter.collapser = Copper.Resizer.installCollapser(document.getElementsByClassName("sidebar-left")[0], "right", function(collapsed){
+        Copper.Session.layout.resourceViewCollapsed = collapsed;
+        Copper.Session.updateLayout(Copper.Session.layout);
+    });
 };
 
 Copper.ResourceViewAdapter.onLayoutUpdated = function(){
@@ -17,6 +22,7 @@ Copper.ResourceViewAdapter.onLayoutUpdated = function(){
     else {
         Copper.ResourceViewAdapter.resizer.reset();
     }
+    Copper.ResourceViewAdapter.collapser.changeCollapsedState(Copper.Session.layout.resourceViewCollapsed);
 };
 
 Copper.ResourceViewAdapter.onEvent = function(event){
@@ -31,7 +37,7 @@ Copper.ResourceViewAdapter.onEvent = function(event){
             if (responseCoapMessage.code.equals(Copper.CoapMessage.Code.CONTENT) && 
                   contentFormatOption.length === 1 && contentFormatOption[0] === Copper.CoapMessage.ContentFormat.CONTENT_TYPE_APPLICATION_LINK_FORMAT.number){
                 Copper.ResourceViewAdapter.updateResourceLinks(Copper.StringUtils.parseLinkFormat(Copper.ByteUtils.convertBytesToString(responseCoapMessage.payload)));
-                let selectedResource = document.getElementById("resource_tree").getElementsByClassName("selected");
+                let selectedResource = document.getElementById("copper-resource-tree").getElementsByClassName("selected");
             }
         }
     }
@@ -60,7 +66,7 @@ Copper.ResourceViewAdapter.onResourcesUpdated = function(){
 };
 
 Copper.ResourceViewAdapter.clearTree = function() {
-	let tree = document.getElementById('resource_tree');
+	let tree = document.getElementById('copper-resource-tree');
     while (tree.firstChild !== null) tree.removeChild(tree.firstChild);
     tree.classList.remove("can_expand");
 };
@@ -70,7 +76,7 @@ Copper.ResourceViewAdapter.onClickResource = function() {
 };
 
 Copper.ResourceViewAdapter.addTreeResource = function(segments, attributes, address, selectedPath) {
-    var tree = document.getElementById('resource_tree');
+    var tree = document.getElementById('copper-resource-tree');
 
     var node = tree;
 

@@ -79,6 +79,7 @@ QUnit.test("ExtensionJsonUtils: Payload", function(assert) {
 QUnit.test("ExtensionJsonUtils: Layout", function(assert) {
 	let data = new Copper.Layout();
 	data.resourceTreeWidth = 22;
+	data.resourceViewCollapsed = true;
 	let json = Copper.JsonUtils.stringify(data);
 	assert.deepEqual(Copper.JsonUtils.parse(json), data);
 	assert.deepEqual((Copper.JsonUtils.parse(json) instanceof Copper.Layout), true);

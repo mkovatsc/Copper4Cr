@@ -37,6 +37,10 @@ Copper.Layout.prototype.messageLogHeight = undefined;
 Copper.Layout.prototype.eventLogWidth = undefined;
 Copper.Layout.prototype.eventLogHeight = undefined;
 
+Copper.Layout.prototype.resourceViewCollapsed = false;
+Copper.Layout.prototype.messageLogCollapsed = false;
+Copper.Layout.prototype.debugOptionsCollapsed = false;
+
 Copper.Layout.prototype.clone = function(){
     return Copper.CopperUtils.cloneObject(this, new Copper.Layout());
 };
