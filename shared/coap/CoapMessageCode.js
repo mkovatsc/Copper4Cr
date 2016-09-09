@@ -40,6 +40,9 @@ Copper.CoapMessage.Code = function(number, name) {
 	this.name = name;
 };
 
+/*
+* @return representation of the code
+*/
 Copper.CoapMessage.Code.prototype.getName = function(){
 	if (this.number < 32){
 		return this.name;
@@ -49,6 +52,9 @@ Copper.CoapMessage.Code.prototype.getName = function(){
 	}
 };
 
+/*
+* @return shortcode for the code, e.g. 2.05 for content
+*/
 Copper.CoapMessage.Code.prototype.getShortcode = function(){
 	if (this.number < 32){
 		return this.name;

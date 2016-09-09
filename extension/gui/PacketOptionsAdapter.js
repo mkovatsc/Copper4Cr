@@ -28,7 +28,10 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+/*
+* GUI-Adapter for the PacketOptions on top center right
+* - Fills the table with all set options for each received coap message
+*/
 Copper.PacketOptionsAdapter = function(){
 };
 

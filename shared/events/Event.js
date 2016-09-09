@@ -29,6 +29,10 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
+/*
+* Event queue for the Copper Application. A seperate queue is maintained for each unique endpointID. 
+* Callbacks can be registered on such endpointIds and only get the messages for the corresponding endpoint
+*/
 Copper.Event = function() {
 };
 
@@ -36,6 +40,9 @@ Copper.Event.callbacks = [];
 Copper.Event.queue = [];
 Copper.Event.isDispatching = false;
 
+/*
+* Registers a new callback for the given endpointId
+*/
 Copper.Event.registerCallback = function(callback, endpointId){
 	if (!(typeof(callback) === "function") || !Number.isInteger(endpointId)){
 		throw new Error("Illegal Arguments");
@@ -46,6 +53,9 @@ Copper.Event.registerCallback = function(callback, endpointId){
 	});
 };
 
+/*
+* Removes the callback with the given endpointID
+*/
 Copper.Event.unregisterCallback = function(callback, endpointId){
 	if (!(typeof(callback) === "function") || !Number.isInteger(endpointId)){
 		throw new Error("Illegal Arguments");
@@ -59,6 +69,9 @@ Copper.Event.unregisterCallback = function(callback, endpointId){
 	}
 };
 
+/**
+* Removes all events for a given endpointId
+*/
 Copper.Event.removeEventsForEndpoint = function(endpointId){
 	if (!Number.isInteger(endpointId)){
 		throw new Error("Illegal Argument");
@@ -72,6 +85,9 @@ Copper.Event.removeEventsForEndpoint = function(endpointId){
 	}
 };
 
+/*
+* Adds a new event to the queue and dispatches the queue
+*/
 Copper.Event.sendEvent = function(event) {
 	if (!Number.isInteger(event.type) || !Number.isInteger(event.endpointId)){
 		throw new Error("Illegal Arguments");
@@ -80,6 +96,9 @@ Copper.Event.sendEvent = function(event) {
 	Copper.Event.dispatchEvents();
 };
 
+/*
+* Processes the event queue and dispatches the events to the registered callbacks (for the given endpoint-ID)
+*/
 Copper.Event.dispatchEvents = function(){
 	if (!Copper.Event.isDispatching) {
 		Copper.Event.isDispatching = true;
@@ -108,6 +127,8 @@ Copper.Event.dispatchEvents = function(){
 		}
 	}
 };
+
+// ------------ Event types ------------
 
 Copper.Event.TYPE_ERROR_ON_SERVER = 1;
 Copper.Event.ERROR_GENERAL = 10;
@@ -141,6 +162,7 @@ Copper.Event.TYPE_REQUEST_TIMEOUT = 54;
 Copper.Event.TYPE_CANCEL_REQUESTS = 55;
 Copper.Event.TYPE_REQUEST_CANCELED = 56;
 
+// ---------- Factories ---------------
 
 Copper.Event.createEvent = function(type, data, endpointId){
 	if (!Number.isInteger(type) || !Number.isInteger(endpointId)){

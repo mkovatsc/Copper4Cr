@@ -28,7 +28,9 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
-
+/*
+* Sender for messages with an observe option
+*/
 Copper.ObserveSender = function(coapMessage, requestHandler, onComplete){
 	if (!(coapMessage instanceof Copper.CoapMessage) || !(requestHandler instanceof Copper.SingleRequestHandler) || typeof(onComplete) !== "function"){
 		throw new Error("Illegal argument");

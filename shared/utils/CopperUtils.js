@@ -32,6 +32,9 @@
 Copper.CopperUtils = function() {
 };
 
+/*
+* Copies the values from @objectToClone to @newObject. Arrays and objects are copied deep.
+*/
 Copper.CopperUtils.cloneObject = function(objectToClone, newObject){
 	let keys = Object.keys(objectToClone);
 	for (let i=0; i<keys.length; i++){

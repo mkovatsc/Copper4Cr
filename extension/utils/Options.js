@@ -29,6 +29,11 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
+/*
+* Holder for the debug options that are set. 
+* Use setters in order to validate the options (an exception is thrown if an option cannot be validated)
+* Use the method @addOptionsToCoapMessage in order to add the options to the coapMessage
+*/
 Copper.Options = function() {
     this.options = new Object();
     this.customOptions = new Object();
@@ -113,7 +118,8 @@ Copper.Options.prototype.addOptionInternal = function(number, value, optionHolde
     if (!optionHeader.multipleValues && this.isOptionSet(number)){
         throw new Error("Option " + optionHeader.name + " must not be set more than once");
     }
-    new Copper.CoapMessage.Option(optionHeader).addValue(this.transformValue(value, optionHeader.type, 4), {useUtf8: this.useUtf8});
+    let transformedValue = this.transformValue(value, optionHeader.type, 4);
+    new Copper.CoapMessage.Option(optionHeader).addValue(transformedValue, {useUtf8: this.useUtf8});
     // check proxy-options / uri-options
     if (number === Copper.CoapMessage.OptionHeader.PROXY_URI.number){
         if (this.isOptionSet(Copper.CoapMessage.OptionHeader.URI_HOST.number) || this.isOptionSet(Copper.CoapMessage.OptionHeader.URI_PORT.number) ||
@@ -121,7 +127,7 @@ Copper.Options.prototype.addOptionInternal = function(number, value, optionHolde
             throw new Error("Proxy-uri cannot be used when URI-* options are set");
         }
         if (this.useProxyScheme) {
-            let uri = Copper.StringUtils.parseUri(this.proxyUri);
+            let uri = Copper.StringUtils.parseUri(transformedValue);
             if (uri === undefined){
                 throw new Error("Proxy URI is not a valid URI");
             }
@@ -187,6 +193,11 @@ Copper.Options.prototype.addOptionToCoapMessage = function(coapMessage, optionHe
         }
         else if (optionHeader.number === Copper.CoapMessage.OptionHeader.LOCATION_QUERY.number){
             Copper.CopperUtils.splitOptionAndAddToCoapMessage(coapMessage, Copper.CoapMessage.OptionHeader.LOCATION_QUERY, value, "&", {useUtf8: this.useUtf8});
+        }
+        else if (optionHeader.number === Copper.CoapMessage.OptionHeader.OBSERVE.number){
+            if (!coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.OBSERVE)) {
+                coapMessage.addOption(optionHeader, value);
+            }
         }
         else {
             coapMessage.addOption(optionHeader, value, false, {useUtf8: this.useUtf8});

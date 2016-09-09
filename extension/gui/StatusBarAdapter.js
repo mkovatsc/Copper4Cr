@@ -29,6 +29,10 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 
+/*
+* GUI-Adapter for the StatusBar on the top
+* - Processes different events and updates the status
+*/
 Copper.StatusBarAdapter = function(){
 };
 

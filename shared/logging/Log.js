@@ -28,7 +28,9 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+/*
+* Logger interface. Concrete loggers have to be registered. Log messages are distributed to all registered Loggers.
+*/
 Copper.Log = function() {
 };
 

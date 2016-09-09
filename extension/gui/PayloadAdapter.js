@@ -28,7 +28,13 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+
+/*
+* GUI-Adapter for the Payload-Panes in the center
+* - Displays payloads of received message in the text and the rendered pane
+* - Updates the text-payload of the payload object on the session
+* - Updates the outgoing pane if the profile is changed
+*/
 Copper.PayloadAdapter = function(){
 };
 

@@ -29,7 +29,9 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-﻿// Called when the user clicks on the browser action.
+﻿/*
+* Adds action to the toolbar button
+*/
 chrome.browserAction.onClicked.addListener(function(tab) {
   chrome.tabs.create({url: chrome.extension.getURL('index.html')});
 });

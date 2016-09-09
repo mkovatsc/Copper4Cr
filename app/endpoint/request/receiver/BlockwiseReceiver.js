@@ -28,7 +28,9 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+/*
+* Receiver that collects responses from a block transfer
+*/
 Copper.BlockwiseReceiver = function(requestHandler, initialSentCoapMessage, initialReceivedCoapMessage){
 	if (!(requestHandler instanceof Copper.SingleRequestHandler) || !(initialSentCoapMessage instanceof Copper.CoapMessage) 
 		    || !(initialReceivedCoapMessage instanceof Copper.CoapMessage) || initialReceivedCoapMessage.getOption(Copper.CoapMessage.OptionHeader.BLOCK2).length === 0) {

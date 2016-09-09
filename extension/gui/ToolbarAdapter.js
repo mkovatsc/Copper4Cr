@@ -28,13 +28,19 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+
+/*
+* GUI-Adapter for the Toolbar on the top
+* - Propagates changes in the behavior menu to the settings object on the session
+* - Propagates changes in the selected profile to the profiles object on the session
+* - Propagates changes in the payload file to the payload object on the session
+* - Executes the different coap requests
+*/
 Copper.ToolbarAdapter = function(){
 };
 
 Copper.ToolbarAdapter.chooseFileDefaultString = "Choose File...";
 Copper.ToolbarAdapter.ongoingDiscoverRequest = false;
-Copper.ToolbarAdapter.resizer = undefined;
 
 Copper.ToolbarAdapter.beforeSessionInitialization = function(){
 	document.getElementById("copper-toolbar-ping").onclick = Copper.ToolbarAdapter.doPing;
@@ -77,22 +83,6 @@ Copper.ToolbarAdapter.beforeSessionInitialization = function(){
     let dropdowns = document.getElementsByClassName("copper-toolbar-dropdown-button");
     for (let i = 0; i < dropdowns.length; i++) {
         dropdowns[i].onclick = Copper.ToolbarAdapter.openDropdown;
-    }
-    
-    Copper.ToolbarAdapter.resizer = Copper.Resizer.installResizer(document.getElementById("copper-toolbar-log-event-container"), function(newWidth, newHeight){
-        Copper.Session.layout.eventLogWidth = newWidth;
-        Copper.Session.layout.eventLogHeight = newHeight;
-        Copper.Session.updateLayout(Copper.Session.layout);
-    }, false, false, true);
-};
-
-Copper.ToolbarAdapter.onLayoutUpdated = function(){
-    if (Copper.Session.layout.eventLogWidth !== undefined && Copper.Session.layout.eventLogHeight !== undefined){
-        Copper.ToolbarAdapter.resizer.setWidth(Copper.Session.layout.eventLogWidth);
-        Copper.ToolbarAdapter.resizer.setHeight(Copper.Session.layout.eventLogHeight);
-    }
-    else {
-        Copper.ToolbarAdapter.resizer.reset();   
     }
 };
 

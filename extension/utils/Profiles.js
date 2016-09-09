@@ -28,7 +28,9 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+/*
+* Holder for the different profiles and the profile options (e.g. selected profile)
+*/
 Copper.Profiles = function() {
     this.profiles = new Object();
     this.profiles[Copper.Profiles.DEFAULT_PROFILE_KEY] = {

@@ -28,7 +28,10 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+
+/*
+* Logs messages on the console
+*/
 Copper.ConsoleLogger = {
 	log : function(logLevel, text) {
 			console.log("[" + Copper.Log.getLogLevelText(logLevel) + "] " + Copper.StringUtils.getDateTime() + ": " + text);

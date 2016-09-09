@@ -28,7 +28,10 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+/*
+* Manages the storage. Used to store or retrieve objects.
+* Internally uses the Copper Storage API to persists objects
+*/
 Copper.StorageManager = function(keyPrefix) {
 	this.keyPrefix = keyPrefix !== undefined ? keyPrefix : "";
 };

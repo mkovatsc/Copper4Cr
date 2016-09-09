@@ -28,7 +28,14 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
-
+/*
+* The Session provides all the shared information on the client to the GUI-Adapters (see the list below).
+* Additionally, it is used
+*  - to perform the startup
+*  - dispatch events to the GUI-Adapters
+*  - send a coap message to the server
+*  - update the shared state and persist it (see update* functions on the bottom)
+*/
 window.onload = function(){
     Copper.Log.registerLogger(Copper.ConsoleLogger.log);
     Copper.Session.initialize();
@@ -40,7 +47,6 @@ Copper.Session = function(){
 Copper.Session.clientId = undefined;
 Copper.Session.storageManager = undefined;
 
-Copper.Session.profileName = undefined;
 Copper.Session.settings = undefined;
 Copper.Session.options = undefined;
 Copper.Session.payload = undefined;
@@ -223,10 +229,6 @@ Copper.Session.onPortDisconnect = function(){
     Copper.Session.clientEndpoint = undefined;
     Copper.Session.localPort = undefined;
     Copper.PopupWindowAdapter.openErrorWindow("Connection lost...", "Connection to Copper app lost. Please restart the extension.", false);
-};
-
-Copper.Session.storeChange = function() {
-    Copper.Session.profiles.updateCurrentProfile();
 };
 
 Copper.Session.updateSettings = function(newSettings, skipStoringToProfile) {

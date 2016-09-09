@@ -29,6 +29,9 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 
+/*
+* Object that contains all the settings for the layout
+*/
 Copper.Layout = function() {
 };
 

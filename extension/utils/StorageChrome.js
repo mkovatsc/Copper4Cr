@@ -29,8 +29,9 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-// Implementation of the storage API for Chrome
-
+/*
+* Implementation of the storage API for Chrome
+*/ 
 Copper.Storage = function(){
 };
 

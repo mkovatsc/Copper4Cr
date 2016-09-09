@@ -29,7 +29,9 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-// Builds on top of the shared JsonUtils
+/*
+* Adds more transformers to the Copper JSON Utility
+*/
 Copper.ExtensionJsonUtils = function(){
 };
 

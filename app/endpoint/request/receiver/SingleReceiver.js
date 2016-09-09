@@ -29,6 +29,9 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
+/*
+* Receiver that completes with the first received message
+*/
 Copper.SingleReceiver = function(requestHandler){
 	if (!(requestHandler instanceof Copper.SingleRequestHandler)){
 		throw new Error("Illegal Argument");

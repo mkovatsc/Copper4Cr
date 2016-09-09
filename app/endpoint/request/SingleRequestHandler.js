@@ -33,6 +33,18 @@
 * This object handles a single Request from the client, meaning
 * - It performs blockwise transfer where appropriate
 * - It handles observable resources
+*
+* To perform a request:
+* 1. Create a SingleRequestHandler using
+*     @coapMessage message to send
+*     @blockwiseEnabled true if handler should automatically do blockwise transfers
+*     @transmissionHandler transmisionHandler that can be used to send messages
+*     @settings settings for this request
+*     @endpointId id of the sending endpoint
+* 2. Start the request using the start() function
+*    - new sender is created (ObserveSender if OBSERVE-Option is set, BlockwiseSender otherwise)
+*    - on a response, a new Receiver is created (depending on the BLOCK2-Option)
+* 3. Process the events sent on the Event-Queue (Copper.Event)
 */
 Copper.SingleRequestHandler = function(coapMessage, blockwiseEnabled, transmissionHandler, settings, endpointId){
 	if (!(coapMessage instanceof Copper.CoapMessage) || !(transmissionHandler instanceof Copper.TransmissionHandler) || !(settings instanceof Copper.Settings)

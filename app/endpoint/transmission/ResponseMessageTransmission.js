@@ -28,7 +28,9 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+/*
+* Holder for a sent response 
+*/
 Copper.ResponseMessageTransmission = function(coapMessage, remoteAddress, remotePort){
 	if (!(coapMessage instanceof Copper.CoapMessage) || coapMessage.mid === undefined || typeof(remoteAddress) !== "string" 
 		     || !Number.isInteger(remotePort) || remotePort <= 0x0 || remotePort > 0xFFFF){
