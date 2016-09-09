@@ -28,7 +28,13 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
-
+/*
+* GUI-Adapter for the DebugOptions on the right side
+* - Propagates changes in the debug options the option object on the session
+* - Validates options using the option object
+* - Updates if the profile is changed
+* - Installs a collapser
+*/
 Copper.DebugOptionsAdapter = function(){
 };
 

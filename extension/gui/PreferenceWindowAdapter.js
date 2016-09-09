@@ -28,7 +28,11 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
-
+/*
+* GUI-Adapter for the Preferences Screen that can be started using the top right settings bottom
+* - Propagates the UTF-8 option to the option object on the session
+* - Performs the selected actions
+*/
 Copper.PreferenceWindowAdapter = function(){
 };
 

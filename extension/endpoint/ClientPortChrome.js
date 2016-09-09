@@ -29,6 +29,9 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 
+/*
+* Implementation of the ClientPort API for chrome
+*/
 Copper.ClientPort = function(){
 };
 

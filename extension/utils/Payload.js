@@ -28,7 +28,10 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
-
+/*
+* Holder for the payload options
+* Use @addPayloadToCoapMessage to add the selected payload to the coapMessage
+*/
 Copper.Payload = function() {
 };
 

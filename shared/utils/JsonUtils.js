@@ -29,6 +29,10 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
+/*
+* JSON interface. Serializes / Deserializes json objects keeping the Copper-Type if a 
+* handler is registered for a given type
+*/
 Copper.JsonUtils = function(){
 };
 

@@ -29,6 +29,9 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 
+/*
+* Helper for installing a resizer and a collapser
+*/
 Copper.Resizer = function(){
 };
 

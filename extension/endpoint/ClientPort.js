@@ -29,6 +29,9 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 
+/*
+* Stub for the port to the server
+*/
 Copper.ClientPort = function(){
     throw new Error("not implemented");
 };

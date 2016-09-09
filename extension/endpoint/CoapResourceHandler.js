@@ -29,6 +29,9 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 
+/*
+* Stub for resolving the selected CoapResource and changing to another CoapResource
+*/
 Copper.CoapResourceHandler = function(){
     throw new Error("not implemented");
 };

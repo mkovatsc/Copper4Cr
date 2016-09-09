@@ -29,6 +29,11 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
+/*
+* GUI-Adapter for the CoapMessageLog on the bottom
+* - Adds each sent / received message to the message log
+* - Installs a resizer and a collapser
+*/
 Copper.MessageLogAdapter = function(){
 };
 

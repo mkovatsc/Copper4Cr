@@ -28,7 +28,10 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+
+/*
+* Holder for the resources for a given key (usually remoteAddress:remotePort)
+*/
 Copper.Resources = function() {
 	this.resources = new Object();	
 };

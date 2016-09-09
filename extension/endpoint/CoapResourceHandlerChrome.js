@@ -29,6 +29,11 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 
+/*
+* Implementation of the CoapResourceHandler API for the Copper-Chrome extension.
+* As it is not possible to install a custom protocol handler, the selected coap resource is appended to the extension URL 
+* as the search parameter
+*/
 Copper.CoapResourceHandler = function(){
 };
 
@@ -42,8 +47,7 @@ Copper.CoapResourceHandler.resolveCoapResource = function(callback){
         Copper.StartupWindowAdapter.openStartupWindow(function(value) {
             uri = Copper.StringUtils.parseUri(value);
             if (uri === undefined){
-                // TODO
-                //errorCallback("Please enter a valid URL");
+                Copper.PopupWindowAdapter.openErrorWindow("Enter URL", "Please enter a valid URL", true);
             }
             else {
                 Copper.CoapResourceHandler.changeCoapResource(uri.protocol ? uri.protocol : "coap", uri.address, uri.port ? uri.port : Copper.CoapConstants.DEFAULT_PORT, uri.path, uri.query);

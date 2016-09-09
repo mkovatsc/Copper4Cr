@@ -36,6 +36,9 @@ Copper.TimeUtils.now = function(){
 	return Date.now ? Date.now() : new Date().getTime();
 };
 
+/*
+* @return true if @timestamp is older than @milliseconds
+*/
 Copper.TimeUtils.isOlderThan = function(timestamp, milliseconds){
 	if (!Number.isInteger(timestamp) || timestamp < 0 || !Number.isInteger(milliseconds) || milliseconds < 0){
 		throw new Error("Illegal argument");
@@ -43,10 +46,17 @@ Copper.TimeUtils.isOlderThan = function(timestamp, milliseconds){
 	return Copper.TimeUtils.now() - timestamp > milliseconds;
 };
 
+/*
+* set a @callback that will be called in @milliseconds
+* @return ID which can be used to clear the timeout
+*/
 Copper.TimeUtils.setTimeout = function(callback, milliseconds) {
 	return window.setTimeout(callback, milliseconds);
 };
 
+/*
+* Clear a previously set timeout
+*/
 Copper.TimeUtils.clearTimeout = function(timeoutId){
 	return window.clearTimeout(timeoutId);
 };

@@ -28,9 +28,10 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
-// Stub for a storage API
 
+/*
+* Stub for storing, loading and removing JSON-Objects
+*/
 Copper.Storage = function(){
 	throw new Error("not implemented");
 };

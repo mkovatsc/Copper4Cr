@@ -28,7 +28,10 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+/*
+* GUI-Adapter for the ProfilesManager
+* - Manages the different profiles in the profiles object on the session 
+*/
 Copper.ProfilesAdapter = function(){
 };
 

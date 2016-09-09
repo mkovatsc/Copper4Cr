@@ -28,7 +28,10 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+
+/*
+* Sender for single messages or blockwise-messages (i.e. messages without observe)
+*/
 Copper.BlockwiseSender = function(coapMessage, blockwiseEnabled, requestHandler, onComplete){
 	if (!(coapMessage instanceof Copper.CoapMessage) || !(requestHandler instanceof Copper.SingleRequestHandler) || typeof(onComplete) !== "function"){
 		throw new Error("Illegal argument");

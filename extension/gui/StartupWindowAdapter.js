@@ -29,6 +29,9 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 
+/*
+* GUI-Adapter for the StartupWindow that is showed if no coap resource is selected
+*/
 Copper.StartupWindowAdapter = function(){
 };
 

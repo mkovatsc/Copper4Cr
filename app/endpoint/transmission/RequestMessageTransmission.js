@@ -28,7 +28,10 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+/*
+* Holder for a request transmission. Offers methods to check whether a retransmission is necessary or 
+* to get the current state
+*/
 Copper.RequestMessageTransmission = function(coapMessage, requestHandler, doRetransmissions){
 	if (!(coapMessage instanceof Copper.CoapMessage) || coapMessage.mid === undefined){
 		throw new Error("Illegal argument");

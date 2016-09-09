@@ -28,7 +28,10 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+
+/*
+* Client interface to the server endpoint
+*/
 Copper.ClientEndpoint = function(port, id){
 	if (!port || !Number.isInteger(id)){
 		throw new Error("Illegal Arguments");

@@ -84,6 +84,14 @@ Copper.StringUtils.lpad = function(str, len, pad){
 	}
 };
 
+/**
+* @return object containing the parsed URI-Parts. The following parts are returned if set
+*   - protocol
+*   - address
+*   - port
+*   - path
+*   - query
+*/
 Copper.StringUtils.parseUri = function(rawUri){
 	if (!rawUri){
 		return undefined;
@@ -94,7 +102,7 @@ Copper.StringUtils.parseUri = function(rawUri){
 	let parser = document.createElement("a");
 
 	// we have to set a valid protocol
-	let protocolMatcher = /^([a-zA-Z]+):\/\/(.+?)$/;
+	let protocolMatcher = /^([a-zA-Z]+):\/\/(.*?)$/;
 	let match = protocolMatcher.exec(rawUri);
 	if (match === null){
 		parser.href = "http://" + rawUri;

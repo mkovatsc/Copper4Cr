@@ -28,7 +28,10 @@
  * 
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
- 
+/*
+* GUI-Adapter for the PacketHeader box on top center left
+* - Sets type, code, mid and token for each received message
+*/
 Copper.PacketHeaderAdapter = function(){
 };
 
