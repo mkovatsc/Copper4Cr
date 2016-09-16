@@ -67,7 +67,7 @@ Copper.ToolbarLoggerAdapter.addLogEntry = function(log, onCurrent) {
     } else {
         newEntry.textContent = time + log;
     }
-    logger.appendChild(newEntry);
+    logger.insertBefore(newEntry, logger.firstChild);
 };
 
 Copper.ToolbarLoggerAdapter.onEvent = function(event) {
