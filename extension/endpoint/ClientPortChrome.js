@@ -58,7 +58,7 @@ Copper.ClientPort.connect = function(clientId, finalDisconnectHandler, callback)
             port.registerDisconnectCallback(function(){
                 // app was not started
                 Copper.TimeUtils.clearTimeout(secondTimeout);
-                Copper.PopupWindowAdapter.openErrorWindow("Copper App not installed", "This extension needs the Copper application to send Coap-Messages. Please install the app and reload.", false);
+                Copper.PopupWindowAdapter.openErrorWindow("Copper App not installed", "This extension needs the Copper application to send Coap-Messages. Please install the app (<a href=\"https://chrome.google.com/webstore/detail/" + appId + "\">Chrome Web Store</a>) and reload.", false);
             });
         });
     });
