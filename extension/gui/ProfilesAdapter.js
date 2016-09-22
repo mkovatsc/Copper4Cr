@@ -71,7 +71,7 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
         // Profile name validation
         // First loop to check if profile names not empty, contain only letters and numbers and are unique
         let hasFormError = false;
-        let validationProfileSet = {};
+        let validationProfileSet = {"Standard Profile" : true};
         for (let i = 0; i < managerProfiles.length; i++) {
             let managerProfileName = managerProfiles[i].firstElementChild.firstElementChild;
 
@@ -88,7 +88,7 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
                     hasFormError = true;
                 }
 
-                if (!/^[A-Za-z0-9]*$/g.test(managerProfileName.value)) {
+                if (!/^[A-Za-z0-9 ]*$/g.test(managerProfileName.value)) {
                     managerProfileName.style.backgroundColor = "rgba(255,0,0,0.6)";
                     hasFormError = true
                 }
