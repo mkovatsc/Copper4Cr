@@ -61,6 +61,22 @@ Copper.PopupWindowAdapter.openPopupWindow = function(title, msg, closable, icon)
         exitButton.onclick = function() {
             blockScreen.classList.add("hidden");
         };
+    } else {
+        let reloadButton = document.createElement("BUTTON");
+        reloadButton.textContent = "Reload Page";
+        reloadButton.classList.add("copper-error-reload-button");
+        document.getElementById("copper-overlay-error").lastElementChild.appendChild(reloadButton);
+        reloadButton.onclick = function() {
+            document.location.reload(true);
+        };
+
+        let backButton = document.createElement("BUTTON");
+        backButton.textContent = "Back to Resource Selection";
+        backButton.classList.add("copper-error-back-to-resource-button");
+        document.getElementById("copper-overlay-error").lastElementChild.appendChild(backButton);
+        backButton.onclick = function() {
+            Copper.CoapResourceHandler.goToResourceSelection();
+        };
     }
 };
 

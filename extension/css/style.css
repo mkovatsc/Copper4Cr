@@ -1074,6 +1074,7 @@ button
 	text-transform: none;
 	margin-left: 30%;
 	margin-right: 30%;
+	margin-top: 15px;
 	width: 40%;
 }
 
@@ -1147,4 +1148,18 @@ button
 	bottom: 5px;
 	width: 80px;
 	left: 160px;
+}
+
+#popup-windows .copper-error .copper-error-reload-button {
+	position: absolute;
+	bottom: 5px;
+	width: 175px;
+	left: 10px;
+}
+
+#popup-windows .copper-error .copper-error-back-to-resource-button {
+	position: absolute;
+	bottom: 5px;
+	width: 175px;
+	left: 195px;
 }

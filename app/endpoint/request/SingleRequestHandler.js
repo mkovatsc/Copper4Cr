@@ -75,7 +75,7 @@ Copper.SingleRequestHandler.prototype.start = function(){
 
 	// check properties of coap message
 	let observeOption = this.coapMessage.getOption(Copper.CoapMessage.OptionHeader.OBSERVE);
-	let observing = observeOption.length === 1 && observeOption[0] === 0;
+	let observing = Copper.CoapMessage.Code.GET.equals(this.coapMessage.code) && observeOption.length === 1 && observeOption[0] === 0;
 
 	// create token and register this handler
 	let token = this.coapMessage.token;

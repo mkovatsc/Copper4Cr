@@ -63,3 +63,7 @@ Copper.CoapResourceHandler.changeCoapResource = function(protocol, remoteAddress
 	window.location.search = "?" + encodeURIComponent((protocol ? protocol + "://" : "") + remoteAddress + ":" + remotePort +
 				(path ? ("/" + path) : "") + (query ? ("?" + query) : ""));
 };
+
+Copper.CoapResourceHandler.goToResourceSelection = function(){
+    window.location.search = "";
+};

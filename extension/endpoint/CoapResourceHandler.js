@@ -43,3 +43,7 @@ Copper.CoapResourceHandler.resolveCoapResource = function(){
 Copper.CoapResourceHandler.changeCoapResource = function(protocol, remoteAddress, remotePort, path, query, reload){
 	throw new Error("not implemented");
 };
+
+Copper.CoapResourceHandler.goToResourceSelection = function(){
+	throw new Error("not implemented");
+};
