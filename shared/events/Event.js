@@ -143,24 +143,24 @@ Copper.Event.TYPE_CLIENT_REGISTERED = 21;
 Copper.Event.TYPE_UNREGISTER_CLIENT = 22;
 Copper.Event.TYPE_UPDATE_SETTINGS = 23;
 
-Copper.Event.TYPE_SEND_COAP_MESSAGE = 30;
-Copper.Event.TYPE_COAP_MESSAGE_SENT = 31;
-Copper.Event.TYPE_MESSAGE_TRANSMISSION_TIMED_OUT = 32;
-Copper.Event.TYPE_MESSAGE_TRANSMISSION_CONFIRMED = 33;
-Copper.Event.TYPE_MESSAGE_TRANSMISSION_COMPLETED = 34;
+Copper.Event.TYPE_COAP_MESSAGE_SENT = 30;
+Copper.Event.TYPE_MESSAGE_TRANSMISSION_TIMED_OUT = 31;
+Copper.Event.TYPE_MESSAGE_TRANSMISSION_CONFIRMED = 32;
+Copper.Event.TYPE_MESSAGE_TRANSMISSION_COMPLETED = 33;
 
 Copper.Event.TYPE_COAP_MESSAGE_RECEIVED = 40;
 Copper.Event.TYPE_UNKNOWN_COAP_MESSAGE_RECEIVED = 41;
 Copper.Event.TYPE_DUPLICATE_COAP_MESSAGE_RECEIVED = 42;
 Copper.Event.TYPE_RECEIVED_PARSE_ERROR = 43;
 
-Copper.Event.TYPE_REQUEST_COMPLETED = 50;
-Copper.Event.TYPE_OBSERVE_REQUEST_FRESH = 51;
-Copper.Event.TYPE_OBSERVE_REQUEST_OUT_OF_ORDER = 52;
-Copper.Event.TYPE_REQUEST_RECEIVE_ERROR = 53;
-Copper.Event.TYPE_REQUEST_TIMEOUT = 54;
-Copper.Event.TYPE_CANCEL_REQUESTS = 55;
-Copper.Event.TYPE_REQUEST_CANCELED = 56;
+Copper.Event.TYPE_SEND_COAP_MESSAGE = 50;
+Copper.Event.TYPE_REQUEST_COMPLETED = 51;
+Copper.Event.TYPE_OBSERVE_REQUEST_FRESH = 52;
+Copper.Event.TYPE_OBSERVE_REQUEST_OUT_OF_ORDER = 53;
+Copper.Event.TYPE_REQUEST_RECEIVE_ERROR = 54;
+Copper.Event.TYPE_REQUEST_TIMEOUT = 55;
+Copper.Event.TYPE_CANCEL_REQUESTS = 56;
+Copper.Event.TYPE_REQUEST_CANCELED = 57;
 
 // ---------- Factories ---------------
 
@@ -215,14 +215,6 @@ Copper.Event.createUpdateSettingsEvent = function(settings, endpointId){
 		settings: settings
 	};
 	return Copper.Event.createEvent(Copper.Event.TYPE_UPDATE_SETTINGS, data, endpointId);
-};
-
-Copper.Event.createClientSendCoapMessageEvent = function(coapMessage, blockwiseEnabled, endpointId){
-	let data = {
-		coapMessage: coapMessage,
-		blockwiseEnabled: (blockwiseEnabled ? true : false)
-	};
-	return Copper.Event.createEvent(Copper.Event.TYPE_SEND_COAP_MESSAGE, data, endpointId);
 };
 
 Copper.Event.createCoapMessageSentEvent = function(coapMessage, bytesSent, retransmissionCount, endpointId){
@@ -301,6 +293,14 @@ Copper.Event.createReceivedParseErrorEvent = function(parserError, remoteAddress
 		byteLength: byteLength
 	};
 	return Copper.Event.createEvent(Copper.Event.TYPE_RECEIVED_PARSE_ERROR, data, endpointId);
+};
+
+Copper.Event.createClientSendCoapMessageEvent = function(coapMessage, blockwiseEnabled, endpointId){
+	let data = {
+		coapMessage: coapMessage,
+		blockwiseEnabled: (blockwiseEnabled ? true : false)
+	};
+	return Copper.Event.createEvent(Copper.Event.TYPE_SEND_COAP_MESSAGE, data, endpointId);
 };
 
 Copper.Event.createRequestCompletedEvent = function(requestCoapMessage, responseCoapMessage, requestDuration, endpointId){
