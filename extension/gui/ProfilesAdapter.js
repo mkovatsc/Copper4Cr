@@ -87,16 +87,11 @@ Copper.ProfilesAdapter.closeProfileManager = function(storeChanges) {
                     managerProfileName.style.backgroundColor = "rgba(255,255,0,0.6)";
                     hasFormError = true;
                 }
-
-                if (!/^[A-Za-z0-9 ]*$/g.test(managerProfileName.value)) {
-                    managerProfileName.style.backgroundColor = "rgba(255,0,0,0.6)";
-                    hasFormError = true
-                }
             }
         }
 
         if (hasFormError) {
-            Copper.PopupWindowAdapter.openErrorWindow("Illegal profile input", "One or more profile names are either empty, contain an illegal character (use letters and numbers only) or have a non-unique name!", true);
+            Copper.PopupWindowAdapter.openErrorWindow("Illegal profile input", "One or more profile names are either empty or have a non-unique name!", true);
             return;
         }
 
