@@ -239,7 +239,6 @@ button
 	height: 8px;
 	left: 4px;
 	top: -5px;
-	z-index: 7;
 }
 
 .y-collapser-top {
@@ -264,7 +263,6 @@ button
 	position: absolute;
 	left: -2px;
 	top: -2px;
-	z-index: 7;
 }
 
 .x-collapser-right {

@@ -60,6 +60,14 @@ Copper.PreferenceWindowAdapter.onUtf8Checkbox = function(){
     Copper.Session.updateOptions(Copper.Session.options);
 };
 
+
+Copper.PreferenceWindowAdapter.openWindow = function() {
+    let preferencesWindow = document.getElementById("preferences-window").parentElement;
+    preferencesWindow.classList.remove("hidden");
+    let buttons = preferencesWindow.getElementsByClassName("close-button");
+    if (buttons.length > 0) buttons[0].focus();  
+};
+
 Copper.PreferenceWindowAdapter.closeWindow = function(){
     let blockScreens = document.getElementById("popup-windows").getElementsByClassName("block_screen");
     for (let i = 0; i < blockScreens.length; i++) {
@@ -71,26 +79,27 @@ Copper.PreferenceWindowAdapter.closeWindow = function(){
 
 Copper.PreferenceWindowAdapter.resetBehavior = function(){
     Copper.Session.updateSettings(new Copper.Settings());
+    Copper.PopupWindowAdapter.openInfoWindow("Behavior Reset", "The behavior was reset.", true);
 };
 
 Copper.PreferenceWindowAdapter.resetPayload = function(){
     Copper.Session.updatePayload(new Copper.Payload());
+    Copper.PopupWindowAdapter.openInfoWindow("Payload Reset", "The payload was reset.", true);
 };
 
 Copper.PreferenceWindowAdapter.resetLayout = function(){
     Copper.Session.updateLayout(new Copper.Layout());
+    Copper.PopupWindowAdapter.openInfoWindow("Layout Reset", "The layout was reset.", true);
 };
 
 Copper.PreferenceWindowAdapter.clearProfilesCache = function(){
-    if (confirm("This will delete the PROFILES cache. Continue?")) {
-        Copper.Session.storageManager.removeProfiles();
-        Copper.Session.updateProfilesSelection(new Copper.Profiles, true);
-    }
+    Copper.Session.storageManager.removeProfiles();
+    Copper.Session.updateProfilesSelection(new Copper.Profiles, true);
+    Copper.PopupWindowAdapter.openInfoWindow("Profile Cache Cleared", "The profile cache was cleared.", true);
 };
 
 Copper.PreferenceWindowAdapter.clearResourceCache = function(){
-    if (confirm("This will delete the RESOURCE cache. Continue?")) {
-        Copper.Session.storageManager.removeResources();
-        Copper.Session.updateResources(new Copper.Resources(), true);
-    }
+    Copper.Session.storageManager.removeResources();
+    Copper.Session.updateResources(new Copper.Resources(), true);
+    Copper.PopupWindowAdapter.openInfoWindow("Resource Cache Cleared", "The resource cache was cleared.", true);
 };
