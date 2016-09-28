@@ -35,15 +35,15 @@
 Copper.PopupWindowAdapter = function(){
 };
 
-Copper.PopupWindowAdapter.openErrorWindow = function(errorTitle, errorMsg, closable) {
-    Copper.PopupWindowAdapter.openPopupWindow(errorTitle, errorMsg, closable, "skin/tool_delete.png");
+Copper.PopupWindowAdapter.openErrorWindow = function(errorTitle, errorMsg, closable, reloadable) {
+    Copper.PopupWindowAdapter.openPopupWindow(errorTitle, errorMsg, closable, reloadable, "skin/tool_delete.png");
 };
 
-Copper.PopupWindowAdapter.openInfoWindow = function(title, msg, closable) {
-    Copper.PopupWindowAdapter.openPopupWindow(title, msg, closable, "skin/tool_discover.png");
+Copper.PopupWindowAdapter.openInfoWindow = function(title, msg, closable, reloadable) {
+    Copper.PopupWindowAdapter.openPopupWindow(title, msg, closable, reloadable, "skin/tool_discover.png");
 };
 
-Copper.PopupWindowAdapter.openPopupWindow = function(title, msg, closable, icon) {
+Copper.PopupWindowAdapter.openPopupWindow = function(title, msg, closable, reloadable, icon) {
     let blockScreen = document.getElementById("copper-overlay-error").parentNode;
     blockScreen.classList.remove("hidden");
     let errorMsgTitleElement = document.getElementById("copper-overlay-error-title");
@@ -53,6 +53,11 @@ Copper.PopupWindowAdapter.openPopupWindow = function(title, msg, closable, icon)
     let iconElement = document.getElementById("copper-overlay-icon");
     iconElement.src = icon;
 
+    let buttons = document.getElementById("copper-overlay-error").getElementsByTagName("BUTTON");
+    for (i=0; i<buttons.length; i++){
+        buttons[i].parentNode.removeChild(buttons[i]);
+    }
+
     if (closable) {
         let exitButton = document.createElement("BUTTON");
         exitButton.textContent = "OK";
@@ -61,7 +66,9 @@ Copper.PopupWindowAdapter.openPopupWindow = function(title, msg, closable, icon)
         exitButton.onclick = function() {
             blockScreen.classList.add("hidden");
         };
-    } else {
+        exitButton.focus();
+
+    } else if (reloadable) {
         let reloadButton = document.createElement("BUTTON");
         reloadButton.textContent = "Reload Page";
         reloadButton.classList.add("copper-error-reload-button");

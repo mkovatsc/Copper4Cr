@@ -151,10 +151,10 @@ Copper.Session.registerClient = function(port){
 
                 break;
             case Copper.Event.TYPE_ERROR_ON_SERVER: 
-                Copper.PopupWindowAdapter.openErrorWindow("Error", "Error " + event.data.errorType + ": " + event.data.errorMessage, false);
+                Copper.PopupWindowAdapter.openErrorWindow("Error", "Error " + event.data.errorType + ": " + event.data.errorMessage, false, true);
                 break;
             default:
-                Copper.PopupWindowAdapter.openErrorWindow("Error: Invalid Event", "Error: Invalid Event", "Received invalid event(" + event.type + ") from app. Please restart the extension.", false);
+                Copper.PopupWindowAdapter.openErrorWindow("Error: Invalid Event", "Error: Invalid Event", "Received invalid event(" + event.type + ") from app. Please restart the extension.", false, true);
                 break;
         }
         return true;
@@ -182,7 +182,7 @@ Copper.Session.showErrorMessage = function(errorNo, errorMessage){
     if (!Number.isInteger(errorNo) || typeof(errorMessage) !== "string"){
         throw new Error("Illegal Arguments");
     }
-    Copper.PopupWindowAdapter.openErrorWindow("Error " + errorNo, errorMessage, false);
+    Copper.PopupWindowAdapter.openErrorWindow("Error " + errorNo, errorMessage, false, true);
 };
 
 Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
@@ -228,7 +228,7 @@ Copper.Session.sendCoapMessage = function(coapMessage, withoutModification){
 Copper.Session.onPortDisconnect = function(){
     Copper.Session.clientEndpoint = undefined;
     Copper.Session.localPort = undefined;
-    Copper.PopupWindowAdapter.openErrorWindow("Connection lost...", "Connection to Copper app lost. Please restart the extension.", false);
+    Copper.PopupWindowAdapter.openErrorWindow("Connection lost...", "Connection to Copper app lost. Please restart the extension.", false, true);
 };
 
 Copper.Session.updateSettings = function(newSettings, skipStoringToProfile) {

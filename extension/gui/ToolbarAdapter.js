@@ -548,22 +548,19 @@ Copper.ToolbarAdapter.chooseFile = function(id) {
 
     // Set menu entry to file name once selected
     input.onchange = function(event) {
-        if (id !== undefined) {
-            Copper.Session.payload.payloadMode = "file";
-        }
-        
         let file = event.target.files[0];
         let reader = new FileReader();
 
         reader.onload = function(event) {
+            if (id !== undefined) {
+                Copper.Session.payload.payloadMode = "file";
+            }
+            let value = input.value.split('\\').pop().split('/').pop();
+            Copper.Session.payload.payloadFileName = value;
             Copper.Session.payload.payloadFileData = reader.result;
             Copper.Session.updatePayload(Copper.Session.payload);
         }
         reader.readAsArrayBuffer(file);
-
-        let value = this.value.split('\\').pop().split('/').pop();
-        Copper.Session.payload.payloadFileName = value;
-        Copper.Session.updatePayload(Copper.Session.payload);
     }
     input.click();
 };
@@ -595,6 +592,5 @@ Copper.ToolbarAdapter.doLog = function(event) {
 };
 
 Copper.ToolbarAdapter.openPreferences = function() {
-    var preferencesWindow = document.getElementById("preferences-window").parentElement;
-    preferencesWindow.classList.remove("hidden");
+    Copper.PreferenceWindowAdapter.openWindow();
 };

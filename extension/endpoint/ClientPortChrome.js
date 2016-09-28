@@ -45,7 +45,7 @@ Copper.ClientPort.connect = function(clientId, finalDisconnectHandler, callback)
         }
         callback(port);
 	};
-    let firstTimeout = Copper.TimeUtils.setTimeout(connectedCallback, 400);
+    let firstTimeout = Copper.TimeUtils.setTimeout(connectedCallback, 600);
 
     port.registerDisconnectCallback(function(){
         // app not started
