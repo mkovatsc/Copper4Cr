@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2016, Institute for Pervasive Computing, ETH Zurich.
  * All rights reserved.
  * 
@@ -31,10 +31,10 @@
 {
 "update_url": "https://clients2.google.com/service/update2/crx",
 
-  "name": "Copper Extension",
+  "name": "Copper (Cu4Cr) Extension",
   "manifest_version": 2,
-  "version": "0.0.1",
-  "description": "Talk to coap servers",
+  "version": "0.1.0",
+  "description": "Copper (Cu4Cr) CoAP user-agent for Chrome",
   "icons": {
     "16":  "skin/Cu_16.png",
     "24":  "skin/Cu_24.png",
