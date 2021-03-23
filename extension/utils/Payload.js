@@ -45,7 +45,10 @@ Copper.Payload.prototype.clone = function(){
 };
 
 Copper.Payload.prototype.addPayloadToCoapMessage = function(coapMessage, useUtf8, setContentType){
-	if (Copper.CoapMessage.Code.POST.equals(coapMessage.code) || Copper.CoapMessage.Code.PUT.equals(coapMessage.code)){
+	if (Copper.CoapMessage.Code.POST.equals(coapMessage.code)
+		|| Copper.CoapMessage.Code.PUT.equals(coapMessage.code)
+		|| Copper.CoapMessage.Code.PATCH.equals(coapMessage.code)
+		|| Copper.CoapMessage.Code.iPATCH.equals(coapMessage.code)){
 		if (this.payloadMode === "text"){
 			if (setContentType && !coapMessage.isOptionSet(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT)){
 				coapMessage.addOption(Copper.CoapMessage.OptionHeader.CONTENT_FORMAT, Copper.CoapMessage.ContentFormat.CONTENT_TYPE_TEXT_PLAIN.number);

@@ -99,6 +99,9 @@ Copper.CoapMessage.Code.GET = new Copper.CoapMessage.Code(1, "GET");
 Copper.CoapMessage.Code.POST = new Copper.CoapMessage.Code(2, "POST");
 Copper.CoapMessage.Code.PUT = new Copper.CoapMessage.Code(3, "PUT");
 Copper.CoapMessage.Code.DELETE = new Copper.CoapMessage.Code(4, "DELETE");
+Copper.CoapMessage.Code.FETCH = new Copper.CoapMessage.Code(5, "FETCH");
+Copper.CoapMessage.Code.PATCH = new Copper.CoapMessage.Code(6, "PATCH");
+Copper.CoapMessage.Code.iPATCH = new Copper.CoapMessage.Code(7, "iPATCH");
 
 /* Success Codes */
 Copper.CoapMessage.Code._UNKNOWN_SUCCESS_CODE = new Copper.CoapMessage.Code(64, "Success (Unknown Code)"); // 2.00 is undefined -- only used to identify class
@@ -136,6 +139,9 @@ Copper.CoapMessage.Code.Registry = [
 	Copper.CoapMessage.Code.POST,
 	Copper.CoapMessage.Code.PUT,
 	Copper.CoapMessage.Code.DELETE,
+	Copper.CoapMessage.Code.FETCH,
+	Copper.CoapMessage.Code.PATCH,
+	Copper.CoapMessage.Code.iPATCH,
 
 	Copper.CoapMessage.Code._UNKNOWN_SUCCESS_CODE,
 	Copper.CoapMessage.Code.CREATED,

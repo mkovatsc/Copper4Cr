@@ -46,8 +46,11 @@ Copper.ToolbarAdapter.beforeSessionInitialization = function(){
 	document.getElementById("copper-toolbar-ping").onclick = Copper.ToolbarAdapter.doPing;
 	document.getElementById("copper-toolbar-discover").onclick = Copper.ToolbarAdapter.doDiscover;
 	document.getElementById("copper-toolbar-get").onclick = Copper.ToolbarAdapter.doGet;
+	document.getElementById("copper-toolbar-fetch").onclick = Copper.ToolbarAdapter.doFetch;
 	document.getElementById("copper-toolbar-post").onclick = Copper.ToolbarAdapter.doPost;
 	document.getElementById("copper-toolbar-put").onclick = Copper.ToolbarAdapter.doPut;
+	document.getElementById("copper-toolbar-patch").onclick = Copper.ToolbarAdapter.doPatch;
+	document.getElementById("copper-toolbar-ipatch").onclick = Copper.ToolbarAdapter.doIPatch;
 	document.getElementById("copper-toolbar-delete").onclick = Copper.ToolbarAdapter.doDelete;
 	document.getElementById("copper-toolbar-observe").onclick = Copper.ToolbarAdapter.doObserve;
 	document.getElementById("copper-toolbar-payload-mode-text").onclick = Copper.ToolbarAdapter.payloadModeText;
@@ -263,6 +266,12 @@ Copper.ToolbarAdapter.doGet = function(){
 	Copper.Session.sendCoapMessage(coapMessage);
 };
 
+Copper.ToolbarAdapter.doFetch = function(){
+    Copper.ToolbarLoggerAdapter.addLogEntry("Do FETCH", true);
+    let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.FETCH);
+	Copper.Session.sendCoapMessage(coapMessage);
+};
+
 Copper.ToolbarAdapter.doPost = function(){
     Copper.ToolbarLoggerAdapter.addLogEntry("Do POST", true);
     let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.POST);
@@ -272,6 +281,18 @@ Copper.ToolbarAdapter.doPost = function(){
 Copper.ToolbarAdapter.doPut = function(){
     Copper.ToolbarLoggerAdapter.addLogEntry("Do PUT", true);
     let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.PUT);
+	Copper.Session.sendCoapMessage(coapMessage);
+};
+
+Copper.ToolbarAdapter.doPatch = function(){
+    Copper.ToolbarLoggerAdapter.addLogEntry("Do PATCH", true);
+    let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.PATCH);
+	Copper.Session.sendCoapMessage(coapMessage);
+};
+
+Copper.ToolbarAdapter.doIPatch = function(){
+    Copper.ToolbarLoggerAdapter.addLogEntry("Do iPATCH", true);
+    let coapMessage = new Copper.CoapMessage(Copper.CoapMessage.Type.getType(Copper.Session.settings.requests), Copper.CoapMessage.Code.iPATCH);
 	Copper.Session.sendCoapMessage(coapMessage);
 };
 
