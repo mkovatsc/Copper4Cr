@@ -119,10 +119,10 @@ Copper.StringUtils.parseUri = function(rawUri){
 			result["port"] = parseInt(parser.port);
 		}
 		if (typeof(parser.pathname) === "string" && parser.pathname.length > 1){
-			result["path"] = parser.pathname.substring(1);
+			result["path"] = decodeURIComponent(parser.pathname.substring(1));
 		}
 		if (typeof(parser.search) === "string"  && parser.search.length > 1){
-			result["query"] = parser.search.substring(1);
+			result["query"] = decodeURIComponent(parser.search.substring(1));
 		}
 		return result;
 	}
