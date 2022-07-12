@@ -38,7 +38,7 @@ Copper.ClientPort = function(){
 Copper.ClientPort.connect = function(clientId, finalDisconnectHandler, callback){
 	
 	// UPDATE with value from chrome://extensions/
-	let appId = "olkcgjkdhadideeemhnfbihnbmbpfjnd";
+	let appId = "pkoikaedgcjcfcdlfbilalpcopndoeod";
 	
 	let port = new Copper.Port(chrome.runtime.connect(appId), clientId);
 

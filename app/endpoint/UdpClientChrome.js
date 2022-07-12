@@ -45,7 +45,8 @@ Copper.UdpClient.prototype.onReceiveCallback = undefined;
 Copper.UdpClient.prototype.onReceiveErrorCallback = undefined;
 
 /* SocketId (set while socket is bind) */
-Copper.UdpClient.prototype.socketId = undefined;
+Copper.UdpClient.prototype.socket4 = undefined;
+Copper.UdpClient.prototype.socket6 = undefined;
 
 /* Binds the socket to a local port. Calls onBind function once the socket is bound.
 *  @arg function onBind(boolean socketReady, int port, string errorMsg)
@@ -59,31 +60,49 @@ Copper.UdpClient.prototype.bind = function(onBind, onReceive, onReceiveError){
 
 	let thisRef = this;
 
-	chrome.sockets.udp.create(null, function(createInfo){
-		thisRef.socketId = createInfo.socketId;
-		
-		chrome.sockets.udp.bind(thisRef.socketId, "0.0.0.0", 0, function(resultCode){
-			if (resultCode >= 0){
-				thisRef.onReceiveCallback = onReceive;
-				thisRef.onReceiveErrorCallback = onReceiveError;
-				chrome.sockets.udp.onReceive.addListener(function(info){
-					thisRef.onReceive(info);
-				});
-				chrome.sockets.udp.onReceiveError.addListener(function(info){
-					thisRef.onReceiveError(info);
-				});
+	thisRef.onReceiveCallback = onReceive;
+	thisRef.onReceiveErrorCallback = onReceiveError;
 
-				chrome.sockets.udp.getInfo(thisRef.socketId, function(socketInfo){
+	chrome.sockets.udp.onReceive.addListener(function(info){
+		thisRef.onReceive(info);
+	});
+	chrome.sockets.udp.onReceiveError.addListener(function(info){
+		thisRef.onReceiveError(info);
+	});
+
+	// IPv4
+	chrome.sockets.udp.create(null, function(createInfo){
+		thisRef.socket4 = createInfo.socketId;
+		
+		chrome.sockets.udp.bind(thisRef.socket4, "0.0.0.0", 0, function(resultCode){
+			if (resultCode >= 0){
+				chrome.sockets.udp.getInfo(thisRef.socket4, function(socketInfo){
 					onBind(socketInfo.localPort > 0, socketInfo.localPort, undefined);
 				});
-			}
-			else {
+			} else {
 				let errorMsg = Copper.UdpClient.getLastError(sendInfo.resultCode);
-				Copper.Log.logError(errorMsg + " while binding the udp socket.");
+				Copper.Log.logError(errorMsg + " while binding IPv4 socket.");
 				onBind(false, 0, errorMsg);
 			}
 		});
 	});
+	// IPv6
+	chrome.sockets.udp.create(null, function(createInfo){
+		thisRef.socket6 = createInfo.socketId;
+		
+		chrome.sockets.udp.bind(thisRef.socket6, "::0", 0, function(resultCode){
+			if (resultCode >= 0){
+				chrome.sockets.udp.getInfo(thisRef.socket6, function(socketInfo){
+					onBind(socketInfo.localPort > 0, socketInfo.localPort, undefined);
+				});
+			} else {
+				let errorMsg = Copper.UdpClient.getLastError(sendInfo.resultCode);
+				Copper.Log.logError(errorMsg + " while binding IPv6 socket.");
+				onBind(false, 0, errorMsg);
+			}
+		});
+	});
+
 };
 
 /**
@@ -95,20 +114,26 @@ Copper.UdpClient.prototype.send = function(datagram, remoteAddress, remotePort, 
 	if (!(datagram instanceof ArrayBuffer) || typeof(remoteAddress) !== "string" || !Number.isInteger(remotePort) || remotePort <= 0x0 || remotePort > 0xFFFF){
 		throw new Error("Illegal Arguments");
 	}
-	if (this.socketId === undefined){
-		throw new Error("Socket not bound");
+	if (remoteAddress.startsWith('[')){
+		if (this.socket6 === undefined) throw new Error("IPv6 Socket not bound");
+		actualSocket = this.socket6;
+		actualAddress = remoteAddress.substring(1, remoteAddress.length-1);
+		actualQueryType = "ipv6";
+	} else {
+		if (this.socket4 === undefined) throw new Error("IPv4 Socket not bound");
+		actualSocket = this.socket4;
+		actualAddress = remoteAddress;
+		actualQueryType = "ipv4";
 	}
-	let thisRef = this;
-	chrome.sockets.udp.send(this.socketId, datagram, remoteAddress, remotePort, function(sendInfo) {
+	chrome.sockets.udp.send(actualSocket, datagram, actualAddress, remotePort, dnsQueryType=actualQueryType, function(sendInfo) {
 		if (sendInfo.resultCode < 0){
 			let errorMsg = Copper.UdpClient.getLastError(sendInfo.resultCode);
-			Copper.Log.logError(errorMsg + " while sending data on udp socket.");
-			chrome.sockets.udp.getInfo(thisRef.socketId, function(socketInfo){
+			Copper.Log.logError(errorMsg + " while sending to " + actualAddress + ":" + remotePort);
+			chrome.sockets.udp.getInfo(actualSocket, function(socketInfo){
 				if (onSent !== undefined) onSent(false, 0, socketInfo.localPort > 0, errorMsg);
 			});
-		}
-		else {
-			Copper.Log.logInfo("Sent " + sendInfo.bytesSent + " bytes to " + remoteAddress + ":" + remotePort);	
+		} else {
+			Copper.Log.logInfo("Sent " + sendInfo.bytesSent + " bytes via " + actualQueryType + " to " + remoteAddress + ":" + remotePort);	
 			if (onSent !== undefined) onSent(true, sendInfo.bytesSent, true, undefined);
 		}
 	});
@@ -116,9 +141,17 @@ Copper.UdpClient.prototype.send = function(datagram, remoteAddress, remotePort, 
 
 /* Closes the socket, releases resources */
 Copper.UdpClient.prototype.close = function() {
-	if (this.socketId !== undefined){
-		let tmpSocketId = this.socketId;
-		this.socketId = undefined;
+	if (this.socket4 !== undefined){
+		let tmpSocketId = this.socket4;
+		this.socket4 = undefined;
+		try {
+			chrome.sockets.udp.close(tmpSocketId);
+		} catch (exception) {
+		}
+	}
+	if (this.socket6 !== undefined){
+		let tmpSocketId = this.socket6;
+		this.socket6 = undefined;
 		try {
 			chrome.sockets.udp.close(tmpSocketId);
 		} catch (exception) {
@@ -133,18 +166,24 @@ Copper.UdpClient.getLastError = function(resultCode){
 };
 
 Copper.UdpClient.prototype.onReceive = function(info){
-	if (info.socketId === this.socketId){
+	if (info.socketId === this.socket4 || info.socketId === this.socket6) {
 		Copper.Log.logInfo("Received " + info.data.byteLength + " bytes from " + info.remoteAddress + ":" + info.remotePort);
 		this.onReceiveCallback(info.data, info.remoteAddress, info.remotePort);
 	}
 };
 
 Copper.UdpClient.prototype.onReceiveError = function(info){
-	if (info.socketId === this.socketId){
-		let errorMsg = Copper.UdpClient.getLastError(info.resultCode);
-		Copper.Log.logError(errorMsg + " while receiving data on udp socket.");
-		let thisRef = this;
-		chrome.sockets.udp.getInfo(this.socketId, function(socketInfo){
+	let errorMsg = Copper.UdpClient.getLastError(info.resultCode);
+	let thisRef = this;
+	if (info.socketId === this.socket4){
+		Copper.Log.logError(errorMsg + " while receiving data on IPv4 socket.");
+		chrome.sockets.udp.getInfo(this.socket4, function(socketInfo){
+			thisRef.onReceiveErrorCallback(socketInfo.localPort > 0, errorMsg);
+		});
+	}
+	if (info.socketId === this.socket6){
+		Copper.Log.logError(errorMsg + " while receiving data on IPv6 socket.");
+		chrome.sockets.udp.getInfo(this.socket6, function(socketInfo){
 			thisRef.onReceiveErrorCallback(socketInfo.localPort > 0, errorMsg);
 		});
 	}
