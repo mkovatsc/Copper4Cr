@@ -177,12 +177,12 @@ Copper.CoapMessageSerializer.serializeOption = function(serMsg, offset, optDelta
 	serMsg[offset] = deltaNibble << 4 | valNibble;
 	if (deltaNibble >= 13) {
 		let buf = Copper.CoapMessageSerializer.encodeOptExtend(optDelta);
-		serMsg.set(new Uint8Array(buf), offset+resSz);
+		serMsg.set(buf, offset+resSz);
 		resSz += buf.byteLength;
 	}
 	if (valNibble >= 13) {
 		let buf = Copper.CoapMessageSerializer.encodeOptExtend(optValSize);
-		serMsg.set(new Uint8Array(buf), offset+resSz);
+		serMsg.set(buf, offset+resSz);
 		resSz += buf.byteLength;
 	}
 	serMsg.set(new Uint8Array(optVal), offset+resSz);
