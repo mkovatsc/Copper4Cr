@@ -175,21 +175,37 @@ Copper.CoapMessageSerializer.serializeOption = function(serMsg, offset, optDelta
 	let valNibble = (optValSize < 13) ? optValSize : (optValSize <= (0xFF+13) ? 13 : 14);
 	let resSz = 1;
 	serMsg[offset] = deltaNibble << 4 | valNibble;
-	let resDelta = optDelta - deltaNibble;
-	if (resDelta > 0){
-		let buf = Copper.ByteUtils.convertUintToBytes(resDelta);
+	if (deltaNibble >= 13) {
+		let buf = Copper.CoapMessageSerializer.encodeOptExtend(optDelta);
 		serMsg.set(new Uint8Array(buf), offset+resSz);
 		resSz += buf.byteLength;
 	}
-	let resValSize = optValSize - valNibble;
-	if (resValSize > 0){
-		let buf = Copper.ByteUtils.convertUintToBytes(resValSize);
+	if (valNibble >= 13) {
+		let buf = Copper.CoapMessageSerializer.encodeOptExtend(optValSize);
 		serMsg.set(new Uint8Array(buf), offset+resSz);
 		resSz += buf.byteLength;
 	}
 	serMsg.set(new Uint8Array(optVal), offset+resSz);
 	return resSz + optValSize;
 };
+
+// caculate opt_extended_array from opt_Val
+Copper.CoapMessageSerializer.encodeOptExtend = function (val) {
+	let nibble = (val < 13) ? val : (val <= (0xFF + 13) ? 13 : 14);
+	let res = val - (nibble == 14 ? 0xff+14 : nibble);
+	let buf;
+	if (nibble == 13) {
+		buf = new Uint8Array(1);
+		buf[0] = res & 0xff;
+	} else if (nibble == 14) {
+		buf = new Uint8Array(2);
+		buf[0] = res >>> 8;
+		buf[1] = res & 0xff;
+	} else {
+		throw new Error("Illegal Arguments");
+	}
+	return buf;
+}
 
 /**
 * calculates the size of the serialized representation of a option
