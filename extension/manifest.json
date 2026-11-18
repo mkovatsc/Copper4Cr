@@ -29,11 +29,10 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
 {
-"update_url": "https://clients2.google.com/service/update2/crx",
+  "manifest_version": 3,
 
   "name": "Copper (Cu4Cr) Extension",
-  "manifest_version": 2,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Copper (Cu4Cr) CoAP user-agent for Chrome",
   "icons": {
     "16":  "skin/Cu_16.png",
@@ -43,16 +42,21 @@
     "128": "skin/Cu_64.png"
   },
 
-  "browser_action": {
-    "default_icon": "skin/Cu_32.png"
+  "action": {
+    "default_icon": "skin/Cu_32.png",
+    "default_title": "Copper (Cu4Cr)"
   },
 
-  "background":{
-      "scripts": [   
-                     // launches the extension with click on action button
-                     "background.js" 
-               ]
+  "background": {
+    "service_worker": "background.js"
   },
 
-  "permissions": [ "tabs", "management", "storage"]
+  "permissions": [ "storage", "nativeMessaging" ],
+
+  "web_accessible_resources": [
+    {
+      "resources": ["index.html", "skin/*", "css/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }

@@ -66,6 +66,19 @@
 
 	<script src="shared/endpoint/Port.js"></script>
 
+	<!-- CoAP Server Endpoint (integrated from Chrome App) -->
+	<script src="coap_server/UdpClient.js"></script>
+	<script src="coap_server/request/receiver/BlockwiseReceiver.js"></script>
+	<script src="coap_server/request/receiver/SingleReceiver.js"></script>
+	<script src="coap_server/request/sender/BlockwiseSender.js"></script>
+	<script src="coap_server/request/sender/ObserveSender.js"></script>
+	<script src="coap_server/request/SingleRequestHandler.js"></script>
+	<script src="coap_server/transmission/RequestMessageTransmission.js"></script>
+	<script src="coap_server/transmission/ResponseMessageTransmission.js"></script>
+	<script src="coap_server/transmission/MessagesInTransmissionSet.js"></script>
+	<script src="coap_server/transmission/TransmissionHandler.js"></script>
+	<script src="coap_server/ServerEndpoint.js"></script>
+
 	<script src="utils/Storage.js"></script>
 	<script src="utils/StorageManager.js"></script>
 	<script src="utils/Options.js"></script>
@@ -97,6 +110,7 @@
 	<script src="Session.js"></script>
 
 	<!-- Chrome Specific Overloads -->
+	<script src="coap_server/UdpClientChrome.js"></script>
 	<script src="shared/endpoint/PortChrome.js"></script>
 	<script src="utils/StorageChrome.js"></script>
 	<script src="endpoint/CoapResourceHandlerChrome.js"></script>
