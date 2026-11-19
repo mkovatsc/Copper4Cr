@@ -1,7 +1,9 @@
 Copper for Chrome (Cu<sub>4</sub>Cr) CoAP user-agent
 ====================================================
 
-<!-- 语言切换 / Language Switch: [中文](#) | [English](README.md) -->
+<p align="right">
+  <a href="./README.md">English</a> | <a href="./README.zh-CN.md">中文</a>
+</p>
 
 实现了 [RFC7252](http://tools.ietf.org/html/rfc7252) 协议的 CoAP 调试工具
 
@@ -64,6 +66,12 @@ Copper (Cu) 是一个 CoAP (Constrained Application Protocol) 用户代理，可
    ```
 
    宿主发布到 `native_host/Copper4Cr.NativeHost/bin/Release/net8.0/win-x64/publish/` 或 `.../linux-x64/publish/`。安装后不要移动宿主；如需移动，请在新位置重新执行安装命令。
+
+   > **已提供预编译包**：预编译好的压缩包已放在 [Releases](https://github.com/mcuxmx/Copper4Cr/releases) 页面，可直接跳过上面的构建步骤：下载对应平台的压缩包并解压即可使用。Linux 下解压后需要先给宿主添加执行权限：
+   > ```bash
+   > chmod +x Copper4Cr.NativeHost
+   > ```
+   > 解压位置可自行选择，请相应调整第 5 步及卸载命令中的路径；执行 `--install` 后不要再移动宿主。
 
 4. **加载扩展并复制扩展 ID**
 

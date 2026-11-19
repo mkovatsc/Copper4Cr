@@ -1,7 +1,9 @@
 Copper for Chrome (Cu<sub>4</sub>Cr) CoAP user-agent
 ====================================================
 
-<!-- Language Switch: [中文](README.zh-CN.md) | [English](#) -->
+<p align="right">
+  <a href="./README.md">English</a> | <a href="./README.zh-CN.md">中文</a>
+</p>
 
 A CoAP debugging tool implementing [RFC7252](http://tools.ietf.org/html/rfc7252)
 
@@ -64,6 +66,12 @@ This repository ([mcuxmx/Copper4Cr](https://github.com/mcuxmx/Copper4Cr)) is a f
    ```
 
    Output goes to `native_host/Copper4Cr.NativeHost/bin/Release/net8.0/win-x64/publish/` or `.../linux-x64/publish/`. Do not move the host after installation. If you move it, run the install command again from its new location.
+
+   > **Prebuilt package available**: precompiled archives are attached to the [Releases](https://github.com/mcuxmx/Copper4Cr/releases) page, so you can skip the build above: download the archive for your platform, extract it, and continue with the remaining steps. On Linux, make sure the extracted host is executable before installing:
+   > ```bash
+   > chmod +x Copper4Cr.NativeHost
+   > ```
+   > Place the extracted files wherever you prefer, adjust the paths in steps 5 and in the uninstall command accordingly, and do not move the host after running `--install`.
 
 4. **Load the extension and copy its ID**
 
