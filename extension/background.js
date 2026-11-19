@@ -1,4 +1,4 @@
-﻿/*******************************************************************************
+/*******************************************************************************
  * Copyright (c) 2016, Institute for Pervasive Computing, ETH Zurich.
  * All rights reserved.
  * 
@@ -29,9 +29,22 @@
  * This file is part of the Copper (Cu) CoAP user-agent.
  ******************************************************************************/
  
-﻿/*
+/*
 * Adds action to the toolbar button
+* Migrated from browserAction to action for Manifest V3
 */
-chrome.browserAction.onClicked.addListener(function(tab) {
-  chrome.tabs.create({url: chrome.extension.getURL('index.html')});
+chrome.action.onClicked.addListener(function(tab) {
+  chrome.tabs.create({url: chrome.runtime.getURL('index.html')});
+});
+
+// Debug: test if chrome.sockets.udp is available in service worker context
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.type === 'test-apis') {
+    sendResponse({
+      sockets: typeof chrome.sockets,
+      udp: typeof chrome?.sockets?.udp,
+      storage: typeof chrome?.storage,
+      runtime: typeof chrome?.runtime
+    });
+  }
 });

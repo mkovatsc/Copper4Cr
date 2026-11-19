@@ -30,17 +30,39 @@
  ******************************************************************************/
 
 /*
-* Implementation of the ClientPort API for chrome
+* Implementation of the ClientPort API for Chrome Extension (Manifest V3).
+* 
+* This replaces the previous architecture that required a separate Chrome App
+* with chrome.runtime.connect(). Now the ServerEndpoint runs directly within 
+* the extension context using LocalPort for internal message passing.
 */
-Copper.ClientPort = function(){
-};
+
+Copper.ClientPort._serverEndpoint = undefined;
+Copper.ClientPort._clientCopperPort = undefined;
+Copper.ClientPort._portId = 1;
 
 Copper.ClientPort.connect = function(clientId, finalDisconnectHandler, callback){
 	
-	// UPDATE with value from chrome://extensions/
-	let appId = "pkoikaedgcjcfcdlfbilalpcopndoeod";
+	// Check if the ServerEndpoint is already created
+	if (Copper.ClientPort._serverEndpoint === undefined){
+		Copper.Log.logFine("Creating ServerEndpoint directly in extension (Manifest V3 mode)");
+		
+		// Create a LocalPort that acts as a two-ended pipe
+		Copper.ClientPort._portId++;
+		let localPort = new Copper.LocalPort(Copper.ClientPort._portId);
+		
+		// Create the ServerEndpoint using one end of the LocalPort.
+		// ServerEndpoint expects a Copper.Port wrapper (provides registerDisconnectCallback).
+		let serverEndPort = localPort.createServerEnd();
+		let wrappedServerPort = new Copper.Port(serverEndPort, Copper.ClientPort._portId);
+		Copper.ClientPort._serverEndpoint = new Copper.ServerEndpoint(wrappedServerPort, Copper.ClientPort._portId);
+		
+		// The ClientEndpoint will use the other end of the LocalPort
+		let clientEndPort = localPort.createClientEnd();
+		Copper.ClientPort._clientCopperPort = clientEndPort;
+	}
 	
-	let port = new Copper.Port(chrome.runtime.connect(appId), clientId);
+	let port = new Copper.Port(Copper.ClientPort._clientCopperPort, clientId);
 
 	let connectedCallback = function(){
         if (port !== undefined){
@@ -48,21 +70,98 @@ Copper.ClientPort.connect = function(clientId, finalDisconnectHandler, callback)
         }
         callback(port);
 	};
-    let firstTimeout = Copper.TimeUtils.setTimeout(connectedCallback, 600);
+	
+	connectedCallback();
+};
 
-    port.registerDisconnectCallback(function(){
-        // app not started
-        Copper.Log.logFine("Starting application");
-        Copper.TimeUtils.clearTimeout(firstTimeout);
-        let secondTimeout = Copper.TimeUtils.setTimeout(connectedCallback, 750)
-        Copper.PopupWindowAdapter.openInfoWindow("Starting...", "Try to start the Copper Application", false);
-        chrome.management.launchApp(appId, function(){
-            port = new Copper.Port(chrome.runtime.connect(appId), clientId);
-            port.registerDisconnectCallback(function(){
-                // app was not started
-                Copper.TimeUtils.clearTimeout(secondTimeout);
-                Copper.PopupWindowAdapter.openErrorWindow("Copper App not installed", "This extension needs the Copper application to send Coap-Messages. Please install the app (<a href=\"https://chrome.google.com/webstore/detail/" + appId + "\">Chrome Web Store</a>) and reload.", false);
-            });
-        });
-    });
+
+/*******************************************************************************
+ * Copper.LocalPort - A local port implementation for same-context message passing.
+ * 
+ * This replaces chrome.runtime.Port which was used to communicate with the 
+ * separate Chrome App. LocalPort creates two "ends" - one for the ServerEndpoint 
+ * and one for the ClientEndpoint. Messages sent from one end go ONLY to the other.
+ * 
+ * Architecture:
+ *   LocalPort
+ *   ├── serverEnd.postMessage → triggers clientEnd's onMessage listener
+ *   └── clientEnd.postMessage → triggers serverEnd's onMessage listener
+ ******************************************************************************/
+
+Copper.LocalPort = function(id){
+	this.id = id;
+	this._serverListener = null;
+	this._clientListener = null;
+	this._disconnectListeners = [];
+};
+
+// Create the Server side of the port (used by ServerEndpoint's Copper.Port wrapper)
+Copper.LocalPort.prototype.createServerEnd = function(){
+	let thisRef = this;
+	return {
+		id: this.id,
+		postMessage: function(msg){
+			if (thisRef._clientListener){
+				try { thisRef._clientListener(msg); } catch(e) {
+					if (typeof Copper !== 'undefined' && Copper.Log){
+						Copper.Log.logError("ServerEnd postMessage error: " + e.message);
+					}
+				}
+			}
+		},
+		onMessage: {
+			addListener: function(callback){
+				thisRef._serverListener = callback;
+			}
+		},
+		onDisconnect: {
+			addListener: function(callback){
+				thisRef._disconnectListeners.push(callback);
+			}
+		},
+		disconnect: function(){
+			thisRef._serverListener = null;
+			thisRef.disconnectAll();
+		}
+	};
+};
+
+// Create the Client side of the port (used by ClientEndpoint's Copper.Port wrapper)
+Copper.LocalPort.prototype.createClientEnd = function(){
+	let thisRef = this;
+	return {
+		id: this.id,
+		postMessage: function(msg){
+			if (thisRef._serverListener){
+				try { thisRef._serverListener(msg); } catch(e) {
+					if (typeof Copper !== 'undefined' && Copper.Log){
+						Copper.Log.logError("ClientEnd postMessage error: " + e.message);
+					}
+				}
+			}
+		},
+		onMessage: {
+			addListener: function(callback){
+				thisRef._clientListener = callback;
+			}
+		},
+		onDisconnect: {
+			addListener: function(callback){
+				thisRef._disconnectListeners.push(callback);
+			}
+		},
+		disconnect: function(){
+			thisRef._clientListener = null;
+			thisRef.disconnectAll();
+		}
+	};
+};
+
+Copper.LocalPort.prototype.disconnectAll = function(){
+	for (let i = 0; i < this._disconnectListeners.length; i++){
+		try { this._disconnectListeners[i](); } catch(e) {}
+	}
+	this._disconnectListeners = [];
+	this._serverListener = null;
+	this._clientListener = null;
 };
